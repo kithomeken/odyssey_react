@@ -6,6 +6,8 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Sanctum } from 'react-sanctum'
 import axios from 'axios'
 
+import SignIn from './views/authentication/SignIn'
+
 interface GuestRouteInterface {
     path: string;
     component: any;
@@ -13,7 +15,7 @@ interface GuestRouteInterface {
 }
 
 const guestRoutes: Array<GuestRouteInterface> = [
-    
+    { path: "/auth/sign-in", component: SignIn, exact: true },
 ];
 
 const sanctumConfig = {
