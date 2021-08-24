@@ -35,7 +35,7 @@ protectedRoutes = temporaryRoutes.concat(
 );    
 
 const sanctumConfig = {
-    apiUrl: "https://project-0.kennedykitho.me/",
+    apiUrl: "https://project-0.kennedykitho.me",
     csrfCookieRoute: "sanctum/csrf-cookie",
     signInRoute: "api/auth/account/agent/authenticate",
     signOutRoute: "api/auth/account/agent/w-token/invalidate",
