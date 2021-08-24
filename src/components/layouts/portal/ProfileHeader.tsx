@@ -2,16 +2,16 @@ import React, {Component} from "react"
 import {Popover, Transition} from '@headlessui/react'
 
 class ProfileHeader extends Component {
-    classNames(...classes) {
-        return classes.filter(Boolean).join(' ')
-    }
+    // classNames(...classes) {
+    //     return classes.filter(Boolean).join(' ')
+    // }
 
     render() {
         return (
             <Popover className="relative mr-3">
                 {({ open }) => (
                     <>
-                        <Popover.Button className={
+                        {/* <Popover.Button className={
                             this.classNames(
                                 open ? 'text-gray-900 bg-gray-200' : 'text-gray-500',
                                 'group bg-white rounded-md w-auto px-2 h-9 items-center justify-center inline-flex text-base font-medium hover:text-gray-900 focus:outline-none'
@@ -20,7 +20,7 @@ class ProfileHeader extends Component {
                             <img className="h-8 w-8 rounded-full mr-1" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80" alt="" />
                             <span className="text-sm ml-2">Kennedy Kithome</span>
 
-                        </Popover.Button>
+                        </Popover.Button> */}
 
                         <Transition
                             show={open}
