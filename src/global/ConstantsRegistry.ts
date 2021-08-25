@@ -1,6 +1,6 @@
 class ConstantsRegistry {
     cookieNameForAccessToken() {
-        return '_ac.tx'
+        return '_actxn'
     }
 }
 
