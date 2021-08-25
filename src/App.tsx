@@ -20,6 +20,7 @@ import HttpServices from './services/HttpServices'
 import SignIn from './views/authentication/SignIn'
 import FromIndexToHome from './Redirects/FromIndexToHome'
 import Home from './views/Home'
+import PasswordRecover from './views/authentication/PasswordRecovery'
 
 interface GuestRouteInterface {
     path: string;
@@ -29,6 +30,7 @@ interface GuestRouteInterface {
 
 const guestRoutes: Array<GuestRouteInterface> = [
     { path: "/auth/sign-in", component: SignIn, exact: true },
+    { path: "/auth/password-recovery", component: PasswordRecover, exact: true },
 ]
 
 const temporaryRoutes = [
