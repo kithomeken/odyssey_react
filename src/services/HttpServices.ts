@@ -8,13 +8,9 @@ class HttpServices {
     protected decryptAccessTokenCookie() {
         const cookieNameForAccessToken = ConstantsRegistry.cookieNameForAccessToken()
         const cipherText = CookieService.get(cookieNameForAccessToken)
-        let accessToken = null
-
-        if (cipherText != null) {
-            accessToken = Crypto.decryptDataUsingAES256(cipherText)
-        }
-
-        return accessToken
+        return (cipherText != null) 
+            ? Crypto.decryptDataUsingAES256(cipherText) 
+            : null
     }
 
     async httpGet(url: string) {
