@@ -184,7 +184,7 @@ class SignIn extends Component<RouteComponentProps> {
                                     })}/>
 
                                     {errors.password.length > 0 && 
-                                        <span className='invalid-feedback font-small text-red-600 font-bold pl-3'>
+                                        <span className='invalid-feedback font-small text-red-600 pl-3'>
                                             {errors.password}
                                         </span>
                                     }
