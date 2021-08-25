@@ -1,13 +1,15 @@
 import thunk from 'redux-thunk'
 import { Provider } from 'react-redux'
-import React, { Component } from 'react'
+import { Component } from 'react'
 import { createStore, applyMiddleware } from 'redux'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Sanctum } from 'react-sanctum'
 import axios from 'axios'
 
+// Modules
 import Reducer from './store/Reducers'
 import { ProtectedRoutes } from './components/router/ProtectedRoutes'
+import HttpServices from './services/HttpServices'
 
 // Components
 import SignIn from './views/authentication/SignIn'
@@ -28,11 +30,17 @@ const temporaryRoutes = [
     { path: "/", component: FromIndexToHome, exact: true, activeMenu: 'Y' },
     { path: "/home", component: Home, exact: true, activeMenu: 'Y' },
 ]
+
 const store = createStore(Reducer, applyMiddleware(thunk))
 let protectedRoutes: Array<any> = []
 
 protectedRoutes = temporaryRoutes.concat(
-);    
+);  
+
+const headers = HttpServices.axiosInstanceHeaders()
+const instance = axios.create({
+    headers
+});
 
 const sanctumConfig = {
     apiUrl: "https://project-0.kennedykitho.me",
@@ -40,7 +48,7 @@ const sanctumConfig = {
     signInRoute: "api/auth/account/agent/authenticate",
     signOutRoute: "api/auth/account/agent/w-token/invalidate",
     userObjectRoute: "api/user",
-    // axiosInstance: instance,
+    axiosInstance: instance,
 };
 
 export default class App extends Component {
