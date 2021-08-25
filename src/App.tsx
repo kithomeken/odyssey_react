@@ -6,6 +6,11 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import { Sanctum } from 'react-sanctum'
 import axios from 'axios'
 
+// Styles
+import './assets/css/tailwind.css'
+import './assets/css/cuba.odyssey.css'
+import './assets/icons/fontawesome_pro/css/all.css'
+
 // Modules
 import Reducer from './store/Reducers'
 import { ProtectedRoutes } from './components/router/ProtectedRoutes'
