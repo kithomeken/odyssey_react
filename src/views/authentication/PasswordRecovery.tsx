@@ -37,7 +37,7 @@ class PasswordRecovery extends Component {
                     <div className="gx-container">
                         <header className="landing-header">
                             <div className="landing-header__left mb-0">
-                                <h2 className="odyssey text-success">{projectApplicationName}</h2>
+                                <h2 className="odyssey text-success nunito">{projectApplicationName}</h2>
                                 <span className="pui-pill selected mt-0 mb-3">Password Recovery</span>
                             </div>
                         </header>
