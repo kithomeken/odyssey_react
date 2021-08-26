@@ -2,8 +2,8 @@ let apiDomain = ""
 let domain = ""
 
 if (process.env.NODE_ENV === 'production') {
-    domain = "https://api.odyssey.kennedykitho.me"
-    apiDomain = 'https://api.odyssey.kennedykitho.me/api/v1/'
+    domain = "https://project-0.kennedykitho.me"
+    apiDomain = 'https://project-0.kennedykitho.me/api/v1/'
 } else {
     domain = 'http://localhost/project-0/public'
     apiDomain = 'http://localhost/project-0/public/api/'
