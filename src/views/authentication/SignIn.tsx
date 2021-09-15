@@ -103,7 +103,9 @@ class SignIn extends Component<RouteComponentProps> {
         console.log(postResponse)
 
         if (postResponse.success) {
-            AuthenticationServices.createAccessTokenCookie(postResponse)
+            const createTokenCookie = AuthenticationServices.createAccessTokenCookie(postResponse)
+            console.log('cookie console', createTokenCookie);
+            
             this.props.history.push('/home')
         } else {
             let errors = {...this.state.errors}
