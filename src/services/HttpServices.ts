@@ -25,6 +25,7 @@ class HttpServices {
             return await axios.get(url, authorizationBearer)
         } catch (error) {
             console.log("Could not fetch data", error)
+            return error
         }
     }
 
