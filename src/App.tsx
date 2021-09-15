@@ -17,10 +17,16 @@ import { ProtectedRoutes } from './components/router/ProtectedRoutes'
 import HttpServices from './services/HttpServices'
 
 // Components
+import ApiServices from './services/ApiServices'
 import SignIn from './views/authentication/SignIn'
 import FromIndexToHome from './Redirects/FromIndexToHome'
 import Home from './views/Home'
 import PasswordRecover from './views/authentication/PasswordRecovery'
+
+// Routes
+import {featuresRoutes} from './routes/parameters/featuresRoutes'
+import {securityRoutes} from './routes/parameters/securityRoutes'
+// import {userMaintenanceRoutes} from './routes/site-man/userMaintenanceRoutes'
 
 interface GuestRouteInterface {
     path: string;
@@ -42,6 +48,8 @@ const store = createStore(Reducer, applyMiddleware(thunk))
 let protectedRoutes: Array<any> = []
 
 protectedRoutes = temporaryRoutes.concat(
+    securityRoutes,
+    featuresRoutes,
 );  
 
 const headers = HttpServices.axiosInstanceHeaders()
@@ -49,8 +57,10 @@ const instance = axios.create({
     headers
 });
 
+const domain = ApiServices.FQDN()
+
 const sanctumConfig = {
-    apiUrl: "https://project-0.kennedykitho.me",
+    apiUrl: domain,
     csrfCookieRoute: "sanctum/csrf-cookie",
     signInRoute: "api/auth/account/agent/authenticate",
     signOutRoute: "api/auth/account/agent/w-token/invalidate",
