@@ -1,8 +1,14 @@
 import React, {Component} from 'react'
 
-class TicketsRights extends Component {
-    state = {
+interface Props {
+    inputs: any,
+    supportFeatures: any
+}
 
+class TicketsRights extends Component<Props> {
+    state = {
+        input: this.props.inputs,
+        supportFeatures: this.props.supportFeatures
     }
 
     render() {
@@ -13,39 +19,51 @@ class TicketsRights extends Component {
                         Set the functionalities and configurations that users in this auth team can undertake regarding tickets.
                     </h2>
 
-                    <div className="ml-6">
-                        <div className="w-9/12 mb-4">
-                            <div className="flex items-center">
-                                <input
-                                    id="create_tickets"
-                                    name="create_tickets"
-                                    type="checkbox"
-                                    className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
-                                />
+                    {
+                        this.state.supportFeatures.client_access == 'Y' ? (
+                            null
+                        ) : (
+                            <div className="ml-6">
+                                <div className="w-9/12 mb-4">
+                                    <div className="flex items-center">
+                                        <input
+                                            id="create_tickets"
+                                            name="create_tickets"
+                                            type="checkbox"
+                                            className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
+                                        />
 
-                                <label htmlFor="create_tickets" className="ml-4 block text-sm text-gray-500">
-                                    Create tickets
-                                </label>
+                                        <label htmlFor="create_tickets" className="ml-4 block text-sm text-gray-500">
+                                            Create tickets
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        )
+                    }
 
-                    <div className="ml-6">
-                        <div className="w-9/12 mb-4">
-                            <div className="flex items-center">
-                                <input
-                                    id="ticket_properties"
-                                    name="ticket_properties"
-                                    type="checkbox"
-                                    className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
-                                />
-
-                                <label htmlFor="ticket_properties" className="ml-4 block text-sm text-gray-500">
-                                    Edit ticket properties
-                                </label>
+                    {
+                        this.state.supportFeatures.client_access == 'Y' ? (
+                            null
+                        ) : (
+                            <div className="ml-6">
+                                <div className="w-9/12 mb-4">
+                                    <div className="flex items-center">
+                                        <input
+                                            id="ticket_properties"
+                                            name="ticket_properties"
+                                            type="checkbox"
+                                            className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
+                                        />
+        
+                                        <label htmlFor="ticket_properties" className="ml-4 block text-sm text-gray-500">
+                                            Edit ticket properties
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
+                        )
+                    }
 
                     <div className="ml-6">
                         <div className="w-9/12 mb-4">
@@ -71,6 +89,14 @@ class TicketsRights extends Component {
                                     id="resolve_tickets"
                                     name="resolve_tickets"
                                     type="checkbox"
+                                    disabled={
+                                        (this.state.input.access_group === 'A') ? 
+                                            false
+                                        : (this.state.input.access_group === 'L') ?
+                                            true
+                                        :
+                                            false
+                                    }
                                     className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                 />
 
