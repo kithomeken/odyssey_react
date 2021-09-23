@@ -10,6 +10,7 @@ import {securityRoutes} from '../../../routes/parameters/securityRoutes'
 import TicketsRights from './modules/TicketsRights'
 import EscalationRights from './modules/EscalationRights'
 import Error500 from '../../errors/500'
+import AdministativeRights from './modules/AdministrativeRights'
 
 const apiHeader = ApiService.apiDomain()
 
@@ -324,13 +325,22 @@ class CreateAuthTeams extends Component {
                                             <span className="lolrtn robot">Ticket Rights</span>
                                         </button>
                                     </div>
-                                    
+
                                     <div className="w-auto cursor-pointer" onClick={() => this.activateTab('escalations')}>
                                         <button type="button" className={this.classNames(
                                             activeTab === 'escalations' ? 'text-green-700 border-b-2 border-green-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
                                             "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
                                         )}>
                                             <span className="lolrtn robot">Escalation Rights</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="w-auto cursor-pointer" onClick={() => this.activateTab('administrative')}>
+                                        <button type="button" className={this.classNames(
+                                            activeTab === 'administrative' ? 'text-green-700 border-b-2 border-green-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
+                                            "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
+                                        )}>
+                                            <span className="lolrtn robot">Administrative Rights</span>
                                         </button>
                                     </div>
 
@@ -344,7 +354,7 @@ class CreateAuthTeams extends Component {
                                 </div>
 
                                 <div className="w-full">
-
+                                            
                                 </div>
 
                             </form>                            
@@ -423,7 +433,16 @@ class CreateAuthTeams extends Component {
                 />
             
             case 'escalations':
-                return <EscalationRights />
+                return <EscalationRights 
+                inputs={this.state.input}
+                supportFeatures={this.state.supportFeatures}
+                />
+
+            case 'administrative':
+                return <AdministativeRights 
+                inputs={this.state.input}
+                supportFeatures={this.state.supportFeatures}
+                />
 
             default:
                 return null
@@ -434,8 +453,7 @@ class CreateAuthTeams extends Component {
         try {
             let apiConsumed = apiHeader + `portal/a/site-master/features/support/all`
             const response : any = await HttpService.httpGet(apiConsumed)
-            console.log(response)
-
+            
             if (response.data.success) {
                 const data = response.data.data
 
