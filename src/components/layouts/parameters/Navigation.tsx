@@ -149,7 +149,7 @@ class SideBar extends Component<Props> {
                             </div>
 
                             <p className="ml-4 text-sm">
-                                Authentication Teams
+                                Auth Teams
                             </p>
                         </Link>
 
