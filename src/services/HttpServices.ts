@@ -4,6 +4,8 @@ import Crypto from "../encryption/Crypto"
 import ConstantsRegistry from "../global/ConstantsRegistry"
 import CookieService from "./CookieService"
 
+const xsrfToken = CookieService.get("XSRF-TOKEN")
+
 class HttpServices {
     protected decryptAccessTokenCookie() {
         const cookieNameForAccessToken = ConstantsRegistry.cookieNameForAccessToken()
@@ -18,6 +20,7 @@ class HttpServices {
         const authorizationBearer = {
             headers: {
                 Authorization: "Bearer " + accessToken,
+                "X-XSRF-TOKEN": xsrfToken,
             }
         }
 
@@ -34,6 +37,7 @@ class HttpServices {
         const authorizationBearer = {
             headers: {
                 Authorization: "Bearer " + accessToken,
+                "X-XSRF-TOKEN": xsrfToken,
             }
         }
 
@@ -51,6 +55,7 @@ class HttpServices {
         const authorizationBearer = {
             headers: {
                 Authorization: "Bearer " + accessToken,
+                "X-XSRF-TOKEN": xsrfToken,
             }
         }
 
