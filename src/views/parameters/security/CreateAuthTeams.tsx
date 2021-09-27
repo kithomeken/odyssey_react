@@ -19,17 +19,40 @@ class CreateAuthTeams extends Component {
         loading: true,
         errorMode: false,
         activeTab: 'tickets',
+        postingFormData: false,
+        supportFeatures: {
+            announcements: null,
+            client_access: null,
+            client_escalations: null,
+            create_company_profile: null,
+            escalation_access: null,
+            field_agent: null,
+        },
         input: {
             name: null,
             description: null,
             field_agent: null,
             access_group: null,
             ticket_access: null,
+            delete_comments: null,
+            whos_comments: null,
+        },
+        errors: {
+            name: '',
+            description: '',
+            access_group: '',
+            ticket_access: '',
+            delete_comments: '',
+            whos_comments: '',
         },
         checked: {
             globalTicketAccess: false
         },
-        supportFeatures: null,
+    }
+
+    constructor(props: any) {
+        super(props)
+        this.onChangeHandler = this.onChangeHandler.bind(this)
     }
 
     render() {
@@ -37,6 +60,7 @@ class CreateAuthTeams extends Component {
         const activeTab = this.state.activeTab
         const loading = this.state.loading
         const errorMode = this.state.errorMode
+        const {errors} = this.state;
 
         const pageTitle = "Create Auth Teams"
         const showButton = false
@@ -60,7 +84,7 @@ class CreateAuthTeams extends Component {
                 <div className="w-full mb-2">
                     <div className="w-9/12">
                         <p className="text-sm form-group mb-0 text-gray-500">
-                            When creating an agent team, you're free to set temporary or long term access for your agents and restrict the information at their disposal. Once created, you will be able to add agents into the teams.
+                            When creating an Auth Team, you're free to set limited or lifetime access for your agents and restrict the resources at their disposal. Once created, you will be able to add agents into the Auth Teams.
                         </p>
                     </div>
                 </div>
@@ -76,40 +100,68 @@ class CreateAuthTeams extends Component {
                                 <Error500 />
                             </div>
                         ) : (
-                            <form className="w-9/12 form-group">
+                            <form className="w-9/12 form-group" onSubmit={this.onFormSubmitHandler}>
                                 <p className="text-green-500 mb-2">Team Details</p>
 
                                 <div className="w-full ml-4 form-group">
                                     <div className="w-12/12 rounded-md shadow-none space-y-px form-group">
                                         <label htmlFor="team-name" className="block mb-1 text-sm">Team Name</label>
                                         <input type="text" name="name" id="team-name" autoComplete="off" onChange={this.onChangeHandler} className="focus:ring-2 focus:ring-green-500 p-2 capitalize flex-1 block w-full text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Team Name" />
+
+                                        {errors.name.length > 0 && 
+                                            <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                                {errors.name}
+                                            </span>
+                                        }
                                     </div>
 
                                     <div className="w-12/12 rounded-md shadow-none space-y-px form-group">
                                         <label htmlFor="team-name" className="block mb-1 text-sm">Description</label>
                                         <textarea name="description" id="team-name" rows={2} autoComplete="off" onChange={this.onChangeHandler} className="focus:border-green-500 p-2 capitalize flex-1 block w-full text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Description" ></textarea>
+
+                                        {errors.description.length > 0 && 
+                                            <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                                {errors.description}
+                                            </span>
+                                        }
                                     </div>
 
-                                    <div className="w-9/12 mb-4">
-                                        <div className="flex items-start">
-                                            <input
-                                                id="field_agent"
-                                                name="field_agent"
-                                                type="checkbox"
-                                                onChange={this.onChangeHandler}
-                                                className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 checked:bg-green-500 focus:bg-green-500 active: border-gray-300 rounded"
-                                            />
-
-                                            <label htmlFor="field_agent" className="ml-2 block text-sm text-gray-500">
-                                                Team contains field agents
-                                            </label>
-                                        </div>
-                                    </div>
+                                    {
+                                        this.state.supportFeatures.field_agent === 'Y' ? (
+                                            <div className="w-9/12 mb-4">
+                                                <div className="flex items-start">
+                                                    <input
+                                                        id="field_agent"
+                                                        name="field_agent"
+                                                        type="checkbox"
+                                                        onChange={this.onChangeHandler}
+                                                        className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 checked:bg-green-500 focus:bg-green-500 active: border-gray-300 rounded"
+                                                    />
+        
+                                                    <label htmlFor="field_agent" className="ml-2 block text-sm text-gray-500">
+                                                        Team contains field agents
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        ) : null
+                                    }
                                 </div>
                                 
-                                <p className="text-green-500 mb-2">Access Group</p>
+                                <p className="text-green-500 mb-2">Access Type</p>
 
                                 <div className="w-full ml-4 form-group">
+                                    <p className="text-sm mb-1 text-gray-500">
+                                        Control users' access to the system by setting an Access Type applicable to each.
+                                    </p>
+
+                                    <p className="text-sm mb-1 text-gray-500">
+                                        <span className="text-black">All Time Access</span> users will have lifetime access to the system with periodic password resets as defined by the set Password Policies.
+                                    </p>
+
+                                    <p className="text-sm form-group text-gray-500">
+                                        <span className="text-black"> Limited Time Access</span> users will have a 30 day span access to the system from account activation, after which their accounts will be de-activated. You can, however, extend a users access if need be.
+                                    </p>
+
                                     <div className="flex items-center w-full">
                                         <div className={this.classNames(
                                             this.state.input.access_group === 'A' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
@@ -167,11 +219,29 @@ class CreateAuthTeams extends Component {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {errors.access_group.length > 0 && 
+                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                            {errors.access_group}
+                                        </span>
+                                    }
                                 </div>
 
                                 <p className="text-green-500 mb-2">Ticket Access</p>
 
                                 <div className="w-full ml-4 form-group">
+                                    <p className="text-sm mb-1 text-gray-500">
+                                        Control users' access to tickets raised by selecting a Ticket Access method.
+                                    </p>
+
+                                    <p className="text-sm mb-1 text-gray-500">
+                                        <span className="text-black">Global Access</span> users can access all tickets raised in Odyssey regardless of who raised them or whether they are/were assigned to them.
+                                    </p>
+
+                                    <p className="text-sm form-group text-gray-500">
+                                        <span className="text-black">Restricted Access</span> users will ONLY have access to the tickets assigned to them.
+                                    </p>
+
                                     <div className="flex items-center w-full">
                                         <div className={this.classNames(
                                             this.state.input.ticket_access === 'GLB' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
@@ -312,6 +382,12 @@ class CreateAuthTeams extends Component {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {errors.ticket_access.length > 0 && 
+                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                            {errors.ticket_access}
+                                        </span>
+                                    }
                                 </div>
 
                                 <p className="text-green-500 mb-2">Grants & Access Rights</p>
@@ -354,28 +430,131 @@ class CreateAuthTeams extends Component {
                                 </div>
 
                                 <div className="w-full">
-                                            
-                                </div>
+                                    {
+                                        this.state.postingFormData ? (
+                                            <button type="button" className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300`} disabled={true}>
+                                                <span>                                                    
+                                                    <span className="left-0 inset-y-0 flex items-center pl-3">
+                                                        <span className="pr-2">
+                                                            Creating Team
+                                                        </span>
 
+                                                        <span className="w-5 h-5">
+                                                            <i className="fad fa-spinner-third fa-lg fa-spin"></i>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </button>
+                                        ) : (
+                                            <button type="submit" className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}>
+                                                <span className="text-sm">
+                                                    Create Auth Team
+                                                </span>
+                                            </button>
+                                        )
+                                    }                                    
+                                </div>
                             </form>                            
                         )
-
-
-                            
-
                     )
                 }
 
-                
             </React.Fragment>
         )
     }
 
+    onFormSubmitHandler = (e: any) => {
+        e.preventDefault()
+
+        if (this.onFormValidation()) {
+            this.setState({
+                postingFormData: false
+            })
+
+            console.log(this.state.input)
+            this.postFormData()
+        } else {
+            this.setState({
+                postingFormData: false
+            })
+        }
+    }
+
+    async postFormData() {
+        try {
+            let input = this.state.input
+            let apiToBeConsumed = apiHeader + `portal/a/site-master/security/auth-team/create`
+            const response: any = await HttpService.httpPost(apiToBeConsumed, input)
+            console.log(response)
+
+            if (response.data.success) {
+                // show success toast
+            } else {
+                // show failed toast
+            }
+        } catch (error) {
+            // show failed toast
+            console.log(error)
+        }
+    }
+    
+    onFormValidation = () => {
+        let {input} = this.state
+        let errors = this.state.errors
+        let isFormValid = true
+
+        if (!input['name']) {
+            isFormValid = false
+            errors.name = 'Please enter a team name'
+        } else {
+            errors.name = ''
+        }
+
+        if (!input['description']) {
+            isFormValid = false
+            errors.description = 'Please enter a team description'
+        } else {
+            errors.description = ''
+        }
+
+        if (!input['access_group']) {
+            isFormValid = false
+            errors.access_group = 'Please select an access group'
+        } else {
+            errors.access_group = ''
+        }
+
+        if (!input['ticket_access']) {
+            isFormValid = false
+            errors.ticket_access = 'Please select a ticket access method'
+        } else {
+            errors.ticket_access = ''
+        }
+
+        if (input['delete_comments'] === 'Y') {
+            if (!input['whos_comments']) {
+                isFormValid = false
+                errors.whos_comments = 'Please select one of the options above'
+            } else {
+                errors.whos_comments = ''
+            }
+        } else {
+            errors.whos_comments = ''
+        }
+
+        this.setState({
+            errors: errors
+        })
+
+        return isFormValid
+    }
+
     onChangeHandler = (e: any) => {
         let {input}: any = this.state
-        // let {checked}: any = this.state
+        let {errors}: any = this.state
         let isCheckbox: any = (e.target.type === 'checkbox') ? true : false;
         input[e.target.name] = e.target.value
+        errors[e.target.name] = ''
 
         if (isCheckbox) {
             if (e.target.checked) {
@@ -429,18 +608,22 @@ class CreateAuthTeams extends Component {
             case 'tickets':
                 return <TicketsRights 
                 inputs={this.state.input}
+                errors={this.state.errors}
+                onChangeHandler={this.onChangeHandler}
                 supportFeatures={this.state.supportFeatures}
                 />
             
             case 'escalations':
                 return <EscalationRights 
                 inputs={this.state.input}
+                onChangeHandler={this.onChangeHandler}
                 supportFeatures={this.state.supportFeatures}
                 />
 
             case 'administrative':
                 return <AdministativeRights 
                 inputs={this.state.input}
+                onChangeHandler={this.onChangeHandler}
                 supportFeatures={this.state.supportFeatures}
                 />
 
