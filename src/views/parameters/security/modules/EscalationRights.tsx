@@ -6,7 +6,8 @@ import {featuresRoutes} from '../../../../routes/parameters/featuresRoutes'
 
 interface Props {
     inputs: any,
-    supportFeatures: any
+    supportFeatures: any,
+    onChangeHandler: any,
 }
 
 class EscalationRights extends Component<Props> {
@@ -34,6 +35,10 @@ class EscalationRights extends Component<Props> {
                                             id="escalate_tickets"
                                             name="escalate_tickets"
                                             type="checkbox"
+                                            onChange={this.props.onChangeHandler}
+                                            checked={
+                                                this.state.input.escalate_tickets === 'Y' ? true : false
+                                            }
                                             className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                         />
 
@@ -51,6 +56,21 @@ class EscalationRights extends Component<Props> {
                                             id="matrix_add"
                                             name="matrix_add"
                                             type="checkbox"
+                                            onChange={this.props.onChangeHandler}
+                                            checked={
+                                                this.state.input.ticket_access === 'GLB' ? (
+                                                    this.state.input.matrix_add === 'Y' ? true : false
+                                                    ) : (
+                                                    false
+                                                )
+                                            }
+                                            disabled={
+                                                this.state.input.ticket_access !== 'GLB' ? (
+                                                    true
+                                                ) : (
+                                                    false
+                                                )
+                                            }
                                             className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                         />
 
@@ -68,6 +88,21 @@ class EscalationRights extends Component<Props> {
                                             id="escalation_purge"
                                             name="escalation_purge"
                                             type="checkbox"
+                                            onChange={this.props.onChangeHandler}
+                                            checked={
+                                                this.state.input.ticket_access === 'GLB' ? (
+                                                    this.state.input.escalation_purge === 'Y' ? true : false
+                                                    ) : (
+                                                    false
+                                                )
+                                            }
+                                            disabled={
+                                                this.state.input.ticket_access !== 'GLB' ? (
+                                                    true
+                                                ) : (
+                                                    false
+                                                )
+                                            }
                                             className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                         />
 
@@ -82,13 +117,28 @@ class EscalationRights extends Component<Props> {
                                 <div className="w-12/12 mb-4">
                                     <div className="flex items-center">
                                         <input
-                                            id="configure_escalations"
-                                            name="configure_escalations"
+                                            id="config_escalations"
+                                            name="config_escalations"
                                             type="checkbox"
+                                            onChange={this.props.onChangeHandler}
+                                            checked={
+                                                this.state.input.ticket_access === 'GLB' ? (
+                                                    this.state.input.config_escalations === 'Y' ? true : false
+                                                    ) : (
+                                                    false
+                                                )
+                                            }
+                                            disabled={
+                                                this.state.input.ticket_access !== 'GLB' ? (
+                                                    true
+                                                ) : (
+                                                    false
+                                                )
+                                            }
                                             className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                         />
 
-                                        <label htmlFor="configure_escalations" className="ml-4 block text-sm text-gray-500">
+                                        <label htmlFor="config_escalations" className="ml-4 block text-sm text-gray-500">
                                             Configure Escalation Matrix settings
                                         </label>
                                     </div>
