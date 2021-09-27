@@ -2,29 +2,24 @@ import React, {Component} from 'react'
 
 interface Props {
     inputs: any,
-    supportFeatures: any
+    errors:  any,
+    supportFeatures: any,
+    onChangeHandler: any,
 }
 
 class TicketsRights extends Component<Props> {
     state = {
         input: this.props.inputs,
+        errors: this.props.errors,
         supportFeatures: this.props.supportFeatures,
-        ticketRights: {
-            create_tickets: 'N',
-            edit_ticket: 'N',
-            add_comments: 'N',
-            delete_comments: 'N',
-            whos_comments: 'N',
-            mark_resolved: 'N',
-            configure_types: 'N',
-            configure_regions: 'N'
-        }
     }
 
     render() {
+        const errors = this.state.errors
+        
         return(
             <React.Fragment>
-                <div className="w-full py-3 h-72">
+                <div className="w-full py-3">
                     <h2 className="text-sm leading-7 text-gray-700 sm:text-lg sm: mb-3">
                         Set the functionalities and configurations that users in this auth team can undertake regarding tickets.
                     </h2>
@@ -40,7 +35,10 @@ class TicketsRights extends Component<Props> {
                                             id="create_tickets"
                                             name="create_tickets"
                                             type="checkbox"
-                                            onChange={this.onChangeHandler}
+                                            onChange={this.props.onChangeHandler}
+                                            checked={
+                                                this.state.input.create_tickets === 'Y' ? true : false
+                                            }
                                             className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                         />
 
@@ -61,14 +59,17 @@ class TicketsRights extends Component<Props> {
                                 <div className="w-9/12 mb-4">
                                     <div className="flex items-center">
                                         <input
-                                            id="ticket_properties"
+                                            id="edit_ticket"
                                             name="edit_ticket"
                                             type="checkbox"
-                                            onChange={this.onChangeHandler}
+                                            onChange={this.props.onChangeHandler}
+                                            checked={
+                                                this.state.input.edit_ticket === 'Y' ? true : false
+                                            }
                                             className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                         />
         
-                                        <label htmlFor="ticket_properties" className="ml-4 block text-sm text-gray-500">
+                                        <label htmlFor="edit_ticket" className="ml-4 block text-sm text-gray-500">
                                             Edit ticket properties
                                         </label>
                                     </div>
@@ -81,14 +82,17 @@ class TicketsRights extends Component<Props> {
                         <div className="w-9/12 mb-4">
                             <div className="flex items-center">
                                 <input
-                                    id="ticket_comments"
+                                    id="add_comments"
                                     name="add_comments"
                                     type="checkbox"
-                                    onChange={this.onChangeHandler}
+                                    onChange={this.props.onChangeHandler}
+                                    checked={
+                                        this.state.input.add_comments === 'Y' ? true : false
+                                    }
                                     className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                 />
 
-                                <label htmlFor="ticket_comments" className="ml-4 block text-sm text-gray-500">
+                                <label htmlFor="add_comments" className="ml-4 block text-sm text-gray-500">
                                     Add notes/comments to tickets
                                 </label>
                             </div>
@@ -102,7 +106,10 @@ class TicketsRights extends Component<Props> {
                                     id="delete_comments"
                                     name="delete_comments"
                                     type="checkbox"
-                                    onChange={this.onChangeHandler}
+                                    onChange={this.props.onChangeHandler}
+                                    checked={
+                                        this.state.input.delete_comments === 'Y' ? true : false
+                                    }
                                     className="h-4 w-4 mt-1 text-green-600 checked:bg-green-500 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                 />
 
@@ -121,9 +128,12 @@ class TicketsRights extends Component<Props> {
                                     name="whos_comments"
                                     type="radio"
                                     value="OWN"
-                                    onChange={this.onChangeHandler}
+                                    onChange={this.props.onChangeHandler}
+                                    checked={
+                                        this.state.input.whos_comments === 'OWN' ? true : false
+                                    }
                                     disabled={
-                                        this.state.ticketRights.delete_comments === 'Y' ? (
+                                        this.props.inputs.delete_comments === 'Y' ? (
                                             false
                                         ) : (
                                             true
@@ -147,12 +157,19 @@ class TicketsRights extends Component<Props> {
                                     name="whos_comments"
                                     type="radio"
                                     value="ANY"
-                                    onChange={this.onChangeHandler}
+                                    onChange={this.props.onChangeHandler}
+                                    checked={
+                                        this.state.input.whos_comments === 'ANY' ? true : false
+                                    }
                                     disabled={
-                                        this.state.ticketRights.delete_comments === 'Y' ? (
-                                            false
-                                        ) : (
+                                        this.props.inputs.ticket_access !== 'GLB' ? (
                                             true
+                                        ) : (
+                                            this.props.inputs.delete_comments === 'Y' ? (
+                                                false
+                                            ) : (
+                                                true
+                                            )
                                         )
                                     }
                                     className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
@@ -162,6 +179,13 @@ class TicketsRights extends Component<Props> {
                                     Anyone's notes/comments
                                 </label>
                             </div>
+
+                            
+                            {errors.whos_comments.length > 0 && 
+                                <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                    {errors.whos_comments}
+                                </span>
+                            }
                         </div>
                     </div>
 
@@ -169,23 +193,50 @@ class TicketsRights extends Component<Props> {
                         <div className="w-9/12 mb-4">
                             <div className="flex items-center">
                                 <input
-                                    id="resolve_tickets"
-                                    name="mark_resolved"
+                                    id="merge_ticket"
+                                    name="merge_ticket"
                                     type="checkbox"
-                                    onChange={this.onChangeHandler}
-                                    disabled={
-                                        (this.state.input.access_group === 'A') ? 
-                                            false
-                                        : (this.state.input.access_group === 'L') ?
-                                            true
-                                        :
-                                            false
+                                    onChange={this.props.onChangeHandler}
+                                    checked={
+                                        this.state.input.merge_ticket === 'Y' ? true : false
                                     }
                                     className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                 />
 
-                                <label htmlFor="resolve_tickets" className="ml-4 block text-sm text-gray-500">
-                                    Mark tickets as resolved - Close completed tickets
+                                <label htmlFor="merge_ticket" className="ml-4 block text-sm text-gray-500">
+                                    Merge / split a ticket
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="ml-6">
+                        <div className="w-9/12 mb-4">
+                            <div className="flex items-center">
+                                <input
+                                    id="close_ticket"
+                                    name="close_ticket"
+                                    type="checkbox"
+                                    onChange={this.props.onChangeHandler}
+                                    checked={
+                                        this.state.input.ticket_access === 'GLB' ? (
+                                            this.state.input.close_ticket === 'Y' ? true : false
+                                            ) : (
+                                            false
+                                        )
+                                    }
+                                    disabled={
+                                        this.state.input.ticket_access !== 'GLB' ? (
+                                            true
+                                        ) : (
+                                            false
+                                        )
+                                    }
+                                    className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
+                                />
+
+                                <label htmlFor="close_ticket" className="ml-4 block text-sm text-gray-500">
+                                    Close resolved tickets
                                 </label>
                             </div>
                         </div>
@@ -195,14 +246,28 @@ class TicketsRights extends Component<Props> {
                         <div className="w-9/12 mb-4">
                             <div className="flex items-center">
                                 <input
-                                    id="ticket_types"
+                                    id="configure_types"
                                     name="configure_types"
                                     type="checkbox"
-                                    onChange={this.onChangeHandler}
+                                    onChange={this.props.onChangeHandler}
+                                    disabled={
+                                        this.state.input.ticket_access !== 'GLB' ? (
+                                            true
+                                        ) : (
+                                            false
+                                        )
+                                    }
+                                    checked={
+                                        this.state.input.ticket_access === 'GLB' ? (
+                                            this.state.input.configure_types === 'Y' ? true : false
+                                            ) : (
+                                            false
+                                        )
+                                    }
                                     className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                 />
 
-                                <label htmlFor="ticket_types" className="ml-4 block text-sm text-gray-500">
+                                <label htmlFor="configure_types" className="ml-4 block text-sm text-gray-500">
                                     Configure ticket types
                                 </label>
                             </div>
@@ -213,47 +278,36 @@ class TicketsRights extends Component<Props> {
                         <div className="w-9/12 mb-4">
                             <div className="flex items-center">
                                 <input
-                                    id="ticket_regions"
+                                    id="configure_regions"
                                     name="configure_regions"
                                     type="checkbox"
-                                    onChange={this.onChangeHandler}
-                                    className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
+                                    onChange={this.props.onChangeHandler}
+                                    disabled={
+                                        this.state.input.ticket_access !== 'GLB' ? (
+                                            true
+                                        ) : (
+                                            false
+                                        )
+                                    }
+                                    checked={
+                                        this.state.input.ticket_access === 'GLB' ? (
+                                            this.state.input.configure_regions === 'Y' ? true : false
+                                        ) : (
+                                            false
+                                        )
+                                    }
+                                    className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded disabled:cursor-not-allowed"
                                 />
 
-                                <label htmlFor="ticket_regions" className="ml-4 block text-sm text-gray-500">
+                                <label htmlFor="configure_regions" className="ml-4 block text-sm text-gray-500">
                                     Configure ticket regions
                                 </label>
                             </div>
                         </div>
                     </div>
-
-
-
-
-
-
-
                 </div>
             </React.Fragment>
         )
-    }
-
-    onChangeHandler = (e: any) => {
-        let {ticketRights}: any = this.state
-        let isCheckbox: any = (e.target.type === 'checkbox') ? true : false;
-        ticketRights[e.target.name] = e.target.value
-
-        if (isCheckbox) {
-            if (e.target.checked) {
-                ticketRights[e.target.name] = "Y"
-            } else {
-                ticketRights[e.target.name] = "N"
-            }
-        }
-
-        this.setState({
-            ticketRights
-        })
     }
 }
 
