@@ -77,6 +77,27 @@ class EscalationFeatures extends React.Component {
                                     </span>
                                 </div>
                             </div>
+                            
+                            <div className="w-full ml-5 mb-3">
+                                <div className="flex flex-row items-center">
+                                    <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onToggleClientEscalations}>
+                                        <input type="checkbox" id="enable_client_escalations" defaultChecked={this.state.data.client_escalations} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                        <label htmlFor="enable_client_escalations" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    </div>
+        
+                                    <label htmlFor="remember-me" className="ml-6 block text-sm mb-1 text-gray-900">
+                                        Configure Escalations Types
+                                    </label>
+                                </div>
+        
+                                <div className="flex flex-row">
+                                    <div className="w-10 mr-2"></div>
+        
+                                    <span className="text-gray-500 text-sm ml-6 w-9/12">
+                                        the types of escalations when escalating. eg. no first response, client not available etc.
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     )
                 }
