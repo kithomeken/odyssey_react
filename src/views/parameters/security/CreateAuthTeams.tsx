@@ -468,7 +468,7 @@ class CreateAuthTeams extends Component {
 
         if (this.onFormValidation()) {
             this.setState({
-                postingFormData: false
+                postingFormData: true
             })
 
             console.log(this.state.input)

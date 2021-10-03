@@ -48,8 +48,8 @@ class ComplementaryTicketFeatures extends Component<Props> {
                                 <div className="w-full">
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="link_similar_tickets" defaultChecked={this.state.features.link_similar_tickets} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="link_similar_tickets"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onChangeToggleHandler}>
+                                                <input type="checkbox" id="link_similar_tickets" defaultChecked={this.state.features.link_similar_tickets === 'Y' ? true : false} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="link_similar_tickets"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
@@ -69,8 +69,8 @@ class ComplementaryTicketFeatures extends Component<Props> {
                                     
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="share_ticket_ownership" defaultChecked={this.state.features.share_ticket_ownership} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="share_ticket_ownership"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onChangeToggleHandler}>
+                                                <input type="checkbox" id="share_ticket_ownership" defaultChecked={this.state.features.share_ticket_ownership === 'Y' ? true : false} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="share_ticket_ownership"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
@@ -90,8 +90,8 @@ class ComplementaryTicketFeatures extends Component<Props> {
                                     
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="parent_child_ticketing" defaultChecked={this.state.features.parent_child_ticketing} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="parent_child_ticketing"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onChangeToggleHandler} */>
+                                                <input type="checkbox" id="parent_child_ticketing" defaultChecked={this.state.features.parent_child_ticketing === 'Y' ? true : false} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="parent_child_ticketing"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
@@ -111,8 +111,8 @@ class ComplementaryTicketFeatures extends Component<Props> {
                                     
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="capture_root_cause" defaultChecked={this.state.features.capture_root_cause} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="capture_root_cause"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onChangeToggleHandler}>
+                                                <input type="checkbox" id="capture_root_cause" defaultChecked={this.state.features.capture_root_cause === 'Y' ? true : false} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="capture_root_cause"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
@@ -132,8 +132,8 @@ class ComplementaryTicketFeatures extends Component<Props> {
                                     
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="capture_solution_deployed" defaultChecked={this.state.features.capture_solution_deployed} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="capture_solution_deployed"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onChangeToggleHandler}>
+                                                <input type="checkbox" id="capture_solution_deployed" defaultChecked={this.state.features.capture_solution_deployed === 'Y' ? true : false} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="capture_solution_deployed"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
@@ -155,7 +155,6 @@ class ComplementaryTicketFeatures extends Component<Props> {
                         )
                     )
                 }
-
             </React.Fragment>
         )
     }
@@ -195,13 +194,14 @@ class ComplementaryTicketFeatures extends Component<Props> {
         this.postTicketFeaturesApiCall(event.target.name, toggleStatus)
     }
 
-    async postTicketFeaturesApiCall(inputName: any, value: any) {
+    async postTicketFeaturesApiCall(targetName: any, value: any) {
         try {
             let input = {
-                inputName: value
+                input_name: targetName,
+                input_value: value,
             }
 
-            let apiConsumed = apiHeader + `portal/a/site-master/features/tickets/config`
+            let apiConsumed = apiHeader + `portal/a/site-master/features/tickets/configure`
             const response: any = await HttpService.httpPost(apiConsumed, input)
 
             if (response.data.success) {
