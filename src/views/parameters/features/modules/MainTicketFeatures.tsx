@@ -48,8 +48,12 @@ class MainTicketFeatures extends Component<Props> {
                                 <div className="w-full">
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="configure_types" defaultChecked={this.state.features.configure_types} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="configure_types"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onChangeToggleHandler}>
+                                                <input type="checkbox" 
+                                                    id="configure_types" 
+                                                    defaultChecked={this.state.features.configure_types === 'Y' ? true : false} 
+                                                    className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" 
+                                                    name="configure_types"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
@@ -69,8 +73,8 @@ class MainTicketFeatures extends Component<Props> {
                                     
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="configure_regions" defaultChecked={this.state.features.configure_regions} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="configure_regions"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onChangeToggleHandler}>
+                                                <input type="checkbox" id="configure_regions" defaultChecked={this.state.features.configure_regions === 'Y' ? true : false} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="configure_regions"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
@@ -90,12 +94,12 @@ class MainTicketFeatures extends Component<Props> {
                                     
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="ticket_scheduling" defaultChecked={this.state.features.schedule_tickets} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="ticket_scheduling"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onChangeToggleHandler}>
+                                                <input type="checkbox" id="schedule_tickets" defaultChecked={this.state.features.schedule_tickets === 'Y' ? true : false} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="schedule_tickets"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
-                                            <label htmlFor="ticket_scheduling" className="ml-6 block text-sm mb-1 text-gray-900">
+                                            <label htmlFor="schedule_tickets" className="ml-6 block text-sm mb-1 text-gray-900">
                                                 Ticket Scheduling
                                             </label>
                                         </div>
@@ -111,12 +115,12 @@ class MainTicketFeatures extends Component<Props> {
                                     
                                     <div className="w-full ml-5 mb-3">
                                         <div className="flex flex-row items-center">
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" /* onClick={this.onToggleClientAccess} */>
-                                                <input type="checkbox" id="ticket_template" defaultChecked={this.state.features.configure_templates} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="ticket_template"/>
+                                            <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={this.onChangeToggleHandler}>
+                                                <input type="checkbox" id="configure_templates" defaultChecked={this.state.features.configure_templates === 'Y' ? true : false} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" name="configure_templates"/>
                                                 <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                             </div>
                 
-                                            <label htmlFor="ticket_template" className="ml-6 block text-sm mb-1 text-gray-900">
+                                            <label htmlFor="configure_templates" className="ml-6 block text-sm mb-1 text-gray-900">
                                                 Configure Ticket Templates
                                             </label>
                                         </div>
@@ -134,7 +138,6 @@ class MainTicketFeatures extends Component<Props> {
                         )
                     )
                 }
-
             </React.Fragment>
         )
     }
@@ -147,7 +150,6 @@ class MainTicketFeatures extends Component<Props> {
         try {
             let apiConsumed = apiHeader + `portal/a/site-master/features/tickets/all`
             const response: any = await HttpService.httpGet(apiConsumed)
-            console.log(response)
 
             if (response.data.success) {
                 let features = response.data.data
@@ -174,13 +176,14 @@ class MainTicketFeatures extends Component<Props> {
         this.postTicketFeaturesApiCall(event.target.name, toggleStatus)
     }
 
-    async postTicketFeaturesApiCall(inputName: any, value: any) {
+    async postTicketFeaturesApiCall(targetName: any, value: any) {
         try {
             let input = {
-                inputName: value
+                input_name: targetName,
+                input_value: value,
             }
 
-            let apiConsumed = apiHeader + `portal/a/site-master/features/tickets/config`
+            let apiConsumed = apiHeader + `portal/a/site-master/features/tickets/configure`
             const response: any = await HttpService.httpPost(apiConsumed, input)
 
             if (response.data.success) {

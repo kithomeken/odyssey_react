@@ -43,7 +43,7 @@ class ClientFeatures extends Component {
                                         <label htmlFor="access-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                     </div>
         
-                                    <label htmlFor="remember-me" className="ml-6 block text-sm mb-1 text-gray-900">
+                                    <label htmlFor="access-toggle" className="ml-6 block text-sm mb-1 text-gray-900">
                                         Client Access
                                     </label>
                                 </div>
@@ -64,7 +64,7 @@ class ClientFeatures extends Component {
                                         <label htmlFor="company-toggle" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                     </div>
         
-                                    <label htmlFor="remember-me" className="ml-6 block text-sm mb-1 text-gray-900">
+                                    <label htmlFor="company-toggle" className="ml-6 block text-sm mb-1 text-gray-900">
                                         Create Company Profile
                                     </label>
                                 </div>

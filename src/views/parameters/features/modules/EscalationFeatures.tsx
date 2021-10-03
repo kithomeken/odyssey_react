@@ -43,7 +43,7 @@ class EscalationFeatures extends React.Component {
                                         <label htmlFor="enable_escalations" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                     </div>
         
-                                    <label htmlFor="remember-me" className="ml-6 block text-sm mb-1 text-gray-900">
+                                    <label htmlFor="enable_escalations" className="ml-6 block text-sm mb-1 text-gray-900">
                                         Enable Escalations
                                     </label>
                                 </div>
@@ -64,7 +64,7 @@ class EscalationFeatures extends React.Component {
                                         <label htmlFor="enable_client_escalations" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                     </div>
         
-                                    <label htmlFor="remember-me" className="ml-6 block text-sm mb-1 text-gray-900">
+                                    <label htmlFor="enable_client_escalations" className="ml-6 block text-sm mb-1 text-gray-900">
                                         Enable Client Escalations
                                     </label>
                                 </div>
