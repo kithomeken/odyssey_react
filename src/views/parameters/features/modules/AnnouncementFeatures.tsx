@@ -42,7 +42,7 @@ class AnnouncementFeatures extends React.Component {
                                         <label htmlFor="enable_announcements" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                                     </div>
         
-                                    <label htmlFor="remember-me" className="ml-6 block text-sm mb-1 text-gray-900">
+                                    <label htmlFor="enable_announcements" className="ml-6 block text-sm mb-1 text-gray-900">
                                         Enable Announcements
                                     </label>
                                 </div>
