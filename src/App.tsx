@@ -26,6 +26,7 @@ import PasswordRecover from './views/authentication/PasswordRecovery'
 // Routes
 import {featuresRoutes} from './routes/parameters/featuresRoutes'
 import {securityRoutes} from './routes/parameters/securityRoutes'
+import {generalRoutes} from './routes/parameters/generalRoutes'
 // import {userMaintenanceRoutes} from './routes/site-man/userMaintenanceRoutes'
 
 interface GuestRouteInterface {
@@ -50,6 +51,7 @@ let protectedRoutes: Array<any> = []
 protectedRoutes = temporaryRoutes.concat(
     securityRoutes,
     featuresRoutes,
+    generalRoutes,
 );  
 
 const headers = HttpServices.axiosInstanceHeaders()
