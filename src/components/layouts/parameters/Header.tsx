@@ -36,13 +36,13 @@ class Header extends Component<Props> {
                         showButton ? (
                             <div className="mt-5 flex lg:mt-0 lg:ml-4">
                                 <span className="hidden sm:block">
-                                    <Link to={buttonLink} type="button" className={`inline-flex items-center px-4 py-1 border border-${buttonColor}-500 rounded shadow-sm text-sm text-white bg-${buttonColor}-500 hover:bg-${buttonHoverColor}-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${buttonHoverColor}-500`}>
+                                    <Link to={buttonLink} type="button" className={`inline-flex items-center px-4 py-1 border border-${buttonColor}-500 rounded shadow-sm text-sm text-white bg-${buttonColor}-500 hover:bg-${buttonHoverColor}-700 hover:border-${buttonHoverColor}-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${buttonHoverColor}-500`}>
                                         <span className="text-sm">
                                             {buttonTitle}
                                         </span>
                                         {
                                             buttonIcon ? (
-                                                <span className={iconType}></span>
+                                                <span className={`ml-2 ${iconType}`}></span>
                                             ) : (
                                                 ''
                                             )
