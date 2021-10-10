@@ -9,6 +9,7 @@ module.exports = {
       backgroundColor: ['checked'],
       borderColor: ['checked'],
       opacity: ['disabled'],
+      textColor: ['visited'],
     },
   },
   plugins: [],
