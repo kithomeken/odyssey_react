@@ -1,13 +1,13 @@
 import React, {Component} from 'react'
 
-import brokenRobot from '../../assets/images/401_broken_robot.png'
+import errorImage from '../../assets/images/empty_box.png'
 
 class Error500 extends Component {
     render() {
         return(
             <React.Fragment>
                 <div className="w-full mb-4">
-                    <img src={brokenRobot} alt="broken_robot" width="250px" className="block text-center m-auto" />
+                    <img src={errorImage} alt="broken_robot" width="150px" className="block text-center m-auto" />
                 </div>
 
                 <div className="w-6/12 m-auto">
