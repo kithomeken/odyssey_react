@@ -88,8 +88,8 @@ class SideBar extends Component<Props> {
                                 </p>
                             </Link>
 
-                            <Link to="/a/default/site-manager/user-maintenance/agents" className={this.classNames(
-                                activeMenu === 'company-groups' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
+                            <Link to={generalRoutes[3].path} className={this.classNames(
+                                activeMenu === 'company' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
                                 'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
                             )}>
                                 <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
