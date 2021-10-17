@@ -4,6 +4,7 @@ import ProductDetails from "../../views/parameters/general/products/ProductDetai
 import CompanyGroups from "../../views/parameters/general/companies/CompanyGroups";
 import CreateCompany from "../../views/parameters/general/companies/CreateCompany";
 import CompanyDetails from "../../views/parameters/general/companies/CompanyDetails";
+import Announcements from "../../views/parameters/general/announcements/Announcements";
 
 export const generalRoutes = [
     // Products
@@ -16,4 +17,6 @@ export const generalRoutes = [
     { path: "/a/default/site-manager/general/company-groups/create", component: CreateCompany, exact: true, activeMenu: 'company' },
     { path: "/a/default/site-manager/general/company-groups/:uuid", component: CompanyDetails, exact: true, activeMenu: 'company' },
 
+    // Announcements
+    { path: "/a/default/site-manager/general/announcements", component: Announcements, exact: true, activeMenu: 'announcements' },
 ]
