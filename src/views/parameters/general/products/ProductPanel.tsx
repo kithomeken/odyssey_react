@@ -10,6 +10,7 @@ const apiHeader = ApiService.apiDomain()
 interface Props {
     data: any,
     showPanel: any,
+    
     closePanel: any,
 }
 
