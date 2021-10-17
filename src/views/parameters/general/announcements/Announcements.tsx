@@ -22,7 +22,6 @@ class Announcements extends Component {
         loading: true,
         errorMode: false,
         loadingTable: true,
-        activeTab: 'tickets',
         postingFormData: false,
         showPanel: false,
         supportFeatures: {
@@ -252,7 +251,6 @@ class Announcements extends Component {
         try {
             let apiConsumed = apiHeader + `portal/a/site-master/general/announcements/all`
             const response : any = await HttpService.httpGet(apiConsumed)
-            console.log(response)
 
             if (response.data.success) {
                 const data = response.data.data
