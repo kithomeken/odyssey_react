@@ -14,7 +14,6 @@ export default function ReactTable({columns, data} : {columns: any, data: any}) 
     })
 
     // Render the UI for your table
-    console.log(columns)
     return (
         <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
             <thead>
@@ -22,7 +21,7 @@ export default function ReactTable({columns, data} : {columns: any, data: any}) 
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map(column => (
                             <th
-                                {...column.getHeaderProps()}
+                                // {...column.getHeaderProps()}
                                 className={`px-3 py-3 text-left text-sm text-green-500 uppercase tracking-wider `}>
                                 {column.render("Header")}
                             </th>
