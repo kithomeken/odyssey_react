@@ -9,6 +9,7 @@ import ApiService from "../../../../services/ApiServices"
 import HttpService from "../../../../services/HttpServices"
 import { generalRoutes } from '../../../../routes/parameters/generalRoutes'
 import ReactTable from '../../../../components/Tables/ReactTables'
+import NoDataReactTable from '../../../../components/Tables/NoDataReactTable'
 
 const apiHeader = ApiService.apiDomain()
 
@@ -93,7 +94,11 @@ class Products extends Component {
                                 <span className="fad text-green-500 fa-spinner-third fa-2x m-auto block fa-spin"></span>
                             </div>
                         ) : (
-                            <ReactTable columns={columns} data={this.state.data} />
+                            this.state.data === null ? (
+                                <NoDataReactTable columns={columns} />
+                            ) : (
+                                <ReactTable columns={columns} data={this.state.data} />
+                            )
                         )
                     }
                 </div>
