@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Helmet } from "react-helmet"
+import { toast } from "react-toastify"
 import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
@@ -11,7 +12,7 @@ import Error500 from "../../../errors/Error500"
 const OrganizationalDetails = () => {
     const [state, setstate] = useState({
         data: null,
-        errorMode: false,
+        requestFailed: false,
         isLoading: true,
         isPostingForm: false,
         disableSubmitBtn: true,
@@ -112,8 +113,24 @@ const OrganizationalDetails = () => {
                 ...state,
                 isPostingForm: true
             })
+
+            onPostFormData()
         }
     }
+
+    const onPostFormData = async () => {
+        const {input}: any = state
+        const apiDomain = ApiServices.apiDomain()
+        const apiCall = apiDomain + `portal/a/site-master/general/organizational-details/change`
+        const response: any = await HttpServices.httpPost(apiCall, input)
+
+        console.log(response)
+        if (response.data.success) {
+            toast("Organization name updated...", {
+                position: toast.POSITION.TOP_RIGHT,
+            });
+        }
+    } 
 
     const cancelOrganizationUpdate = () => {
         const {isPostingForm} = state
@@ -139,34 +156,34 @@ const OrganizationalDetails = () => {
         }
     }
 
-    const fecthOrganizationDetails = async () => {
-        try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + `portal/a/site-master/general/organizational-details`
-            const response: any = await HttpServices.httpGet(apiCall)
-
-            if (response.data.success) {
-                
-            } else {
-
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
     const organizationalData = usePromiseEffect(async () => {
         const apiDomain = ApiServices.apiDomain()
         const apiCall = apiDomain + `portal/a/site-master/general/organizational-details`
         const response: any = await HttpServices.httpGet(apiCall)
 
         if (!response.data.success) {
+            setstate({
+                ...state,
+                requestFailed: true
+            })
             throw new Error("Something went wrong when fetching organizational details.");
         }
 
         console.log(response);
+        setstate({
+            ...state,
+            requestFailed: true
+        })
+
+        console.log(state);
+
         return {response}
-    }, [])    
+    }, [])
+
+        // setstate({
+        //     ...state,
+        //     requestFailed: true
+        // })
     
     return (
         <React.Fragment>
