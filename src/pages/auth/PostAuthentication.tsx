@@ -2,66 +2,53 @@ import React, {useState, useEffect} from 'react'
 import {useDispatch} from "react-redux";
 import {Helmet} from "react-helmet"
 
+import ApiServices from '../../api/ApiServices';
 import Crypto from '../../encryption/Crypto';
+import Loading from '../../components/layouts/Loading'
+import HttpServices from '../../services/HttpServices';
 import CookieServices from '../../services/CookieServices';
-import Loading from '../../lib/layouts/Loading'
 import ConstantsRegistry from '../../global/ConstantsRegistry';
 
-import { useAppSelector } from '../../store/hooks';
-import { postAuthentication } from '../../store/auth/postAuthenticationActions';
 import { Navigate, useLocation } from 'react-router-dom';
-import { failedAuthentication } from '../../store/auth/failedAuthenticationActions';
+import { usePromiseEffect } from '../../lib/hooks/usePromiseEffect';
 
 const PostAuthentication = () => {
-    const dispatch = useDispatch()
-    const location = useLocation()
-    const locationState = location.state
-
-    const postAuthState = useAppSelector((state) => state.postAuthentication);
-
-    const [loadingState, setLoadingState] = useState({
-        isLoading: true
+    const [state, setstate] = useState({
+        requestFailed: false,
+        isLoading: true,
+        data: null
     })
 
-    const accountName = ConstantsRegistry.cookieNameForAccountName()
-    const accountEmail = ConstantsRegistry.cookieNameForAccountEmail()
+    const dispatch = useDispatch()
+    const location = useLocation()
 
-    const postAuthActions = () => async (dispatch: any) => {
-        try {
-            const encryptedSanctumToken = CookieServices.get(ConstantsRegistry.cookieNameForSanctumToken())
-            const sanctumToken = Crypto.decryptDataUsingAES256(encryptedSanctumToken)
-            dispatch(postAuthentication(sanctumToken))
-        } catch (error) {
-            console.log(error)
-            dispatch(failedAuthentication())
+    const postAuthenticationProcess = usePromiseEffect(async () => {
+        const apiDomain = ApiServices.apiDomain()
+        const apiCall = apiDomain + `auth/account/agent/info`
+        const response: any = await HttpServices.httpGet(apiCall)
+
+        if (response.status !== 200) {
+            throw new Error("Something went wrong while signing user in.");
         }
-    }
 
-    useEffect(() => {
-        dispatch(postAuthActions())
+        const accountName = response.first_name + ' ' + response.last_name
+        const accountEmail = response.email
+        const options = {path: '/', secure: true, sameSite: 'none'}
+
+        const encryptedAccountName = Crypto.encryptDataUsingAES256(accountName)
+        const encryptedAccountEmail = Crypto.encryptDataUsingAES256(accountEmail)
+        
+        const cookieNameForAccountName = ConstantsRegistry.cookieNameForAccountName()
+        const cookieNameForAccountEmail = ConstantsRegistry.cookieNameForAccountEmail()
+        
+        CookieServices.set(cookieNameForAccountName, encryptedAccountName, options)
+        CookieServices.set(cookieNameForAccountEmail, encryptedAccountEmail, options)
+
+        return {response}
     }, [dispatch])
-
-    const loadData = () => {
-        // if (agentCarter === null || agentCartersEmail === null) {
-            // const encryptedSanctumToken = CookieServices.get(ConstantsRegistry.cookieNameForSanctumToken())
-            // const sanctumToken = Crypto.decryptDataUsingAES256(encryptedSanctumToken)
-
-            // let g3 = dispatch(postAuthentication(sanctumToken))
-            // console.log("G3", g3)
-        // }
-    }
-
-    if (postAuthState.isAuthenticated) {
-        if (locationState) {
-            alert('TODO:// Tried to navigate back to page but failed...')
-            // return <Navigate replace to={fromLocation} />;
-        } else {
-            return <Navigate replace to="/home" />;
-        }
-    }
     
-    if (postAuthState.errorMode) {
-        dispatch(failedAuthentication())
+    if (postAuthenticationProcess.status === 'fulfilled') {
+        return <Navigate replace to="/home" />
     }
 
     return(
@@ -70,25 +57,8 @@ const PostAuthentication = () => {
                 <title>Signing you in... </title>
             </Helmet>
 
-            {
-                postAuthState.isLoading ? (
-                    <Loading />
-                ) : (
-                    <div className="mb-3 pt-3 px-10 w-full">
-                        <button className="auth-submit-button" type="button" onClick={loadData}>
-                            <span>
-                                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                                    <svg className="w-5 h-5 text-white group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                                    </svg>
-                                </span>
+            <Loading />
 
-                                Load Page
-                            </span>
-                        </button>
-                    </div>
-                )
-            }
         </React.Fragment>
     )
 }

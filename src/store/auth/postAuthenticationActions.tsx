@@ -48,7 +48,3 @@ export const postAuthentication = (token: any) => {
         })
     }
 }
-
-export const postAuthenticationFailure = () => {
-    
-}

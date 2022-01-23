@@ -26,10 +26,10 @@ const SignIn = () => {
         dispatch(accountAuthentication(credentials.email, credentials.password));
     };
 
-    if (Auth.isAuthenticated()) {
+    if (authState.uuid) {
         return <Navigate 
             replace 
-            state={{from: locationState }} 
+            state={{from: locationState }}
             to={`/auth/post/access/ac/sntm/oen/seal/${authState.uuid}`} 
         />;
     }
