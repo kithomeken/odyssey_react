@@ -3,12 +3,12 @@ import { sessionReducer } from 'redux-react-session';
 import { withReduxStateSync } from 'redux-state-sync';
 
 import authenticationReducer from './auth/authenticationReducers';
-import postAuthenticationReducer from './auth/postAuthenticationReducer';
+import failedAuthenticationReducer from './auth/failedAuthenticationReducer';
 
 const rootReducer = combineReducers({ 
     session: sessionReducer,
     authentication: authenticationReducer,
-    postAuthentication: postAuthenticationReducer,
+    failedAuthenticationReducer: failedAuthenticationReducer,
 })
 
 export default withReduxStateSync(rootReducer)
