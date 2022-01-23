@@ -1,5 +1,6 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import Navigation from "../../components/settings/Navigation";
 import Auth from "./Auth";
 
 export default function RequireAuthentication() {
@@ -15,9 +16,9 @@ export default function RequireAuthentication() {
 
     return (
         <div className="flex h-screen">
-            {/* <ParamsNavigation 
-                activeMenu={activeMenu}
-            /> */}
+            <Navigation
+                activeMenu={'activeMenu'}
+            />
 
             <div className="flex flex-col w-full mb-5" style={marginLeft}>
                 {/* <ParamsUserBox /> */}
