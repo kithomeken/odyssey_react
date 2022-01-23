@@ -2,7 +2,7 @@ import { Navigate } from "react-router"
 import ConstantsRegistry from "../../global/ConstantsRegistry"
 import CookieServices from "../../services/CookieServices"
 
-export const failedAuthenticationReducer = (action: any) => {
+const failedAuthenticationReducer = (action: any) => {
     switch (action.type) {
         case 'REVOKE_AUTH_ACCESS_':
             // Revoke authentication access
@@ -17,3 +17,5 @@ export const failedAuthenticationReducer = (action: any) => {
             return <Navigate replace to="/auth/sign-in" />
     }
 }
+
+export default failedAuthenticationReducer
