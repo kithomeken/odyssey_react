@@ -50,7 +50,8 @@ const postAuthenticationReducer = (state = initialState, action: any) => {
 
         case 'POST_AUTH_INVALID_TOKEN_':
         case 'POST_AUTH_CATCH_EXCEPTION_':
-        default:            
+        default:
+            console.log('error state - 0000000')
             return {
                 ...initialState,
                 errorMode: true,
