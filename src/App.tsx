@@ -16,6 +16,7 @@ import FromIndexToHome from './lib/redirects/FromIndexToHome';
 import RequireAuthentication from './lib/router/RequireAuthentication';
 import PostAuthentication from './pages/auth/PostAuthentication';
 import { generalRoutes } from './routes/settings/generalRoutes';
+import { securityRoutes } from './routes/settings/securityRoutes';
 
 
 interface GuestRouteInterface {
@@ -38,7 +39,8 @@ const redirectedRoutes = [
 let protectedRoutes: Array<any> = []
 
 protectedRoutes = redirectedRoutes.concat(
-    generalRoutes
+    generalRoutes,
+    securityRoutes,
 );
 
 interface RouteContextType {
