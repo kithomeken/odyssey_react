@@ -12,7 +12,7 @@ const EditAuthorizations = () => {
 
     const breadCrumb = [
         { linkItem: true, title: "Security", url: thisPageRoutes },
-        { linkItem: true, title: "Authorization" + groupOrTeam, url: thisPageRoutes },
+        { linkItem: true, title: "Authorization " + groupOrTeam, url: thisPageRoutes },
         { linkItem: false, title: "Edit" },
     ]
 

@@ -18,7 +18,7 @@ const AuthorizationTeams = () => {
 
     const groupOrTeam = 'Team'
     const showButton = false
-    const pageTitle = "Authorization Groups"
+    const pageTitle = "Authorization " + groupOrTeam
     const thisPageRoutes = securityRoutes[0].path
 
     const breadCrumb = [
@@ -36,7 +36,7 @@ const AuthorizationTeams = () => {
                 ...state,
                 requestFailed: true
             })
-            throw new Error("Something went wrong when fetching organizational details.");
+            throw new Error("Something went wrong when fetching authorization groups...");
         }
 
         return response.data
