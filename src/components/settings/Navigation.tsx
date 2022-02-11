@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
+import { supportFeaturesRoutes } from "../../routes/settings/featuresRoutes"
 import { generalRoutes } from "../../routes/settings/generalRoutes"
 import { securityRoutes } from "../../routes/settings/securityRoutes"
 
@@ -82,6 +83,25 @@ class Navigation extends Component<Props> {
 
                                 <p className="ml-4 text-sm">
                                     Authorization Groups
+                                </p>
+                            </Link>
+                        </div>
+
+                        <div className="w-full">
+                            <span className="lan-1 mb-0 mt-3 lolrtn text-gray-500 text-xs block tracking-widest">
+                                Features
+                            </span>
+
+                            <Link to={supportFeaturesRoutes[0].path} className={this.classNames(
+                                activeMenu === 'authorization' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
+                                'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
+                            )}>
+                                <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
+                                    <i className="fal fa-headset"></i>
+                                </div>
+
+                                <p className="ml-4 text-sm">
+                                    Support Features
                                 </p>
                             </Link>
                         </div>
