@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Navigation from "../../components/settings/Navigation";
+import TopHeader from "../../components/settings/TopHeader";
 import Auth from "./Auth";
 
 export default function RequireAuthentication() {
@@ -20,8 +21,9 @@ export default function RequireAuthentication() {
                 activeMenu={'activeMenu'}
             />
 
+            <TopHeader />
+
             <div className="flex flex-col w-full mb-5" style={marginLeft}>
-                {/* <ParamsUserBox /> */}
 
                 <div className="w-full px-8 py-3 overflow-y-auto">
                     <div className="kiOAkj" style={marginTop}>

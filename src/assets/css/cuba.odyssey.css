@@ -352,7 +352,8 @@ body {
 
 .swal-title {
     color: rgba(0, 0, 0, .65);
-    font-weight: 600;
+    font-weight: normal;
+    font-family: 'Rubik', sans-serif;
     text-transform: none;
     position: relative;
     display: block;
@@ -365,9 +366,10 @@ body {
 
 .swal-text {
     font-size: 14px;
+    font-family: 'Rubik', sans-serif;
     position: relative;
     float: none;
-    line-height: normal;
+    line-height: inherit;
     vertical-align: top;
     text-align: center;
     display: inline-block;
@@ -381,11 +383,11 @@ body {
 }
 
 .swal-button {
-    padding: 7px 20px;
+    padding: 6px 18px;
 }
 
 .swal-modal {
-    width: 450px;
+    width: 320px;
     opacity: 0;
     pointer-events: none;
     background-color: #fff;
@@ -413,3 +415,12 @@ body {
     --tw-bg-opacity: 1;
     background-color: rgba(243, 244, 246, var(--tw-bg-opacity));
 }
+
+.swal-footer {
+    text-align: right;
+    margin-top: 13px;
+    padding: 8px;
+    border-radius: inherit;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
