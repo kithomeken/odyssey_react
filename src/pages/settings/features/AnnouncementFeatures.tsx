@@ -1,86 +1,51 @@
-import React, { useState } from "react"
-import { toast } from "react-toastify";
-import ApiServices from "../../../api/ApiServices";
-import { usePromiseEffect } from "../../../lib/hooks/usePromiseEffect";
-import HttpServices from "../../../services/HttpServices";
+import React from "react"
+import { toast } from "react-toastify"
+
 import Error500 from "../../errors/Error500";
+import ApiServices from "../../../api/ApiServices";
+import HttpServices from "../../../services/HttpServices";
+import { usePromiseEffect } from "../../../lib/hooks/usePromiseEffect";
 
 const AnnouncementFeatures = () => {
-    const [state, setstate] = useState({
-        input: {
-            enable_announcements: ''
-        }
-    })
-
-    const onToggleEnableAnnouncements = (e: any) => {
+    const onToggleAnnouncementsFeature = async (e: any) => {
         let checked = e.target.checked;
-        let checkedString = ''
-
-        if (checked) {
-            checkedString = 'Y'            
-        } else {
-            checkedString = 'N'
-        }
-
-        setstate({
-            ...state,
-            input: {
-                enable_announcements: checkedString
-            }
-        })
-
-        enableAnnouncementsSupportFeature(checkedString)
-    }
-
-    const enableAnnouncementsSupportFeature = async (checkedString: string) => {
+        let toggleStatus = checked ? 'Y' : 'N'
+        
         try {
             let input = {   
-                enable_announcements: checkedString
+                announcements: toggleStatus
             }
             const apiDomain = ApiServices.apiDomain()
             const apiCall = apiDomain + `portal/a/site-master/features/support/announcements/enable`
             const response: any = await HttpServices.httpPost(apiCall, input)
-    
-            console.log(response)
+            
             if (response.data.success) {
-                if (checkedString === 'Y') {
-                    toast("Announcements feature is now activated...", {
+                if (toggleStatus === 'Y') {
+                    toast("Annoucements Feature Activated...", {
                         position: toast.POSITION.TOP_RIGHT,
                     });
-                } else if (checkedString === 'N') {
-                    toast("Announcements feature is now de-activated...", {
+                } else {
+                    toast("Annoucements Feature De-activated...", {
                         position: toast.POSITION.TOP_RIGHT,
                     });
                 }
             } else {
-                let previousValue = checkedString === 'Y' ? 'N' : 'Y'
-                announcementState.value.announcements = checkedString === 'Y' ? false : true
-                toast("Something went wrong when trying to action on this feature...", {
+                let stateBeforeOnToggle = toggleStatus === 'Y' ? true : false
+                announcementState.value.announcements = stateBeforeOnToggle
+
+                toast("Something went wrong, could not change feature status...", {
                     position: toast.POSITION.TOP_RIGHT,
                 });
-
-                setstate({
-                    ...state,
-                    input: {
-                        enable_announcements: previousValue
-                    }
-                })
             }
         } catch (error) {
-            let previousValue = checkedString === 'Y' ? 'N' : 'Y'
-            announcementState.value.announcements = checkedString === 'Y' ? false : true
-            toast("Something went wrong when trying to action on this feature...", {
+            let stateBeforeOnToggle = toggleStatus === 'Y' ? true : false
+            announcementState.value.announcements = stateBeforeOnToggle
+
+            toast("Something went wrong, could not change feature status...", {
                 position: toast.POSITION.TOP_RIGHT,
             });
-            
-            setstate({
-                ...state,
-                input: {
-                    enable_announcements: previousValue
-                }
-            })
         }
-    } 
+    }
 
     let announcementState = usePromiseEffect(async () => {
         const apiDomain = ApiServices.apiDomain()
@@ -91,12 +56,8 @@ const AnnouncementFeatures = () => {
             throw new Error("Something went wrong when fetching the announcement support features...");
         }
 
-        if (response.data.data.announcements === 'Y') {
-            response.data.data.announcements = true
-        } else {
-            response.data.data.announcements = false
-        }
-
+        console.log(response);
+        
         return response.data.data
     }, [])
 
@@ -120,9 +81,14 @@ const AnnouncementFeatures = () => {
 
                             <div className="w-full ml-5 mb-3">
                                 <div className="flex flex-row items-center">
-                                    <div className="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in" onClick={onToggleEnableAnnouncements}>
-                                        <input type="checkbox" id="enable_announcements" defaultChecked={announcementState.value.announcements} className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                        <label htmlFor="enable_announcements" className="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                                    <div className="relative inline-block w-8 mr-2 align-middle select-none transition duration-200 ease-in" onClick={onToggleAnnouncementsFeature}>
+                                        <input 
+                                            type="checkbox" 
+                                            id="enable_announcements" 
+                                            defaultChecked={announcementState.value.announcements === 'Y' ? true : false} 
+                                            className="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 appearance-none cursor-pointer"
+                                        />
+                                        <label htmlFor="enable_announcements" className="toggle-label block overflow-hidden h-4 rounded-full bg-gray-300 cursor-pointer"></label>
                                     </div>
         
                                     <label htmlFor="enable_announcements" className="ml-4 block text-sm mb-1 text-gray-900">
@@ -133,7 +99,7 @@ const AnnouncementFeatures = () => {
                                 <div className="flex flex-row">
                                     <div className="w-10 mr-2"></div>
         
-                                    <span className="text-gray-500 text-sm ml-7 w-12/12">
+                                    <span className="text-gray-500 text-sm ml-6 w-12/12">
                                         Activating this feature allows you to send important messages/updates to all your users, or if you'd like a sub set of users. This feature will only be available to users with administrative rights
                                     </span>
                                 </div>
