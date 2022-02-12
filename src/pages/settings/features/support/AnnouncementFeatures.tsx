@@ -1,37 +1,37 @@
 import React from "react"
 import { toast } from "react-toastify"
 
-import Error500 from "../../errors/Error500";
-import ApiServices from "../../../api/ApiServices";
-import HttpServices from "../../../services/HttpServices";
-import { usePromiseEffect } from "../../../lib/hooks/usePromiseEffect";
+import Error500 from "../../../errors/Error500";
+import ApiServices from "../../../../api/ApiServices";
+import HttpServices from "../../../../services/HttpServices";
+import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect";
 
-const AgentFeatures = () => {
-    const onToggleAgentTechnicianFeature = async (e: any) => {
+const AnnouncementFeatures = () => {
+    const onToggleAnnouncementsFeature = async (e: any) => {
         let checked = e.target.checked;
         let toggleStatus = checked ? 'Y' : 'N'
         
         try {
             let input = {   
-                field_agent: toggleStatus
+                announcements: toggleStatus
             }
             const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + `portal/a/site-master/features/support/agents/field-agent`
+            const apiCall = apiDomain + `portal/a/site-master/features/support/announcements/enable`
             const response: any = await HttpServices.httpPost(apiCall, input)
-                
+            
             if (response.data.success) {
                 if (toggleStatus === 'Y') {
-                    toast("Agent Technician Feature Activated...", {
+                    toast("Annoucements Feature Activated...", {
                         position: toast.POSITION.TOP_RIGHT,
                     });
                 } else {
-                    toast("Agent Technician Feature De-activated...", {
+                    toast("Annoucements Feature De-activated...", {
                         position: toast.POSITION.TOP_RIGHT,
                     });
                 }
             } else {
                 let stateBeforeOnToggle = toggleStatus === 'Y' ? true : false
-                agentSupportState.value.field_agent = stateBeforeOnToggle
+                announcementState.value.announcements = stateBeforeOnToggle
 
                 toast("Something went wrong, could not change feature status...", {
                     position: toast.POSITION.TOP_RIGHT,
@@ -39,23 +39,25 @@ const AgentFeatures = () => {
             }
         } catch (error) {
             let stateBeforeOnToggle = toggleStatus === 'Y' ? true : false
-            agentSupportState.value.field_agent = stateBeforeOnToggle
+            announcementState.value.announcements = stateBeforeOnToggle
 
             toast("Something went wrong, could not change feature status...", {
                 position: toast.POSITION.TOP_RIGHT,
             });
         }
     }
-    
-    let agentSupportState = usePromiseEffect(async () => {
+
+    let announcementState = usePromiseEffect(async () => {
         const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + `portal/a/site-master/features/support/agents`
+        const apiCall = apiDomain + `portal/a/site-master/features/support/announcements`
         const response: any = await HttpServices.httpGet(apiCall)
 
         if (response.status !== 200) {
-            throw new Error("Something went wrong when fetching agent support features...");
+            throw new Error("Something went wrong when fetching the announcement support features...");
         }
 
+        console.log(response);
+        
         return response.data.data
     }, [])
 
@@ -63,41 +65,42 @@ const AgentFeatures = () => {
         <React.Fragment>
             <div className="py-4">
                 {
-                    agentSupportState.status === 'rejected' ? (
+                    announcementState.status === 'rejected' ? (
                         <Error500 />
-                    ) : agentSupportState.status === 'fulfilled' ? (
+                    ) : announcementState.status === 'fulfilled' ? (
                         <div>
-                            <h2 className="text-lg leading-7 text-green-500 sm: mb-2">
-                                Agent Features
+                            <h2 className="text-lg leading-7 text-green-500 sm:text-lg sm: mb-2">
+                                Announcement Features
                             </h2>
 
-                            <div className="w-12/12">
+                            <div className="w-10/12">
                                 <p className="text-sm form-group text-gray-500">
-                                    Support features that extend the functionalities and capabilities of your agents to enable them hit the road running. 
+                                    Support features to extend your in-house communication and reach a specific, if not all, sub set of users.
                                 </p>
                             </div>
 
                             <div className="w-full ml-5 mb-3">
                                 <div className="flex flex-row items-center">
-                                    <div className="relative inline-block w-8 mr-2 align-middle select-none transition duration-200 ease-in" onClick={onToggleAgentTechnicianFeature}>
-                                        <input type="checkbox" 
-                                            id="support-toggle" 
-                                            defaultChecked={agentSupportState.value.field_agent === 'Y' ? true : false} 
+                                    <div className="relative inline-block w-8 mr-2 align-middle select-none transition duration-200 ease-in" onClick={onToggleAnnouncementsFeature}>
+                                        <input 
+                                            type="checkbox" 
+                                            id="enable_announcements" 
+                                            defaultChecked={announcementState.value.announcements === 'Y' ? true : false} 
                                             className="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 appearance-none cursor-pointer"
                                         />
-                                        <label htmlFor="support-toggle" className="toggle-label block overflow-hidden h-4 rounded-full bg-gray-300 cursor-pointer"></label>
+                                        <label htmlFor="enable_announcements" className="toggle-label block overflow-hidden h-4 rounded-full bg-gray-300 cursor-pointer"></label>
                                     </div>
-
-                                    <label htmlFor="support-toggle" className="ml-4 block text-sm mb-1 text-gray-900">
-                                        Support team consists of field technicians
+        
+                                    <label htmlFor="enable_announcements" className="ml-4 block text-sm mb-1 text-gray-900">
+                                        Enable Announcements
                                     </label>
                                 </div>
-
+        
                                 <div className="flex flex-row">
                                     <div className="w-10 mr-2"></div>
-
+        
                                     <span className="text-gray-500 text-sm ml-6 w-12/12">
-                                        Support team consists of trained professionals engaged in performing on-site end-user support. They are responsible for troubleshooting, repairs and client training of devices in any assigned location. Most useful in a network setup.
+                                        Activating this feature allows you to send important messages/updates to all your users, or if you'd like a sub set of users. This feature will only be available to users with administrative rights
                                     </span>
                                 </div>
                             </div>
@@ -113,4 +116,4 @@ const AgentFeatures = () => {
     )
 }
 
-export default AgentFeatures
+export default AnnouncementFeatures

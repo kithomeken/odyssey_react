@@ -1,10 +1,10 @@
 import React from "react"
 import { toast } from "react-toastify"
 
-import Error500 from "../../errors/Error500";
-import ApiServices from "../../../api/ApiServices";
-import HttpServices from "../../../services/HttpServices";
-import { usePromiseEffect } from "../../../lib/hooks/usePromiseEffect";
+import Error500 from "../../../errors/Error500";
+import ApiServices from "../../../../api/ApiServices";
+import HttpServices from "../../../../services/HttpServices";
+import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect";
 
 const ClientFeatures = () => {
     let clientSupportFeaturesPromise = usePromiseEffect(async () => {
