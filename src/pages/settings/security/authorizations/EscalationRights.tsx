@@ -13,7 +13,7 @@ const EscalationRights: FC<Props> = ({input, errors, supportFeatures, onChangeHa
         <React.Fragment>
             <div className="w-full py-4">
                 {
-                    supportFeatures.escalation_access === '' ? (
+                    supportFeatures.value.escalation_access === 'Y' ? (
                         <div>
                             <h2 className="text-sm leading-7 text-gray-700 sm:text-lg sm: mb-3">
                                 Define escalations your users can abide to when working on worflow items or when they need green light on items.

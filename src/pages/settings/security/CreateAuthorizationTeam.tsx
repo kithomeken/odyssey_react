@@ -19,6 +19,7 @@ const CreateAuthorizationTeam = () => {
     const [state, setstate] = useState({
         showModal: false,
         activeTab: 'administrative',
+        isPostingForm: false,
         input: {
             name: '',
             description: '',
@@ -139,6 +140,8 @@ const CreateAuthorizationTeam = () => {
             throw new Error("Something went wrong when fetching support features...");
         }
 
+        console.log(response);
+        
         return response.data.data
     }, [])
 
@@ -153,6 +156,43 @@ const CreateAuthorizationTeam = () => {
         setstate({
             ...state,
             showModal: false
+        })
+    }
+
+    const onAccessTypeHandler = (e: any) => {
+        let {input}: any = state
+        let {errors}: any = state
+        input[e.target.name] = e.target.value
+        errors[e.target.name] = ''
+
+        setstate({
+            ...state, input, errors
+        })
+
+        if (state.input.access_group === 'L') {
+            input['ticket_access'] = 'RST'
+        } else {
+            input['ticket_access'] = null
+        }
+    }
+
+    const onTicketVisibilityHandler = (e: any) => {
+        let {input}: any = state
+        let {errors}: any = state
+        input[e.target.name] = e.target.value
+        errors[e.target.name] = ''
+
+        setstate({
+            ...state, input, errors
+        })
+    }
+
+    const onSubmitFormData = (e: any) => {
+        e.preventDefault()
+
+        setstate({
+            ...state,
+            isPostingForm: true
         })
     }
 
@@ -171,7 +211,7 @@ const CreateAuthorizationTeam = () => {
             <div className="w-full mb-2">
                 <div className="w-12/12">
                     <p className="text-sm mb-3 text-gray-500">
-                        When creating an Authorization {groupOrTeam}, you're free to set limited or lifetime access for your agents, restrict the resources at their disposal and issue the various rights appropriate for each. Once created, you will be able to add agents into the various Auth Teams.
+                        When creating an Authorization {groupOrTeam}, you're free to set limited or lifetime access for your agents, restrict the resources at their disposal and issue the various rights appropriate for each. Once created, you will be able to add agents into the various Auth Groups.
                     </p>
                 </div>
             </div>
@@ -182,13 +222,13 @@ const CreateAuthorizationTeam = () => {
                         <Error500 />
                     </div>
                 ) : supportFeaturesPromise.status === 'fulfilled' ? (
-                    <form className="w-8/12 form-group">
+                    <form className="w-8/12 form-group" onSubmit={onSubmitFormData}>
                         <div className="w-full">
-                            <p className="text-green-500 mb-2">Team Details</p>
+                            <p className="text-green-500 mb-2">Group Details</p>
 
                             <div className="w-12/12 rounded-md shadow-none space-y-px form-group pl-4">
-                                <label htmlFor="team-name" className="block mb-1 text-sm">Team Name</label>
-                                <input type="text" name="name" id="team-name" autoComplete="off" className="focus:ring-2 focus:ring-green-500 p-2 capitalize flex-1 block w-full text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Team Name" />
+                                <label htmlFor="team-name" className="block mb-1 text-sm">Group Name</label>
+                                <input type="text" name="name" id="team-name" autoComplete="off" className="focus:ring-2 focus:ring-green-500 p-2 capitalize flex-1 block w-full text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Group Name" />
 
                                 {state.errors.name.length > 0 && 
                                     <span className='invalid-feedback font-small text-red-600 pl-0'>
@@ -220,7 +260,7 @@ const CreateAuthorizationTeam = () => {
                                             />
 
                                             <label htmlFor="field_agent" className="ml-2 block text-sm text-gray-500">
-                                                Team contains field agents
+                                                Group contains field agents
                                             </label>
                                         </div>
                                     </div>
@@ -247,6 +287,7 @@ const CreateAuthorizationTeam = () => {
                                             name="access_group"
                                             type="radio"
                                             value="A"
+                                            onChange={onAccessTypeHandler}
                                             className="h-4 w-4 mt-1 text-green-600 focus:ring-2 form-control checked:border-green-500 checked:bg-green-500 focus:ring-green-500 focus:bg-green-500 border-gray-300 rounded"
                                         />
 
@@ -275,6 +316,7 @@ const CreateAuthorizationTeam = () => {
                                             name="access_group"
                                             type="radio"
                                             value="L"
+                                            onChange={onAccessTypeHandler}
                                             className="h-4 w-4 mt-1 text-green-600 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                         />
 
@@ -324,6 +366,7 @@ const CreateAuthorizationTeam = () => {
                                                     true
                                                 )
                                             }
+                                            onChange={onTicketVisibilityHandler}
                                             className={classNames(
                                                 (state.input.access_group === 'A') ? null : 'cursor-not-allowed',
                                                 "h-4 w-4 mt-1 text-green-600 disabled:opacity-50 focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
@@ -360,14 +403,7 @@ const CreateAuthorizationTeam = () => {
                                                     name="ticket_access"
                                                     type="radio"
                                                     value="RST"
-                                                    disabled={
-                                                        (state.input.access_group === 'A') ? 
-                                                            false
-                                                        : (state.input.access_group === 'L') ?
-                                                            false
-                                                        :
-                                                            false
-                                                    }
+                                                    onChange={onTicketVisibilityHandler}
                                                     className="h-4 w-4 mt-1 text-green-600 disabled:opacity-50 focus:ring-green-500 checked:bg-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                                 />
                                             ) : (state.input.access_group === 'L') ? (
@@ -376,6 +412,8 @@ const CreateAuthorizationTeam = () => {
                                                     name="ticket_access"
                                                     type="radio"
                                                     value="RST"
+                                                    checked={true}
+                                                    onChange={onTicketVisibilityHandler}
                                                     className="h-4 w-4 mt-1 text-green-600 disabled:opacity-50 focus:ring-green-500 checked:bg-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                                 />
                                             ) : (
@@ -384,22 +422,9 @@ const CreateAuthorizationTeam = () => {
                                                     name="ticket_access"
                                                     type="radio"
                                                     value="RST"
-                                                    checked={
-                                                        (state.input.access_group === 'A') ? 
-                                                            false
-                                                        : (state.input.access_group === 'L') ?
-                                                            true
-                                                        :
-                                                            false
-                                                    }
-                                                    disabled={
-                                                        (state.input.access_group === 'A') ? 
-                                                            false
-                                                        : (state.input.access_group === 'L') ?
-                                                            false
-                                                        :
-                                                            false
-                                                    }
+                                                    checked={false}
+                                                    disabled={true}
+                                                    onChange={onTicketVisibilityHandler}
                                                     className="h-4 w-4 mt-1 text-green-600 disabled:opacity-50 focus:ring-green-500 checked:bg-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                                 />
                                             )
@@ -476,14 +501,31 @@ const CreateAuthorizationTeam = () => {
                             </div>
                         </div>
 
+                        <div className="w-full pt-3 mb-5">
+                            {
+                                state.isPostingForm ? (
+                                    <button type="button" className={`inline-flex items-center px-4 py-1 border float-right border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-500`} disabled={true}>
+                                        <span>                                                    
+                                            <span className="left-0 inset-y-0 flex items-center pl-3">
+                                                <span className="pr-2">
+                                                    Creating...
+                                                </span>
 
-
-
-
-
-
-
-
+                                                <span className="w-5 h-5">
+                                                    <i className="fad fa-spinner-third fa-lg fa-spin"></i>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </button>
+                                ) : (
+                                    <button type="submit" className={`inline-flex items-center px-4 py-1 border border-green-500 float-right rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500`}>
+                                        <span className="text-sm">
+                                            Create Authorization Group
+                                        </span>
+                                    </button>
+                                )
+                            }
+                        </div>
                     </form>
                 ) : (
                     <div className="flex flex-col align-middle mt-24 w-full h-16">
