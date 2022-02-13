@@ -173,9 +173,9 @@ const TicketRights: FC<Props> = ({input, errors, supportFeatures, onChangeHandle
 
                         
                         {errors.whos_comments.length > 0 && 
-                            <span className='invalid-feedback font-small text-red-600 pl-0'>
+                            <p className='invalid-feedback font-small text-red-600 pl-0 form-group'>
                                 {errors.whos_comments}
-                            </span>
+                            </p>
                         }
                     </div>
                 </div>

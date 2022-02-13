@@ -14,6 +14,7 @@ import AdministativeRights from "./authorizations/AdministrativeRights"
 import EscalationRights from "./authorizations/EscalationRights"
 import TicketRights from "./authorizations/TicketRights"
 import { InformationAlert } from "../../../components/lib/InformationAlert"
+import { toast } from "react-toastify"
 
 const CreateAuthorizationTeam = () => {
     const [state, setstate] = useState({
@@ -187,13 +188,108 @@ const CreateAuthorizationTeam = () => {
         })
     }
 
+    const handleValidation = () => {
+        let {input}: any = state
+        let {errors}: any = state
+        let isFormValid = true
+
+        if (!input['name']) {
+            isFormValid = false
+            errors.name = 'Please enter a group name'
+        } else if (input['name'] < 3) {
+            isFormValid = false
+            errors.name = 'Group name cannot be less than 3 characters'
+        } else if (input['name'] < 15) {
+            isFormValid = false
+            errors.name = 'Group name cannot be greater than 15 characters'
+        } else {
+            errors.name = ''
+        }
+
+        if (!input['description']) {
+            isFormValid = false
+            errors.description = 'Please enter a group description'
+        } else if (input['description'] < 3) {
+            isFormValid = false
+            errors.description = 'Group description cannot be less than 3 characters'
+        } else if (input['description'] < 25) {
+            isFormValid = false
+            errors.description = 'Group description cannot be greater than 25 characters'
+        } else {
+            errors.description = ''
+        }
+
+        if (!input['access_group']) {
+            isFormValid = false
+            errors.access_group = 'Please select an account access type'
+        } else {
+            errors.access_group = ''
+        }
+
+        if (!input['ticket_access']) {
+            isFormValid = false
+            errors.ticket_access = 'Please select a ticket visibility method'
+        } else {
+            errors.ticket_access = ''
+        }
+
+        if (input['delete_comments'] === 'Y') {
+            if (!input['whos_comments']) {
+                isFormValid = false
+                errors.whos_comments = 'Please select one of the options above'
+            } else {
+                errors.whos_comments = ''
+            }
+        } else {
+            errors.whos_comments = ''
+        }
+
+        return isFormValid
+    }
+
+    const handlePostingFormData = async () => {        
+        try {
+            let input = state.input
+            const apiDomain = ApiServices.apiDomain()
+            const apiCall = apiDomain + `portal/a/site-master/security/auth-team/create`
+            const response: any = await HttpServices.httpPost(apiCall, input)
+                
+            if (response.data.success) {
+                toast("Created authorization group...", {
+                    position: toast.POSITION.TOP_RIGHT,
+                });
+            } else {
+                toast("Something went wrong, could not create authorization group...", {
+                    position: toast.POSITION.TOP_RIGHT,
+                });
+            }
+        } catch (error) {
+            toast("Something went wrong, could not create authorization group...", {
+                position: toast.POSITION.TOP_RIGHT,
+            });
+        }
+    }
+
     const onSubmitFormData = (e: any) => {
         e.preventDefault()
 
-        setstate({
-            ...state,
-            isPostingForm: true
-        })
+        if (handleValidation()) {
+            setstate({
+                ...state,
+                isPostingForm: true
+            })
+
+            handlePostingFormData()
+        } else {
+            toast.error("Kindly clear validation errors before posting form data...", {
+                position: toast.POSITION.TOP_RIGHT,
+            });
+
+            setstate({
+                ...state,
+                isPostingForm: false
+            })
+        }
     }
 
     return (
@@ -228,23 +324,23 @@ const CreateAuthorizationTeam = () => {
 
                             <div className="w-12/12 rounded-md shadow-none space-y-px form-group pl-4">
                                 <label htmlFor="team-name" className="block mb-1 text-sm">Group Name</label>
-                                <input type="text" name="name" id="team-name" autoComplete="off" className="focus:ring-2 focus:ring-green-500 p-2 capitalize flex-1 block w-full text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Group Name" />
+                                <input type="text" name="name" id="team-name" autoComplete="off" className="focus:ring-2 focus:ring-green-500 p-2 capitalize flex-1 block w-full text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Group Name" onChange={onChangeHandler} />
 
                                 {state.errors.name.length > 0 && 
-                                    <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                    <p className='invalid-feedback font-small text-red-600 pl-0'>
                                         {state.errors.name}
-                                    </span>
+                                    </p>
                                 }
                             </div>
 
                             <div className="w-12/12 rounded-md shadow-none space-y-px form-group pl-4">
                                 <label htmlFor="team-description" className="block mb-1 text-sm">Description</label>
-                                <textarea name="description" id="team-description" rows={2} autoComplete="off" className="focus:border-green-500 p-2 capitalize flex-1 block w-full text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Description"></textarea>
+                                <textarea name="description" id="team-description" rows={2} autoComplete="off" className="focus:border-green-500 p-2 capitalize flex-1 block w-full text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Description" onChange={onChangeHandler}></textarea>
 
                                 {state.errors.description.length > 0 && 
-                                    <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                    <p className='invalid-feedback font-small text-red-600 pl-0'>
                                         {state.errors.description}
-                                    </span>
+                                    </p>
                                 }
                             </div>
 
@@ -269,11 +365,11 @@ const CreateAuthorizationTeam = () => {
                         </div>
 
                         <div className="w-full text-justify border-t pt-3">
-                            <p className="text-green-500 mb-2">Access Type</p>
+                            <p className="text-green-500 mb-2">Account Access</p>
 
                             <div className="w-full form-group">
                                 <p className="text-sm mb-2 text-gray-500">
-                                    Control users' access to the system by setting an Access Type applicable to each team.
+                                    Control users' account access to the system by setting an Access Type applicable to each team.
                                 </p>
                             </div>
 
@@ -338,6 +434,12 @@ const CreateAuthorizationTeam = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {state.errors.access_group.length > 0 && 
+                                <p className='invalid-feedback font-small text-red-600 pl-4 form-group'>
+                                    {state.errors.access_group}
+                                </p>
+                            }
                         </div>
 
                         <div className="w-full border-t pt-3">
@@ -454,9 +556,9 @@ const CreateAuthorizationTeam = () => {
                             </div>
 
                             {state.errors.ticket_access.length > 0 && 
-                                <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                <p className='invalid-feedback font-small text-red-600 pl-4 form-group'>
                                     {state.errors.ticket_access}
-                                </span>
+                                </p>
                             }
                         </div>
 
