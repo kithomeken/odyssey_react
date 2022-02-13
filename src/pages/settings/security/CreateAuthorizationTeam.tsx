@@ -1,5 +1,7 @@
 import React, { useState } from "react"
+import swal from "sweetalert"
 import { Helmet } from "react-helmet"
+
 import ApiServices from "../../../api/ApiServices"
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
@@ -11,9 +13,11 @@ import Error500 from "../../errors/Error500"
 import AdministativeRights from "./authorizations/AdministrativeRights"
 import EscalationRights from "./authorizations/EscalationRights"
 import TicketRights from "./authorizations/TicketRights"
+import { InformationAlert } from "../../../components/lib/InformationAlert"
 
 const CreateAuthorizationTeam = () => {
     const [state, setstate] = useState({
+        showModal: false,
         activeTab: 'administrative',
         input: {
             name: '',
@@ -138,6 +142,20 @@ const CreateAuthorizationTeam = () => {
         return response.data.data
     }, [])
 
+    const openInformationModel = () => {
+        setstate({
+            ...state,
+            showModal: true
+        })
+    }
+    
+    const closeInformationModel = () => {
+        setstate({
+            ...state,
+            showModal: false
+        })
+    }
+
     return (
         <React.Fragment>
             <Helmet>
@@ -217,20 +235,11 @@ const CreateAuthorizationTeam = () => {
                                 <p className="text-sm mb-2 text-gray-500">
                                     Control users' access to the system by setting an Access Type applicable to each team.
                                 </p>
-
-                                <p className="text-sm mb-2 pl-4 text-gray-500">
-                                    <span className="text-black">All Time Access:</span> users will have lifetime access to the system with periodic password resets as defined in the Password Policies.
-                                </p>
-
-                                <p className="text-sm form-group pl-4 text-gray-500">
-                                    <span className="text-black"> Limited Time Access:</span> users will have a 30 day span access to the system after account activation, after which their accounts will be de-activated. You can, however, extend a users access if need be.
-                                </p>
                             </div>
 
-                            <div className="mb-3 flex items-center w-full pl-4">
-                                <div className={classNames(
-                                    state.input.access_group === 'A' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
-                                    "flex-1 min-w-0 p-4 pl-8 border border-gray-300 mr-1 rounded-md"
+                            <div className="w-100 form-group pl-4">
+                                <div className={classNames(state.input.access_group === 'A' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
+                                    "flex-1 min-w-0 p-4 pl-8 border border-gray-300 rounded-md"
                                 )}>
                                     <div className="w-full flex">
                                         <input
@@ -248,16 +257,17 @@ const CreateAuthorizationTeam = () => {
 
                                             <div className="font-smaller text-secondary">
                                                 <span className="acs-psd">
-                                                    No account expiry
+                                                    Users will have lifetime access to the system with periodic password resets.
                                                 </span>
                                             </div>
                                         </label>
                                     </div>
                                 </div>
-
-                                <div className={classNames(
-                                    state.input.access_group === 'L' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
-                                    "flex-1 min-w-0 p-4 pl-8 border border-gray-300 ml-1 rounded-md"
+                            </div>
+                            
+                            <div className="w-100 form-group pl-4">
+                                <div className={classNames(state.input.access_group === 'L' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
+                                    "flex-1 min-w-0 p-4 pl-8 border border-gray-300 rounded-md"
                                 )}>
                                     <div className="w-full flex">
                                         <input
@@ -269,24 +279,22 @@ const CreateAuthorizationTeam = () => {
                                         />
 
                                         <label htmlFor="limited_access" className="ml-2 text-sm text-gray-500">
-                                            <span className="custom-radio-button-label text-black">
-                                                Limited Time Access
+                                            <span className="custom-radio-button-label flex items-center">
+                                                <span className="text-black">
+                                                    Limited Time Access
+                                                </span>
+
+                                                <button type="button" className="far fa-question-circle text-blue-500 ml-3 fa-lg" onClick={openInformationModel}></button>
                                             </span>
 
                                             <div className="font-smaller text-secondary">
                                                 <span className="acs-psd">
-                                                    30 days access pass
+                                                    Users will have a 30 day span access to the system after account activation.
                                                 </span>
                                             </div>
                                         </label>
                                     </div>
                                 </div>
-
-                                {state.errors.access_group.length > 0 && 
-                                    <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                        {state.errors.access_group}
-                                    </span>
-                                }
                             </div>
                         </div>
 
@@ -295,22 +303,13 @@ const CreateAuthorizationTeam = () => {
 
                             <div className="w-full form-group">
                                 <p className="text-sm mb-2 text-gray-500">
-                                    Control users' access to tickets raised by setting a visibility mode.
-                                </p>
-
-                                <p className="text-sm mb-2 text-gray-500 pl-4">
-                                    <span className="text-black">Global Access:</span> users have visibility to all tickets raised, regardless of who raised them and whether they are/were assigned to them.
-                                </p>
-
-                                <p className="text-sm form-group text-gray-500 pl-4">
-                                    <span className="text-black">Restricted Access:</span> users will <span className="text-red-500">ONLY</span> have access to the tickets assigned to them.
+                                    Control users' access and visibility to tickets raised by selecting a visibility mode.
                                 </p>
                             </div>
 
-                            <div className="flex items-center w-full mb-3 pl-4">
-                                <div className={classNames(
-                                    state.input.ticket_access === 'GLB' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
-                                    "flex-1 min-w-0 p-4 pl-8 border border-gray-300 mr-1 rounded-md"
+                            <div className="w-100 form-group pl-4">
+                                <div className={classNames(state.input.ticket_access === 'GLB' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
+                                    "flex-1 min-w-0 p-4 pl-8 border border-gray-300 rounded-md"
                                 )}>
                                     <div className="w-full flex">
                                         <input
@@ -341,16 +340,17 @@ const CreateAuthorizationTeam = () => {
 
                                             <div className="font-smaller text-secondary">
                                                 <span className="acs-psd">
-                                                    Visibility to all tickets
+                                                    Visibility to all tickets raised, and whether they are/were assigned to them.
                                                 </span>
                                             </div>
                                         </label>
                                     </div>
                                 </div>
-                                
-                                <div className={classNames(
-                                    state.input.ticket_access === 'RST' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
-                                    "flex-1 min-w-0 p-4 pl-8 border border-gray-300 ml-1 rounded-md"
+                            </div>
+                            
+                            <div className="w-100 form-group pl-4">
+                                <div className={classNames(state.input.ticket_access === 'RST' ? 'border-green-400 bg-green-50' : 'border-gray-300 bg-white',
+                                    "flex-1 min-w-0 p-4 pl-8 border border-gray-300 rounded-md"
                                 )}>
                                     <div className="w-full flex">
                                         {
@@ -420,7 +420,7 @@ const CreateAuthorizationTeam = () => {
 
                                             <div className="font-smaller text-secondary">
                                                 <span className="acs-psd">
-                                                    Visibility to assigned tickets
+                                                    Visibility <span className="text-red-500">ONLY</span> to the tickets assigned to them.
                                                 </span>
                                             </div>
                                         </label>
@@ -492,6 +492,12 @@ const CreateAuthorizationTeam = () => {
                 )
             }
             
+            <InformationAlert 
+                title=""
+                details="Once the 30 days access span elapses, the user accounts will be de-activated. You can however, extend a users access if need be."
+                showModal={state.showModal}
+                closeModal={closeInformationModel}
+            />
         </React.Fragment>
     )
 }
