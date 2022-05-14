@@ -6,7 +6,6 @@ import axios from 'axios'
 import ConstantsRegistry from '../../global/ConstantsRegistry'
 import ApiServices from '../../services/ApiServices'
 import AuthenticationServices from '../../services/AuthenticationServices'
-import Auth from '../../components/router/Auth'
 
 const projectApplicationName = ConstantsRegistry.projectApplicationName()
 
@@ -105,9 +104,7 @@ class SignIn extends Component<RouteComponentProps> {
 
         if (postResponse.success) {
             await AuthenticationServices.createAccessTokenCookie(postResponse)
-            let locationState: any = this.props.location.state;
-            console.log('Authenticated: ', Auth.isAuthenticated());
-            
+            let locationState: any = this.props.location.state;            
 
             if (locationState.from) {
                 return this.props.history.push(locationState.from)
