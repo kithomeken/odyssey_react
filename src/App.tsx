@@ -68,7 +68,7 @@ const sanctumConfig = {
     csrfCookieRoute: "sanctum/csrf-cookie",
     signInRoute: "api/auth/account/agent/authenticate",
     signOutRoute: "api/auth/account/agent/w-token/invalidate",
-    userObjectRoute: "api/user",
+    userObjectRoute: "api/auth/account/agent/info",
     axiosInstance: instance,
 };
 
