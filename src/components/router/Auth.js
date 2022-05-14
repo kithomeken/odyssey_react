@@ -6,11 +6,15 @@ const cookieNameForAccessToken = ConstantsRegistry.cookieNameForAccessToken()
 class Auth {
     constructor() {
         const token = CookieService.get(cookieNameForAccessToken)
+        console.log('Token: ', token);
         token ? (this.authenticated = true) : (this.authenticated = false)
     }
 
     isAuthenticated() {
-        return this.authenticated
+        const token = CookieService.get(cookieNameForAccessToken)
+        let authenticated = false
+        token ? (authenticated = true) : (authenticated = false)
+        return authenticated
     }
 
     signOut(cb) {

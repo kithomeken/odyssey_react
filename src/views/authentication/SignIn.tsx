@@ -6,6 +6,7 @@ import axios from 'axios'
 import ConstantsRegistry from '../../global/ConstantsRegistry'
 import ApiServices from '../../services/ApiServices'
 import AuthenticationServices from '../../services/AuthenticationServices'
+import Auth from '../../components/router/Auth'
 
 const projectApplicationName = ConstantsRegistry.projectApplicationName()
 
@@ -103,10 +104,16 @@ class SignIn extends Component<RouteComponentProps> {
         console.log(postResponse)
 
         if (postResponse.success) {
-            const createTokenCookie = AuthenticationServices.createAccessTokenCookie(postResponse)
-            console.log('cookie console', createTokenCookie);
+            await AuthenticationServices.createAccessTokenCookie(postResponse)
+            let locationState: any = this.props.location.state;
+            console.log('Authenticated: ', Auth.isAuthenticated());
             
-            this.props.history.push('/home')
+
+            if (locationState.from) {
+                return this.props.history.push(locationState.from)
+            } else {
+                return this.props.history.push('/home')
+            }
         } else {
             let errors = {...this.state.errors}
             errors.email = postResponse.message
