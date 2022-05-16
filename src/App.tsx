@@ -15,26 +15,15 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import FromIndexToHome from './lib/redirects/FromIndexToHome';
 import RequireAuthentication from './lib/router/RequireAuthentication';
 import PostAuthentication from './pages/auth/PostAuthentication';
+
+import { guestRoutes } from './routes/auth/guestRoutes';
 import { generalRoutes } from './routes/settings/generalRoutes';
 import { securityRoutes } from './routes/settings/securityRoutes';
 import { supportFeaturesRoutes } from './routes/settings/featuresRoutes';
 
-
-interface GuestRouteInterface {
-    path: string;
-    element: any;
-    caseSensitive?: boolean;
-}
-
-const guestRoutes: Array<GuestRouteInterface> = [
-    { path: "/auth/sign-in", element: <SignIn />, caseSensitive: true },
-    { path: "/auth/forgot-password", element: <ForgotPassword />, caseSensitive: true },
-]
-
 const redirectedRoutes = [
     { path: "/", element: <FromIndexToHome />, activeMenu: 'Y' },
     { path: "/home", element: <Home />, activeMenu: 'Y' },
-    { path: "/auth/post/access/ac/sntm/oen/seal/:uuid", element: <PostAuthentication />, activeMenu: 'Y' },
 ]
 
 let protectedRoutes: Array<any> = []
