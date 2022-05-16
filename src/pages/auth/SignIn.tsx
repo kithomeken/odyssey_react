@@ -30,7 +30,7 @@ const SignIn = () => {
         return <Navigate 
             replace 
             state={{from: locationState }}
-            to={`/auth/post/access/ac/sntm/oen/seal/${authState.uuid}`} 
+            to={`/ac/post/auth/access/sntm/oen/seal/${authState.uuid}`} 
         />;
     }
 
@@ -77,13 +77,27 @@ const SignIn = () => {
                             <div className="mb-3 pt-3 px-10">
                                 <button className="auth-submit-button" type="submit">
                                     <span>
-                                        <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                                            <svg className="w-5 h-5 text-white group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                                            </svg>
-                                        </span>
+                                        {
+                                            authState.loading ? (
+                                                <>
+                                                    <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                                                        <span className="fad text-white fa-spinner-third fa-2x m-auto block fa-spin"></span>
+                                                    </span>
 
-                                        Sign In
+                                                    Signing In
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                                                        <svg className="w-5 h-5 text-white group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                                                        </svg>
+                                                    </span>
+
+                                                    Sign In
+                                                </>
+                                            )
+                                        }
                                     </span>
                                 </button>
                             </div>
