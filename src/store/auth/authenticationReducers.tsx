@@ -3,6 +3,7 @@ import Crypto from "../../encryption/Crypto";
 import ConstantsRegistry from "../../global/ConstantsRegistry";
 
 const initialState = {
+    loading: false,
     error: '',
     uuid: ''
 };
@@ -19,6 +20,7 @@ const authenticationReducer = (state = initialState, action: any) => {
             return {
                 ...initialState,
                 error: '',
+                loading: true,
                 uuid: action.response.data.uuid
             };
 
@@ -29,6 +31,7 @@ const authenticationReducer = (state = initialState, action: any) => {
             return {
                 ...initialState,
                 error: apiResponse.message,
+                loading: false,
                 uuid: ''
             };
 
@@ -36,6 +39,7 @@ const authenticationReducer = (state = initialState, action: any) => {
             return {
                 ...initialState,
                 error: 'Failed. Credentials did not match our records.',
+                loading: false,
                 uuid: ''
             };
 
