@@ -8,7 +8,7 @@ const xsrfToken = CookieServices.get("XSRF-TOKEN")
 
 class HttpServices {
     protected decryptSanctumTokenCookie() {
-        const cookieNameForSanctumToken = ConstantsRegistry.cookieNameForSanctumToken()
+        const cookieNameForSanctumToken = ConstantsRegistry.sanctumCookie()
         const cipherText = CookieServices.get(cookieNameForSanctumToken)
 
         return (cipherText != null) 
