@@ -32,11 +32,11 @@ const postAuthenticationReducer = (state = initialState, action: any) => {
             const encryptedAgentCarter = Crypto.encryptDataUsingAES256(agentCarter)
             const encryptedAgentCarterEmail = Crypto.encryptDataUsingAES256(agentCarterEmail)
             
-            const cookieNameForAgentCarter = ConstantsRegistry.cookieNameForAccountName()
-            const cookieNameForAgentCartersEmail = ConstantsRegistry.cookieNameForAccountEmail()
+            const accountNameCookie = ConstantsRegistry.accountNameCookie()
+            const accountEmailCookie = ConstantsRegistry.accountEmailCookie()
             
-            CookieServices.set(cookieNameForAgentCarter, encryptedAgentCarter, options)
-            CookieServices.set(cookieNameForAgentCartersEmail, encryptedAgentCarterEmail, options)
+            CookieServices.set(accountNameCookie, encryptedAgentCarter, options)
+            CookieServices.set(accountEmailCookie, encryptedAgentCarterEmail, options)
 
             return {
                 ...initialState,

@@ -3,6 +3,7 @@ import Crypto from "../../encryption/Crypto";
 import ConstantsRegistry from "../../global/ConstantsRegistry";
 
 const initialState = {
+    loading: false,
     error: '',
     uuid: ''
 };
@@ -13,12 +14,18 @@ const authenticationReducer = (state = initialState, action: any) => {
             // Create a new session in successful sign in
             const options = {path: '/', secure: true, sameSite: 'none'}
             const encryptedAccessToken = Crypto.encryptDataUsingAES256(action.response.data.token)
-            const cookieNameForSanctumToken = ConstantsRegistry.cookieNameForSanctumToken()
-            CookieServices.set(cookieNameForSanctumToken, encryptedAccessToken, options)
+            const encryptedUuidToken = Crypto.encryptDataUsingAES256(action.response.data.uuid)
+
+            const sanctumCookie = ConstantsRegistry.sanctumCookie()
+            CookieServices.set(sanctumCookie, encryptedAccessToken, options)
+
+            const uuidCookie = ConstantsRegistry.uuidCookie()
+            CookieServices.set(uuidCookie, encryptedUuidToken, options)
             
             return {
                 ...initialState,
                 error: '',
+                loading: true,
                 uuid: action.response.data.uuid
             };
 
@@ -29,6 +36,7 @@ const authenticationReducer = (state = initialState, action: any) => {
             return {
                 ...initialState,
                 error: apiResponse.message,
+                loading: false,
                 uuid: ''
             };
 
@@ -36,6 +44,7 @@ const authenticationReducer = (state = initialState, action: any) => {
             return {
                 ...initialState,
                 error: 'Failed. Credentials did not match our records.',
+                loading: false,
                 uuid: ''
             };
 
