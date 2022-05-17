@@ -11,5 +11,4 @@ interface GuestRouteInterface {
 export const guestRoutes: Array<GuestRouteInterface> = [
     { path: "/auth/sign-in", element: <SignIn />, caseSensitive: true },
     { path: "/auth/forgot-password", element: <ForgotPassword />, caseSensitive: true },
-    { path: "/ac/post/auth/access/sntm/oen/seal/:uuid", element: <PostAuthentication />, caseSensitive: true },
 ]
