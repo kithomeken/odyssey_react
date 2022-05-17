@@ -13,23 +13,27 @@ const SignIn = () => {
     const authState = useAppSelector(state => state.authentication);
     const dispatch = useDispatch();
     const location = useLocation()
-    const locationState = location.state
+    const locationState: any = location.state
     const [credentials, setCredentials] = useState({
         email: "",
         password: "",
     });
 
     const handleSubmit = (e: any) => {
-        e.preventDefault();
-        console.log('here', credentials);
-        
+        e.preventDefault();        
         dispatch(accountAuthentication(credentials.email, credentials.password));
     };
 
     if (authState.uuid) {
+        const from = locationState?.from
+        const state = {
+            from : from,
+            postAuth: true
+        }
+
         return <Navigate 
             replace 
-            state={{from: locationState }}
+            state={state}
             to={`/ac/post/auth/access/sntm/oen/seal/${authState.uuid}`} 
         />;
     }
