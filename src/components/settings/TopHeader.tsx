@@ -6,14 +6,11 @@ import ConstantsRegistry from "../../global/ConstantsRegistry"
 import CookieService from "../../services/CookieServices"
 
 const TopHeader = () => {
-    const displayNone = {display: 'none'}
-    const cookieNameForAccountName = ConstantsRegistry.cookieNameForAccountName()
-    const encryptedAccountName = CookieService.get(cookieNameForAccountName)
-    const decryptedAccountName = Crypto.decryptDataUsingAES256(encryptedAccountName)
+    const acNameCookie = ConstantsRegistry.accountNameCookie()
+    const encryptedAccountName = CookieService.get(acNameCookie)
 
-    console.log(encryptedAccountName);
-    console.log(decryptedAccountName);
-    
+    const decryptedAccountName = Crypto.decryptDataUsingAES256(encryptedAccountName)
+    const displayNone = {display: 'none'}
     
     return (
         <React.Fragment>
