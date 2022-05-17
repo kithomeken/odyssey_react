@@ -6,9 +6,9 @@ const failedAuthenticationReducer = (action: any) => {
     switch (action.type) {
         case 'REVOKE_AUTH_ACCESS_':
             // Revoke authentication access
-            const cookieNameForAccountName = ConstantsRegistry.cookieNameForAccountName()
-            const cookieNameForAccountEmail = ConstantsRegistry.cookieNameForAccountEmail()
-            const cookieNameForSanctumToken = ConstantsRegistry.cookieNameForSanctumToken()
+            const cookieNameForAccountName = ConstantsRegistry.accountNameCookie()
+            const cookieNameForAccountEmail = ConstantsRegistry.accountEmailCookie()
+            const cookieNameForSanctumToken = ConstantsRegistry.sanctumCookie()
 
             CookieServices.remove(cookieNameForAccountName)
             CookieServices.remove(cookieNameForAccountEmail)
