@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
-import { BrowserRouter as Router, Routes, Route, useLocation, useParams} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
 
 import './assets/css/tailwind.css'
 import './assets/css/cuba.odyssey.css'
@@ -8,22 +8,22 @@ import "react-toastify/dist/ReactToastify.css";
 import './assets/icons/fontawesome_pro/css/all.css'
 
 import Home from './pages/home/Home';
-import SignIn from './pages/auth/SignIn';
 import Error404 from './pages/errors/Error404';
-import ForgotPassword from './pages/auth/ForgotPassword';
 
 import FromIndexToHome from './lib/redirects/FromIndexToHome';
 import RequireAuthentication from './lib/router/RequireAuthentication';
-import PostAuthentication from './pages/auth/PostAuthentication';
 
 import { guestRoutes } from './routes/auth/guestRoutes';
 import { generalRoutes } from './routes/settings/generalRoutes';
 import { securityRoutes } from './routes/settings/securityRoutes';
 import { supportFeaturesRoutes } from './routes/settings/featuresRoutes';
+import CheckAuthentication from './lib/router/CheckAuthentication';
+import PostAuthentication from './pages/auth/PostAuthentication';
 
 const redirectedRoutes = [
-    { path: "/", element: <FromIndexToHome />, activeMenu: 'Y' },
     { path: "/home", element: <Home />, activeMenu: 'Y' },
+    { path: "/", element: <FromIndexToHome />, activeMenu: 'Y' },
+    { path: "/ac/post/auth/access/sntm/oen/seal/:uuid", element: <PostAuthentication />, activeMenu: 'N'},
 ]
 
 let protectedRoutes: Array<any> = []
@@ -59,25 +59,24 @@ function App() {
         </RoutingContext.Provider>
     }
     
-    
-    const route = useContext(RoutingContext);
-
     return (
         <Router>
             <RouterProvider>
                 <ToastContainer />
 
                 <Routes>
-                    {guestRoutes.map((route, index) => {
-                            return (
-                                <Route
-                                    path={route.path}
-                                    element={route.element}
-                                    key={index}
-                                />
-                            )
-                        })
-                    }
+                    <Route element={<CheckAuthentication />}>
+                        {guestRoutes.map((route, index) => {
+                                return (
+                                    <Route
+                                        path={route.path}
+                                        element={route.element}
+                                        key={index}
+                                    />
+                                )
+                            })
+                        }
+                    </Route>
                     
                     <Route element={<RequireAuthentication />} >
                         {
