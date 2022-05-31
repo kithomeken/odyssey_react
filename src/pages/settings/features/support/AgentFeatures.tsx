@@ -56,6 +56,9 @@ const AgentFeatures = () => {
             throw new Error("Something went wrong when fetching agent support features...");
         }
 
+        console.log(response);
+        
+
         return response.data.data
     }, [])
 
