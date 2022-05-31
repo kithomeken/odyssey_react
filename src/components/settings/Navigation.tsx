@@ -53,6 +53,19 @@ class Navigation extends Component<Props> {
                                     Organizational Details
                                 </p>
                             </Link>
+
+                            <Link to={generalRoutes[2].path} className={this.classNames(
+                                activeMenu === 'products' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
+                                'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
+                            )}>
+                                <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
+                                    <i className="fal fa-box-full"></i>
+                                </div>
+
+                                <p className="ml-4 text-sm">
+                                    Products Management
+                                </p>
+                            </Link>
                             
                             <Link to={generalRoutes[1].path} className={this.classNames(
                                 activeMenu === 'announcements' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
