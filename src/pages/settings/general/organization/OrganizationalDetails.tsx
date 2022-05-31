@@ -214,7 +214,7 @@ const OrganizationalDetails = () => {
                                     <div className="w-full flex">
                                         <div className="w-9/12">
                                             <div className="w-10/12 mb-1">
-                                                <input type="text" name="name" id="org-name" autoComplete="off" onChange={onChangeHandler} onBlur={onInputBlur} className="focus:ring-1 w-full focus:ring-green-500 text-gray-500 p-2 capitalize flex-1 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50" placeholder="Organization Name" value={state.input.name} />                                        
+                                                <input type="text" name="name" id="org-name" autoComplete="off" onChange={onChangeHandler} onBlur={onInputBlur} className="focus:ring-1 w-full focus:ring-green-500 text-gray-500 p-2 capitalize flex-1 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50" placeholder="Organization Name" value={state.input.name} />
                                             </div>
 
                                             {state.errors.name.length > 0 && 
