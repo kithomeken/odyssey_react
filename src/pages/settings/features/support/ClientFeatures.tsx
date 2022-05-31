@@ -129,7 +129,7 @@ const ClientFeatures = () => {
                                     </div>
         
                                     <label htmlFor="client-access" className="ml-4 block text-sm mb-1 text-gray-900">
-                                        Client Access
+                                        Client Ticketing
                                     </label>
                                 </div>
         
@@ -137,7 +137,7 @@ const ClientFeatures = () => {
                                     <div className="w-10 mr-2"></div>
         
                                     <span className="text-gray-500 text-sm ml-6 w-12/12">
-                                        Activating this feature allows you to create user accounts for your clients and enables them to raise tickets, add comments, suggestions, attachments and follow the tickets' odyssey until closure. In retrospect only clients will create tickets. 
+                                        Activating this feature allows you to create user accounts for your clients and enable them to raise tickets, add comments, attachments and follow the Ticket's Odyssey until closure. {/* In retrospect only clients will create tickets.  */}
                                     </span>
                                 </div>
                             </div>
