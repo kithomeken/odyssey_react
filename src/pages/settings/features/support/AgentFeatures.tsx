@@ -54,7 +54,7 @@ const AgentFeatures = () => {
 
         if (response.status !== 200) {
             throw new Error("Something went wrong when fetching agent support features...");
-        }
+        }        
 
         return response.data.data
     }, [])
