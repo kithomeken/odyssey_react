@@ -149,8 +149,6 @@ const ProductManagement = () => {
                 </div>
             </div>
 
-            {/* <AddProduct /> */}
-
         </React.Fragment>
     )
 }

@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useDispatch } from "react-redux"
-import { useNavigate, useParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import swal from 'sweetalert';
 
 import Error500 from "../../../errors/Error500"
@@ -9,18 +9,35 @@ import ApiServices from "../../../../api/ApiServices"
 import Header from "../../../../components/settings/Header"
 import HttpServices from "../../../../services/HttpServices"
 import DateFormating from "../../../../lib/hooks/DateFormating"
-import { PRODUCT_DECOMMISSION_API_ROUTE, PRODUCT_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
+import { PRODUCT_DECOMMISSION_API_ROUTE, PRODUCT_REINSTATE_API_ROUTE, PRODUCT_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
-import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
+import SuccessBanner from "../../../../components/layouts/SuccessBanner";
+import ErrorBanner from "../../../../components/layouts/ErrorBanner";
+import ProductEdit from "./ProductChange";
 
 const Productview = () => {
     const [state, setstate] = useState({
-        
+        status: 'pending',
+        requestFailed: false,
+        banner: {
+            show: false,
+            type: 'error',
+            message: '',
+        },
+        panel: {
+            show: false,
+        },
+        product: {
+            name: '',
+            description: '',
+            deleted_at: '',
+            updated_at: '',
+
+        },
     })
 
     const showButton = false
     const params = useParams();
-    const navigate = useNavigate()
     const dispatch = useDispatch()
     const pageTitle = "Product View"
 
@@ -28,22 +45,58 @@ const Productview = () => {
         { linkItem: true, title: "General Settings", url: "" },
         { linkItem: true, title: "Product Management", url: "" },
         { linkItem: false, title: pageTitle },
-    ] 
+    ]
 
-    const productViewApiCall = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const productId = params.uuid
-        const apiCall = apiDomain + PRODUCT_VIEW_API_ROUTE + '/' + productId
-        const response: any = await HttpServices.httpGet(apiCall)
+    async function fetchProductDetailsApiCall() {
+        setStatusAsPending()
 
-        if (response.status !== 200) {
-            throw new Error("Something went wrong while fecthing products list.");
+        try {
+            const apiDomain = ApiServices.apiDomain()
+            const productId = params.uuid
+            const apiCall = apiDomain + PRODUCT_VIEW_API_ROUTE + '/' + productId
+            const response: any = await HttpServices.httpGet(apiCall)
+
+            let { product } = state
+            let status = state.status
+
+            product = response.data.data
+            status = 'fulfilled'
+
+            setstate({
+                ...state,
+                product,
+                status,
+            })
+            
+        } catch (e) {
+            console.warn(e);
+            let status = state.status
+            let requestFailed = state.requestFailed
+
+            requestFailed = true
+            status = 'rejected'
+
+            setstate({
+                ...state,
+                status,
+                requestFailed,
+            })
+        } finally {
+            // Do nothing            
         }
+    }
 
-        console.log(response.data.data);
+    React.useEffect(() => {
+        fetchProductDetailsApiCall();
+    }, []);
 
-        return response.data.data
-    }, [dispatch])
+    function setStatusAsPending() {
+        let status = state.status
+        setstate({
+            ...state,
+            status: 'Pending'
+        })
+    }
 
     const onClickDecommissionProduct = () => {
         swal({
@@ -52,27 +105,86 @@ const Productview = () => {
             dangerMode: true,
             buttons: ["Cancel", "Proceed"],
         })
-        .then((willDelete) => {
-            if (willDelete) {
-                decommissionProductApiCall()
-            }
-        });
+            .then((willDelete) => {
+                if (willDelete) {
+                    setStatusAsPending()
+                    decommissionProductApiCall()
+                }
+            });
     }
 
     const decommissionProductApiCall = async () => {
+        let { banner }: any = state
+
         try {
             const apiDomain = ApiServices.apiDomain()
             const apiCall = apiDomain + PRODUCT_DECOMMISSION_API_ROUTE
             const response: any = await HttpServices.httpPost(apiCall, params)
 
             if (response.data.success) {
-                navigate(0)
+                fetchProductDetailsApiCall()
             } else {
-
+                banner.type = 'error'
+                banner.show = true
+                banner.message = 'Could not decommission product. Something went wrong'
             }
         } catch (error) {
-            
+            banner.type = 'error'
+            banner.show = true
+            banner.message = 'Could not decommission product. Something went wrong'
         }
+
+        setstate({ ...state, banner })
+    }
+
+    const onClickReinstateProduct = () => {
+        swal({
+            title: "Are you sure?",
+            text: "This actions will reinstate this product. Do you wish to proceed?",
+            dangerMode: true,
+            buttons: ["Cancel", "Proceed"],
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    setStatusAsPending()
+                    reinstateProductApiCall()
+                }
+            });
+    }
+
+    const reinstateProductApiCall = async () => {
+        let { banner }: any = state
+
+        try {
+            const apiDomain = ApiServices.apiDomain()
+            const apiCall = apiDomain + PRODUCT_REINSTATE_API_ROUTE
+            const response: any = await HttpServices.httpPost(apiCall, params)
+
+            if (response.data.success) {
+                // navigate(0)
+                fetchProductDetailsApiCall()
+            } else {
+                banner.type = 'error'
+                banner.show = true
+                banner.message = 'Could not decommission product. Something went wrong'
+            }
+        } catch (error) {
+            banner.type = 'error'
+            banner.show = true
+            banner.message = 'Could not decommission product. Something went wrong'
+        }
+    }
+
+    const showProductChangePanel = () => {
+        let { panel }: any = state
+        panel.show = true
+        setstate({ ...state, panel })
+    }
+
+    const hideProductChangePanel = () => {
+        let { panel }: any = state
+        panel.show = false
+        setstate({ ...state, panel })
     }
 
     return (
@@ -83,10 +195,25 @@ const Productview = () => {
 
             <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <div className="w-10/12 form-group pt-3">
-                {/* <SuccessBanner message="Quis hendrerit dolor magna eget est lorem ipsum dolor" />
-                <ErrorBanner message="Quis hendrerit dolor magna eget est lorem ipsum dolor" /> */}
-            </div>
+            {
+                state.banner.show ? (
+                    <div className="w-10/12 pt-3">
+                        {
+                            state.banner.type === 'error' ? (
+                                <ErrorBanner
+                                    message={state.banner.message}
+                                    showBanner={state.banner.show}
+                                />
+                            ) : state.banner.type === 'success' ? (
+                                <SuccessBanner
+                                    message={state.banner.message}
+                                    showBanner={state.banner.show}
+                                />
+                            ) : null
+                        }
+                    </div>
+                ) : null
+            }
 
             <Header title={pageTitle}
                 showButton={showButton}
@@ -100,9 +227,9 @@ const Productview = () => {
                 <div className="w-12/12">
                     <div className="mb-5">
                         {
-                            productViewApiCall.status === 'rejected' ? (
+                            state.status === 'rejected' ? (
                                 <Error500 />
-                            ) : productViewApiCall.status === 'fulfilled' ? (
+                            ) : state.status === 'fulfilled' ? (
                                 <div>
                                     <div className="pt-2 pb-6">
                                         <div className="flex flex-row align-middle">
@@ -114,21 +241,21 @@ const Productview = () => {
 
                                             <div className="w-full">
                                                 <p className="text-2xl">
-                                                    {productViewApiCall.value.name}
+                                                    {state.product.name}
                                                 </p>
 
                                                 <p className="text-sm form-group text-gray-500 w-7/12">
-                                                    {productViewApiCall.value.description}
+                                                    {state.product.description}
                                                 </p>
 
                                                 {
-                                                    productViewApiCall.value.deleted_at === null ? (
+                                                    state.product.deleted_at === null ? (
                                                         <div>
                                                             <p className="form-group text-sm text-gray-500 flex items-center align-middle">
                                                                 <i className="fal fa-clock text-gray-700"></i>
                                                                 <span className="ml-2">
                                                                     <span className="text-gray-700">Last Updated: </span>
-                                                                    <DateFormating dateString={productViewApiCall.value.updated_at} />
+                                                                    <DateFormating dateString={state.product.updated_at} />
                                                                 </span>
                                                             </p>
 
@@ -152,10 +279,10 @@ const Productview = () => {
                                                             </div>
 
                                                             <div className="form-group flex pt-4 items-center align-middle">
-                                                                <p className="text-sm form-group text-sky-500 pr-5 hover:cursor-pointer">
+                                                                <p className="text-sm form-group text-sky-500 pr-5 hover:cursor-pointer" onClick={showProductChangePanel}>
                                                                     Edit Product Details
                                                                 </p>
-                                                                
+
                                                                 <p className="text-sm form-group text-gray-500 pr-5">
                                                                     |
                                                                 </p>
@@ -171,7 +298,7 @@ const Productview = () => {
                                                                 <i className="fal fa-clock"></i>
                                                                 <span className="ml-2">
                                                                     <span className="">Decommissioned On: </span>
-                                                                    <DateFormating dateString={productViewApiCall.value.deleted_at} />
+                                                                    <DateFormating dateString={state.product.deleted_at} />
                                                                 </span>
                                                             </p>
 
@@ -185,7 +312,7 @@ const Productview = () => {
                                                             </div>
 
                                                             <div className="form-group flex pt-4 items-center align-middle">
-                                                                <p className="text-sm form-group text-sky-500 hover:cursor-pointer">
+                                                                <p className="text-sm form-group text-sky-500 hover:cursor-pointer" onClick={onClickReinstateProduct}>
                                                                     Reinstate Product
                                                                 </p>
                                                             </div>
@@ -195,6 +322,14 @@ const Productview = () => {
                                             </div>
                                         </div>
                                     </div>
+
+                                    <ProductEdit
+                                        uuid={params.uuid}
+                                        show={state.panel.show}
+                                        productProps={state.product}
+                                        hidePanel={hideProductChangePanel}
+                                        fetchFunc={fetchProductDetailsApiCall}
+                                    />
                                 </div>
                             ) : (
                                 <div className="flex flex-col align-middle mt-6 h-16">
