@@ -1,6 +1,6 @@
 import { useTable } from 'react-table'
 
-export default function ReactTable({columns, data} : {columns: any, data: any}) {
+export default function ReactTable({columns, data}) {
     // Use the state and functions returned from useTable to build your UI
     const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow} 
     = useTable({
