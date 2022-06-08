@@ -11,7 +11,6 @@ import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 
 const AddProduct = () => {
     const [state, setstate] = useState({
-        data: null,
         requestFailed: '',
         isPostingForm: false,
         disableSubmitBtn: true,
@@ -261,7 +260,7 @@ const AddProduct = () => {
                                         state.input.another === 'Y' ? true : false
                                     }
                                     className="h-5 w-5 text-green-600 focus:ring-green-500 checked:bg-green-500 focus:bg-green-500 form-tick appearance-none border border-gray-300 rounded-md checked:border-transparent focus:outline-none"/>
-                                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-500">Add another product</label>
+                                    <label htmlFor="add-another" className="ml-2 block text-sm text-gray-500">Add another product</label>
                                 </div>
                             </div>
                         </div>
