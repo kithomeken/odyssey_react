@@ -1,6 +1,6 @@
 import React, { Component } from "react"
 import { Link } from "react-router-dom"
-import { supportFeaturesRoutes } from "../../routes/settings/featuresRoutes"
+import { featuresRoutes } from "../../routes/settings/featuresRoutes"
 import { generalRoutes } from "../../routes/settings/generalRoutes"
 import { securityRoutes } from "../../routes/settings/securityRoutes"
 
@@ -66,6 +66,19 @@ class Navigation extends Component<Props> {
                                     Products Management
                                 </p>
                             </Link>
+
+                            <Link to={generalRoutes[5].path} className={this.classNames(
+                                activeMenu === 'products' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
+                                'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
+                            )}>
+                                <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
+                                    <i className="fal fa-box"></i>
+                                </div>
+
+                                <p className="ml-4 text-sm">
+                                    Company Groups
+                                </p>
+                            </Link>
                             
                             <Link to={generalRoutes[1].path} className={this.classNames(
                                 activeMenu === 'announcements' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
@@ -105,7 +118,7 @@ class Navigation extends Component<Props> {
                                 Features
                             </span>
 
-                            <Link to={supportFeaturesRoutes[0].path} className={this.classNames(
+                            <Link to={featuresRoutes[0].path} className={this.classNames(
                                 activeMenu === 'authorization' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
                                 'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
                             )}>
@@ -115,6 +128,19 @@ class Navigation extends Component<Props> {
 
                                 <p className="ml-4 text-sm">
                                     Support Features
+                                </p>
+                            </Link>
+
+                            <Link to={featuresRoutes[1].path} className={this.classNames(
+                                activeMenu === 'authorization' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
+                                'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
+                            )}>
+                                <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
+                                    <i className="fal fa-ticket"></i>
+                                </div>
+
+                                <p className="ml-4 text-sm">
+                                    Ticket Types
                                 </p>
                             </Link>
                         </div>
