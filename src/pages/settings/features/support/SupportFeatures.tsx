@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import ConstantsRegistry from "../../../../global/ConstantsRegistry"
-import { supportFeaturesRoutes } from "../../../../routes/settings/featuresRoutes"
+import { featuresRoutes } from "../../../../routes/settings/featuresRoutes"
 import AgentFeatures from "./AgentFeatures"
 import AnnouncementFeatures from "./AnnouncementFeatures"
 import ClientFeatures from "./ClientFeatures"
@@ -18,7 +18,7 @@ const SupportFeatures = () => {
 
     const showButton = false
     const pageTitle = "Support Features"
-    const thisPageRoutes = supportFeaturesRoutes[0].path
+    const thisPageRoutes = featuresRoutes[0].path
     const applicationName = ConstantsRegistry.projectApplicationName()
 
     const breadCrumb = [
