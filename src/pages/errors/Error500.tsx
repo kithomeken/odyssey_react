@@ -4,7 +4,7 @@ import emptyBox from "../../assets/images/error_500.png"
 const Error500 = () => {
     return (
         <React.Fragment>
-            <div className="w-full mb-4 mt-10">
+            <div className="w-6/12 pb-4 pt-10 m-auto">
                 <img src={emptyBox} alt="broken_robot" width="300px" className="block text-center m-auto" />
             </div>
 
@@ -18,7 +18,7 @@ const Error500 = () => {
                 </p>
 
                 <p className="text-sm text-center form-group mb-0 text-gray-600">
-                    An unexpected error occurred while trying to perform this action. Please try again later. If the error persists, kindly contact the support team.
+                    An unexpected error occurred while trying to perform this action. Please try again later...
                 </p>
             </div>
         </React.Fragment>
