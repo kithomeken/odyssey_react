@@ -1,6 +1,5 @@
-import React, { Fragment, useState } from 'react'
+import React, {  } from 'react'
 import { useTable, usePagination } from 'react-table'
-import { Listbox, Transition } from '@headlessui/react'
 
 export default function ReactTable({ columns, data }) {
     // Use the state and functions returned from useTable to build your UI
