@@ -202,12 +202,10 @@ const Productview = () => {
                             state.banner.type === 'error' ? (
                                 <ErrorBanner
                                     message={state.banner.message}
-                                    showBanner={state.banner.show}
                                 />
                             ) : state.banner.type === 'success' ? (
                                 <SuccessBanner
                                     message={state.banner.message}
-                                    showBanner={state.banner.show}
                                 />
                             ) : null
                         }

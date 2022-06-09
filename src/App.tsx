@@ -16,7 +16,7 @@ import RequireAuthentication from './lib/router/RequireAuthentication';
 import { guestRoutes } from './routes/auth/guestRoutes';
 import { generalRoutes } from './routes/settings/generalRoutes';
 import { securityRoutes } from './routes/settings/securityRoutes';
-import { supportFeaturesRoutes } from './routes/settings/featuresRoutes';
+import { featuresRoutes } from './routes/settings/featuresRoutes';
 import CheckAuthentication from './lib/router/CheckAuthentication';
 import PostAuthentication from './pages/auth/PostAuthentication';
 
@@ -31,7 +31,7 @@ let protectedRoutes: Array<any> = []
 protectedRoutes = redirectedRoutes.concat(
     generalRoutes,
     securityRoutes,
-    supportFeaturesRoutes,
+    featuresRoutes,
 );
 
 interface RouteContextType {

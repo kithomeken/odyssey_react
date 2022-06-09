@@ -39,7 +39,7 @@ const ProductManagement = () => {
 
         if (response.status !== 200) {
             throw new Error("Something went wrong while fecthing products list.");
-        }
+        }        
 
         return response.data.data
     }, [dispatch])
@@ -69,7 +69,7 @@ const ProductManagement = () => {
                         </span>
                     ) : (
                         <span className="text-red-600 bg-red-100 mb-0 text-xs py-1 px-2 rounded">
-                            Cancelled
+                            Suspended
                         </span>
                     )
                 )
@@ -83,7 +83,7 @@ const ProductManagement = () => {
                 )
             },
             {
-                Header: ' ',
+                Header: '-',
                 accessor: (data: { uuid: any }) => (
                     <Link to={`${data.uuid}`} className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-900 text-sm">
                         Details
@@ -136,7 +136,7 @@ const ProductManagement = () => {
                                     productsListApiCall.value === null ? (
                                         <NoDataReactTable columns={columns} />
                                     ) : (
-                                        <ReactTable columns={columns} data={productsListApiCall.value.data} />
+                                        <ReactTable columns={columns} data={productsListApiCall.value} />
                                     )
                                 }
                             </div>
