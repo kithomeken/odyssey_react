@@ -4,6 +4,8 @@ import { Helmet } from "react-helmet"
 import { useNavigate } from "react-router-dom"
 import { TICKET_TYPES_CHECK_API_ROUTE, TICKET_TYPES_CREATE_API_ROUTE } from "../../../../api/ApiRoutes"
 import ApiServices from "../../../../api/ApiServices"
+import ErrorBanner from "../../../../components/layouts/ErrorBanner"
+import SuccessBanner from "../../../../components/layouts/SuccessBanner"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import { featuresRoutes } from "../../../../routes/settings/featuresRoutes"
@@ -29,6 +31,9 @@ const CreateTicketType = () => {
             checkTicket: false,
             ticketExists: true
         },
+        banner: {
+            name: ''
+        }
     })
 
     const showButton = false
@@ -173,6 +178,7 @@ const CreateTicketType = () => {
         let { requestFailed }: any = state
         let { isPostingForm } = state
         let { input }: any = state
+        let { banner }: any = state
 
         try {
             const apiDomain = ApiServices.apiDomain()
@@ -181,6 +187,7 @@ const CreateTicketType = () => {
 
             if (response.data.success) {
                 if (state.input.another === 'Y') {
+                    banner.name = input.name
                     input.name = ''
                     input.description = ''
                     input.another = 'N'
@@ -199,7 +206,7 @@ const CreateTicketType = () => {
         isPostingForm = false
 
         setstate({
-            ...state, input, requestFailed, isPostingForm, requestSucceeded
+            ...state, input, requestFailed, isPostingForm, requestSucceeded, banner
         })
     }
 
@@ -278,60 +285,24 @@ const CreateTicketType = () => {
                                             state.input.another === 'Y' ? true : false
                                         }
                                         className="h-5 w-5 text-green-600 focus:ring-green-500 checked:bg-green-500 focus:bg-green-500 form-tick appearance-none border border-gray-300 rounded-md checked:border-transparent focus:outline-none" />
-                                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-500">Add another ticket type</label>
+                                    <label htmlFor="add-another" className="ml-2 block text-sm text-gray-500">Add another ticket type</label>
                                 </div>
                             </div>
                         </div>
 
                         {
                             state.requestFailed ? (
-                                <Transition
-                                show={true}
-                                enter="transition ease-in-out duration-300 transform"
-                                enterFrom="-translate-x-full"
-                                enterTo="translate-x-0"
-                                leave="transition ease-in-out duration-300 transform"
-                                leaveFrom="translate-x-0"
-                                leaveTo="-translate-x-full"
-                            >
-                                <div className="w-11/12 bg-red-100 py-3 rounded-md">
-                                    <span className="left-0 inset-y-0 flex items-center align-middle text-xs pl-3 text-red-600">
-                                        <span className="">
-                                            <i className="fad fa-lg fa-ban mr-1"></i>
-                                        </span>
-
-                                        <span className="pl-2 w-full">
-                                            Failed to add ticket type, please try again later...
-                                        </span>
-                                    </span>
+                                <div className="w-11/12">
+                                    <ErrorBanner message={`Failed to add ticket type, please try again later...`} />
                                 </div>
-                            </Transition>
                             ) : null
                         }
-                        
+
                         {
                             state.requestSucceeded ? (
-                                <Transition
-                                show={true}
-                                enter="transition ease-in-out duration-300 transform"
-                                enterFrom="-translate-x-full"
-                                enterTo="translate-x-0"
-                                leave="transition ease-in-out duration-300 transform"
-                                leaveFrom="translate-x-0"
-                                leaveTo="-translate-x-full"
-                            >
-                                <div className="w-11/12 bg-green-100 py-3 rounded-md">
-                            <span className="left-0 inset-y-0 flex items-center align-middle text-sm pl-3 text-green-600">
-                                <span className="w-4 h-4">
-                                    <i className="fad fa-lg fa-check-circle mr-3"></i>
-                                </span>
-
-                                <span className="pl-2">
-                                    Ticket type created
-                                </span>
-                            </span>
-                        </div>
-                            </Transition>
+                                <div className="w-11/12">
+                                    <SuccessBanner message={`Ticket type ${state.banner.name} created...`} />
+                                </div>
                             ) : null
                         }
 
