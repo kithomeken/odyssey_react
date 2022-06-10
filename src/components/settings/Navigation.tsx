@@ -72,7 +72,7 @@ class Navigation extends Component<Props> {
                                 'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
                             )}>
                                 <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
-                                    <i className="fal fa-box"></i>
+                                    <i className="fal fa-warehouse-alt"></i>
                                 </div>
 
                                 <p className="ml-4 text-sm">
@@ -131,12 +131,25 @@ class Navigation extends Component<Props> {
                                 </p>
                             </Link>
 
+                            <Link to={featuresRoutes[3].path} className={this.classNames(
+                                activeMenu === 'authorization' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
+                                'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
+                            )}>
+                                <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
+                                    <i className="fal fa-ballot-check"></i>
+                                </div>
+
+                                <p className="ml-4 text-sm">
+                                    Ticket Features
+                                </p>
+                            </Link>
+
                             <Link to={featuresRoutes[1].path} className={this.classNames(
                                 activeMenu === 'authorization' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
                                 'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
                             )}>
                                 <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
-                                    <i className="fal fa-ticket"></i>
+                                    <i className="fal fa-typewriter"></i>
                                 </div>
 
                                 <p className="ml-4 text-sm">
