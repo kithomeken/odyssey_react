@@ -23,3 +23,4 @@ class ConstantsRegistry {
 export default new ConstantsRegistry()
 
 export const COOKIE_OPTIONS = {path: '/', secure: true, sameSite: 'none'}
+export const HEADER_SECTION_BG = 'bg-green-50'
