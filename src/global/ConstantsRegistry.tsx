@@ -21,3 +21,5 @@ class ConstantsRegistry {
 }
 
 export default new ConstantsRegistry()
+
+export const COOKIE_OPTIONS = {path: '/', secure: true, sameSite: 'none'}

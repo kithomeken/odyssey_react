@@ -7,7 +7,7 @@ import ApiServices from '../../api/ApiServices';
 import Crypto from '../../encryption/Crypto';
 import HttpServices from '../../services/HttpServices';
 import CookieServices from '../../services/CookieServices';
-import ConstantsRegistry from '../../global/ConstantsRegistry';
+import ConstantsRegistry, { COOKIE_OPTIONS } from '../../global/ConstantsRegistry';
 
 import { Navigate, useLocation } from 'react-router-dom';
 import { usePromiseEffect } from '../../lib/hooks/usePromiseEffect';
@@ -26,7 +26,6 @@ const PostAuthentication = () => {
         console.log(response);
         const accountName = response.data.first_name + ' ' + response.data.last_name
         const accountEmail = response.data.email
-        const options = {path: '/', secure: true, sameSite: 'none'}
 
         const encryptedAccountName = Crypto.encryptDataUsingAES256(accountName)
         const encryptedAccountEmail = Crypto.encryptDataUsingAES256(accountEmail)
@@ -34,8 +33,8 @@ const PostAuthentication = () => {
         const accountNameCookie = ConstantsRegistry.accountNameCookie()
         const accountEmailCookie = ConstantsRegistry.accountEmailCookie()
         
-        CookieServices.set(accountNameCookie, encryptedAccountName, options)
-        CookieServices.set(accountEmailCookie, encryptedAccountEmail, options)
+        CookieServices.set(accountNameCookie, encryptedAccountName, COOKIE_OPTIONS)
+        CookieServices.set(accountEmailCookie, encryptedAccountEmail, COOKIE_OPTIONS)
 
         return {response}
     }, [dispatch])
