@@ -4,6 +4,8 @@ import { toast } from "react-toastify"
 import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
+import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
+import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
 import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 import HttpServices from "../../../../services/HttpServices"
@@ -33,28 +35,28 @@ const OrganizationalDetails = () => {
         { linkItem: false, title: pageTitle },
     ]
 
-    const onChangeHandler = (e: {target: {name: string; value: string}}) => {
-        const {isPostingForm} = state
+    const onChangeHandler = (e: { target: { name: string; value: string } }) => {
+        const { isPostingForm } = state
 
         if (!isPostingForm) {
-            let {input}: any = state
-            let {errors}: any = state
-            
+            let { input }: any = state
+            let { errors }: any = state
+
             input[e.target.name] = e.target.value
             errors[e.target.name] = ''
-    
+
             setstate({
                 ...state, input, errors
             })
         }
     }
 
-    const onInputBlur = (e: {target: {name: string; value: string}}) => {
-        const {isPostingForm} = state
+    const onInputBlur = (e: { target: { name: string; value: string } }) => {
+        const { isPostingForm } = state
 
         if (!isPostingForm) {
-            let {input}: any = state
-            let {errors}: any = state
+            let { input }: any = state
+            let { errors }: any = state
             let organization = e.target.value
             organization = organization.trim()
 
@@ -78,14 +80,14 @@ const OrganizationalDetails = () => {
         }
     }
 
-    const formValidation = (e: {target: {name: string; value: string}}) => {
-        let {input}: any = state
-        let {disableSubmitBtn} = state
+    const formValidation = (e: { target: { name: string; value: string } }) => {
+        let { input }: any = state
+        let { disableSubmitBtn } = state
         console.log(input[e.target.name]);
 
         if (!input['name']) {
             console.log(1);
-            
+
             disableSubmitBtn = true
         } else if (input['name'].length < 3) {
             console.log(2);
@@ -119,7 +121,7 @@ const OrganizationalDetails = () => {
     }
 
     const onPostFormData = async () => {
-        const {input}: any = state
+        const { input }: any = state
         const apiDomain = ApiServices.apiDomain()
         const apiCall = apiDomain + `portal/a/site-master/general/organizational-details/change`
         const response: any = await HttpServices.httpPost(apiCall, input)
@@ -130,26 +132,26 @@ const OrganizationalDetails = () => {
                 position: toast.POSITION.TOP_RIGHT,
             });
         }
-    } 
+    }
 
     const cancelOrganizationUpdate = () => {
-        const {isPostingForm} = state
-        
-        if (!isPostingForm) {
-            let {input}: any = state
-            let {errors}: any = state
+        const { isPostingForm } = state
 
-            Object.keys(input).forEach(function(key) {
-                input[key] = ''               
+        if (!isPostingForm) {
+            let { input }: any = state
+            let { errors }: any = state
+
+            Object.keys(input).forEach(function (key) {
+                input[key] = ''
             });
-            
-            Object.keys(errors).forEach(function(key) {
-                errors[key] = ''                              
+
+            Object.keys(errors).forEach(function (key) {
+                errors[key] = ''
             });
 
             setstate({
-                ...state, 
-                input, 
+                ...state,
+                input,
                 errors,
                 disableSubmitBtn: true
             })
@@ -177,32 +179,32 @@ const OrganizationalDetails = () => {
 
         console.log(state);
 
-        return {response}
+        return { response }
     }, [])
 
-        // setstate({
-        //     ...state,
-        //     requestFailed: true
-        // })
-    
+    // setstate({
+    //     ...state,
+    //     requestFailed: true
+    // })
+
     return (
         <React.Fragment>
             <Helmet>
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <Header title={pageTitle}
-                showButton={showButton}
-            />
+                <Header title={pageTitle}
+                    showButton={showButton}
+                />
 
-            <div className="w-full form-group">
+                <HeaderParagraph title="Your organization name is displayed in report headings and emails sent to managed accounts." />
+            </div>
+
+            <div className="w-full px-12 form-group">
                 <div className="w-10/12">
-                    <p className="text-sm mb-5">
-                        Your organization name is displayed in report headings and emails sent to managed accounts.
-                    </p>
-
                     {
                         organizationalData.status === 'rejected' ? (
                             <Error500 />
@@ -217,7 +219,7 @@ const OrganizationalDetails = () => {
                                                 <input type="text" name="name" id="org-name" autoComplete="off" onChange={onChangeHandler} onBlur={onInputBlur} className="focus:ring-1 w-full focus:ring-green-500 text-gray-500 p-2 capitalize flex-1 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50" placeholder="Organization Name" value={state.input.name} />
                                             </div>
 
-                                            {state.errors.name.length > 0 && 
+                                            {state.errors.name.length > 0 &&
                                                 <div className="w-full">
                                                     <span className='invalid-feedback font-small text-red-600 pl-0'>
                                                         {state.errors.name}
@@ -231,7 +233,7 @@ const OrganizationalDetails = () => {
                                                         state.isPostingForm ? (
                                                             <button className="bg-green-500 relative flex justify-center py-1 px-3 border border-transparent text-sm font-medium rounded-md text-white hover:bg-green-600 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-green-600 mr-2 disabled:opacity-50" type="button" disabled={state.disableSubmitBtn}>
                                                                 <span>
-                                                                    Changing 
+                                                                    Changing
                                                                     <span className="fad text-white fa-spinner-third block fa-spin ml-2"></span>
                                                                 </span>
                                                             </button>
@@ -243,7 +245,7 @@ const OrganizationalDetails = () => {
                                                             </button>
                                                         )
                                                     }
-                                                    
+
                                                     <button className="bg-gray-300 relative flex justify-center py-1 px-3 border border-transparent text-sm font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-gray-600 ml-1" type="button" onClick={cancelOrganizationUpdate}>
                                                         <span>
                                                             Cancel
@@ -262,7 +264,7 @@ const OrganizationalDetails = () => {
                         )
                     }
                 </div>
-            </div>            
+            </div>
         </React.Fragment>
     )
 }

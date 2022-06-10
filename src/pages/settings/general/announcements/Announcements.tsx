@@ -3,7 +3,11 @@ import { Helmet } from "react-helmet"
 import { toast } from "react-toastify"
 
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
+import Header from "../../../../components/settings/Header"
+import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
+import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import ActivateFeature from "../../../../lib/activations/ActivateFeature"
+import { featuresRoutes } from "../../../../routes/settings/featuresRoutes"
 import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 import Error500 from "../../../errors/Error500"
 
@@ -14,6 +18,7 @@ const Announcements = () => {
         allowAnnouncements: false,
     })
 
+    const showButton = false
     const pageTitle = "Announcements"
     const thisPageRoutes = generalRoutes[0].path
 
@@ -28,15 +33,17 @@ const Announcements = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <div className="flex items-center py-4 lg:justify-between w-full">
-                <div className="flex-1 min-w-0">
-                    <h2 className="text-3xl leading-7 text-green-500 sm:text-2xl sm: mb-0">
-                        {pageTitle}
-                    </h2>
-                </div>
+                <Header title={pageTitle}
+                    showButton={showButton}
+                />
 
+                <HeaderParagraph title="An extension of your in-house communication between you and your users in the form of a broadcast. Send important messages/updates that will reach all your users, or if you'd like a specific set of users." />
+            </div>
+
+            <div className="flex items-center px-12 py-4 lg:justify-between w-full">
                 {
                     state.isLoading || state.requestFailed ? (
                         null
@@ -48,8 +55,8 @@ const Announcements = () => {
                                         <span className="text-sm">
                                             Send Announcement
                                         </span>
-                                        
-                                        <span className={`ml-2 fal fa-megaphone`}></span>  
+
+                                        <span className={`ml-2 fal fa-megaphone`}></span>
                                     </button>
                                 </span>
                             </div>
@@ -58,47 +65,47 @@ const Announcements = () => {
                         )
                     )
                 }
-            </div>
 
-            {
-                state.isLoading ? (
-                    <div className="flex flex-col align-middle mt-4 w-full h-16">
-                        <span className="fad text-green-500 fa-spinner-third fa-2x m-auto block fa-spin"></span>
-                    </div>
-                ) : (
-                    state.requestFailed ? (
-                        <div className="w-full form-group">
-                            <div className="w-10/12 m-auto">
-                                <Error500 />
-                            </div>
+                {
+                    state.isLoading ? (
+                        <div className="flex flex-col align-middle mt-4 w-full h-16">
+                            <span className="fad text-green-500 fa-spinner-third fa-2x m-auto block fa-spin"></span>
                         </div>
                     ) : (
-                        state.allowAnnouncements ? (
-                            <div>
-                                <div className="w-full form-group">
-                                    <div className="w-9/12 mb-5">
-                                        <p className="text-sm form-group mb-0 text-gray-600">
-                                            An extension of your in-house communication between you and your users in the form of a broadcast. Send important messages/updates that will reach all your users, or if you'd like a specific set of users.
-                                        </p>
-                                    </div>
+                        state.requestFailed ? (
+                            <div className="w-full form-group">
+                                <div className="w-10/12 m-auto">
+                                    <Error500 />
                                 </div>
-
-
-
                             </div>
                         ) : (
-                            <ActivateFeature
-                                link=""
-                                linkName="Support Features"
-                            />
+                            state.allowAnnouncements ? (
+                                <div>
+                                    <div className="w-full form-group">
+                                        <div className="w-9/12 mb-5">
+                                            <p className="text-sm form-group mb-0 text-gray-600">
+
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="w-10/12 m-auto">
+                                    <ActivateFeature
+                                        link={featuresRoutes[0].path}
+                                        linkName="Support Features"
+                                    />
+                                </div>
+                            )
                         )
                     )
-                )
-            }
+                }
+            </div>
+
 
             <div className="w-full form-group">
                 <div className="w-10/12">
-                    
+
                 </div>
             </div>
         </React.Fragment>

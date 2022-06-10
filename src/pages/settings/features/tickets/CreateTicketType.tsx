@@ -8,6 +8,8 @@ import ErrorBanner from "../../../../components/layouts/ErrorBanner"
 import SuccessBanner from "../../../../components/layouts/SuccessBanner"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
+import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
+import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import { featuresRoutes } from "../../../../routes/settings/featuresRoutes"
 import HttpServices from "../../../../services/HttpServices"
 
@@ -216,17 +218,22 @@ const CreateTicketType = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <Header title={pageTitle}
-                showButton={showButton}
-            />
+                <Header title={pageTitle}
+                    showButton={showButton}
+                />
 
-            <div className="w-full form-group">
-                <div className="w-10/12">
+                <HeaderParagraph 
+                    title="Kindly ensure you've captured the correct ticket type data as you'll not be able to make any ammendements later on. You can however, decommission a ticket type to prevent any further usage." />
+            </div>
+
+            <div className="w-full px-12 form-group">
+                <div className="w-9/12">
                     <div className="w-full">
                         <p className="text-gray-600 text-sm form-group">
-                            Kindly ensure you've captured the correct ticket type data as you'll not be able to make any ammendements later on. You can however, decommission a ticket type to prevent any further usage.
+                            
                         </p>
                     </div>
 
@@ -323,7 +330,7 @@ const CreateTicketType = () => {
                                         </span>
                                     </button>
                                 ) : (
-                                    <button type="submit" disabled={state.ticket.ticketExists} className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50`}>
+                                    <button type="submit" disabled={state.ticket.ticketExists} className={`inline-flex items-center px-4 py-1-5 border border-blue-500 rounded shadow-sm text-sm text-white bg-blue-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50`}>
                                         <span className="text-sm">
                                             Create Ticket Type
                                         </span>
