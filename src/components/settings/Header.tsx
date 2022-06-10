@@ -7,8 +7,6 @@ interface Props {
     buttonTitle?: string,
     buttonIcon?: boolean,
     iconType?: string,
-    buttonColor?: string,
-    buttonHoverColor?: string,
     buttonLink?: any,
 }
 
@@ -19,15 +17,13 @@ class Header extends Component<Props> {
         const {buttonTitle} = this.props
         const {buttonIcon} = this.props
         const {iconType} = this.props
-        const {buttonColor} = this.props
-        const {buttonHoverColor} = this.props
         const {buttonLink} = this.props
 
         return (
             <React.Fragment>
                 <div className="flex items-center pb-3 pt-3 lg:justify-between w-full">
                     <div className="flex-1 min-w-0">
-                        <h2 className="text-3xl leading-7 text-green-500 sm:text-2xl sm: mb-0">
+                        <h2 className="text-3xl leading-7 text-green-600 sm:text-2xl sm: mb-0">
                             {title}
                         </h2>
                     </div>
@@ -36,7 +32,7 @@ class Header extends Component<Props> {
                         showButton ? (
                             <div className="mt-5 flex lg:mt-0 lg:ml-4">
                                 <span className="hidden sm:block">
-                                    <Link to={buttonLink} type="button" className={`inline-flex items-center px-4 py-1 border border-${buttonColor}-500 rounded shadow-sm text-sm text-white bg-${buttonColor}-500 hover:bg-${buttonHoverColor}-700 hover:border-${buttonHoverColor}-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${buttonHoverColor}-500`}>
+                                    <Link to={buttonLink} type="button" className={`inline-flex items-center px-4 py-1-5 border-2 border-green-600 rounded shadow-sm text-sm text-green-700 hover:border-green-800 hover:text-green-800 focus:outline-none focus:ring focus:ring-offset-2 focus:ring-green-400`}>
                                         <span className="text-sm">
                                             {buttonTitle}
                                         </span>
