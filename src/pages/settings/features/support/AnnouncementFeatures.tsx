@@ -69,7 +69,7 @@ const AnnouncementFeatures = () => {
                         <Error500 />
                     ) : announcementState.status === 'fulfilled' ? (
                         <div>
-                            <h2 className="text-lg leading-7 text-green-500 sm:text-lg sm: mb-2">
+                            <h2 className="text-lg leading-7 text-gray-700 sm:text-lg sm: mb-2">
                                 Announcement Features
                             </h2>
 
@@ -99,7 +99,7 @@ const AnnouncementFeatures = () => {
                                 <div className="flex flex-row">
                                     <div className="w-10 mr-2"></div>
         
-                                    <span className="text-gray-500 text-sm ml-6 w-12/12">
+                                    <span className="text-gray-500 text-sm ml-6 w-9/12">
                                         Activating this feature allows you to send important messages/updates to all your users, or if you'd like a sub set of users. This feature will only be available to users with administrative rights
                                     </span>
                                 </div>

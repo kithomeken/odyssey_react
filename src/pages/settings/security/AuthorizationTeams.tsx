@@ -5,6 +5,8 @@ import { Link } from "react-router-dom"
 import ApiServices from "../../../api/ApiServices"
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
+import HeaderParagraphLarge from "../../../components/settings/HeaderParagraphLarge"
+import { HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
 import { usePromiseEffect } from "../../../lib/hooks/usePromiseEffect"
 import { securityRoutes } from "../../../routes/settings/securityRoutes"
 import HttpServices from "../../../services/HttpServices"
@@ -17,9 +19,15 @@ const AuthorizationTeams = () => {
     })
 
     const groupOrTeam = 'Team'
-    const showButton = false
     const pageTitle = "Authorization " + groupOrTeam
     const thisPageRoutes = securityRoutes[0].path
+
+    // Header button
+    const showButton = true
+    const buttonTitle = "Create Auth Team"
+    const buttonIcon = true
+    const iconType = "fas fa-plus-circle"
+    const buttonLink = securityRoutes[1].path
 
     const breadCrumb = [
         { linkItem: true, title: "Security", url: thisPageRoutes },
@@ -44,7 +52,7 @@ const AuthorizationTeams = () => {
 
     const responseValues: any = authTeamsUsePromiseResponse.value
     console.log(responseValues);
-    
+
 
     return (
         <React.Fragment>
@@ -52,48 +60,21 @@ const AuthorizationTeams = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <Header title={pageTitle}
-                showButton={showButton}
-            />
+                <Header title={pageTitle}
+                    showButton={showButton}
+                    buttonTitle={buttonTitle}
+                    buttonIcon={buttonIcon}
+                    iconType={iconType}
+                    buttonLink={buttonLink}
+                />
 
-            <div className="w-full form-group">
-                <div className="w-12/12">
-                    <p className="text-sm form-group text-gray-500">
-                        Organize your support agents into specialized teams and make it easier to issue out access rights. Create a team and specify the actions that your agents can perform.
-                        To start you off, we've automatically created a few teams with the default badge tag. Go ahead and create a new team for your agents.
-                    </p>
-                </div>
+                <HeaderParagraphLarge title="Organize your support agents into specialized teams and make it easier to issue out access rights. Create a team and specify the actions that your agents can perform. To start you off, we've automatically created a few teams with the default badge tag. Go ahead and create a new team for your agents." />
+            </div>
 
-                {
-                    authTeamsUsePromiseResponse.status === 'fulfilled' ? (
-                        <div className="mt-5 flex w-full flex-row-reverse mb-5">
-                            <span className="hidden sm:block float-right">
-                                <Link to={securityRoutes[1].path} className="inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
-                                    <span className="text-sm">
-                                        Create Group
-                                    </span>
-                                    
-                                    <span className={`ml-2 fas fa-plus-circle`}></span>  
-                                </Link>
-                            </span>
-                        </div>
-                    ) : (
-                        <div className="mt-5 flex w-full flex-row-reverse mb-5">
-                            <span className="hidden sm:block float-right">
-                                <button type="button" disabled className="inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
-                                    <span className="text-sm">
-                                        Create {groupOrTeam}
-                                    </span>
-                                    
-                                    <span className={`ml-2 fas fa-plus-circle`}></span>  
-                                </button>
-                            </span>
-                        </div>
-                    )
-                }
-
+            <div className="w-full px-12 form-group">
                 {
                     authTeamsUsePromiseResponse.status === 'rejected' ? (
                         <div className="w-full form-group">
@@ -104,7 +85,7 @@ const AuthorizationTeams = () => {
                             {
                                 authTeamsUsePromiseResponse.value.map((authTeam: any, index: any) => {
                                     const createdOn = new Date(authTeam.created_at);
-                                    
+
                                     return (
                                         <div className="w-full mb-3 py-3 px-4 rounded-md border hover:shadow" key={index}>
                                             <div className="flex mb-2 items-center">
@@ -112,7 +93,7 @@ const AuthorizationTeams = () => {
                                                     <Link to={`/a/default/settings/security/authorization-groups/${authTeam.uuid}`} className="text-green-500 block hover:underline">
                                                         {authTeam.name}
                                                     </Link>
-                                                    
+
                                                     <span className="text-sm text-gray-600 block">
                                                         {authTeam.description}
                                                     </span>
@@ -121,7 +102,7 @@ const AuthorizationTeams = () => {
                                                 <div className="basis-1/4">
                                                     <Link to="/auth/forgot-password" className="font-medium text-center mr-3 float-right text-blue-600 hover:text-blue-800 flex items-center">
                                                         <span className="fad fa-pencil block fa-sm mr-2"></span>
-                                                    
+
                                                         <span className="font-small">
                                                             Edit {groupOrTeam}
                                                         </span>
@@ -136,15 +117,15 @@ const AuthorizationTeams = () => {
                                                             <span className="inline-flex items-center justify-center px-2 py-1 mr-3 text-xs leading-none text-gray-700 bg-gray-300 rounded">
                                                                 Default
                                                             </span>
-                                                        ): null
+                                                        ) : null
                                                     }
-                                                    
+
                                                     {
                                                         authTeam.access_type === 'A' ? (
                                                             <span className="inline-flex items-center justify-center px-2 py-1 mr-3 text-xs leading-none text-indigo-700 bg-indigo-300 rounded">
                                                                 All Time Access
                                                             </span>
-                                                        ): (
+                                                        ) : (
                                                             <span className="inline-flex items-center justify-center px-2 py-1 mr-3 text-xs leading-none text-indigo-700 bg-indigo-300 rounded">
                                                                 Limited Time Access
                                                             </span>
@@ -153,23 +134,23 @@ const AuthorizationTeams = () => {
 
                                                     <span className="text-xs text-gray-400 mb-2">
                                                         <span className="text-gray-600">
-                                                            Ticket Access: 
+                                                            Ticket Access:
                                                         </span>
 
                                                         <span className="ml-2">
-                                                            { authTeam.ticket_access === 'GLB' ? 'Global Access' : 'Limited Access' }
+                                                            {authTeam.ticket_access === 'GLB' ? 'Global Access' : 'Limited Access'}
                                                         </span>
                                                     </span>
                                                 </div>
-                                                
+
                                                 <div className="basis-2/4">
                                                     <span className="text-xs text-gray-400 mb-2 float-right mr-3">
                                                         <span className="text-gray-600">
-                                                            Created on: 
+                                                            Created on:
                                                         </span>
 
                                                         <span className="ml-2">
-                                                            { format(createdOn, "MMMM do, yyyy") }
+                                                            {format(createdOn, "MMMM do, yyyy")}
                                                         </span>
                                                     </span>
                                                 </div>

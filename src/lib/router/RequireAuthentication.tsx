@@ -30,7 +30,7 @@ export default function RequireAuthentication() {
         
                         <div className="flex flex-col w-full mb-5" style={marginLeft}>
         
-                            <div className="w-full px-8 py-3 overflow-y-auto">
+                            <div className="w-full overflow-y-auto">
                                 <div className="kiOAkj" style={marginTop}>
         
                                     <Outlet />

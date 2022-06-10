@@ -14,6 +14,8 @@ import ReactTable from "../../../../lib/hooks/ReactTable"
 import Error500 from "../../../errors/Error500"
 import DateFormating from "../../../../lib/hooks/DateFormating"
 import { Transition } from "@headlessui/react";
+import HeaderParagraph from "../../../../components/settings/HeaderParagraph";
+import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry";
 
 const TicketTypes = () => {
     const [state, setstate] = useState({
@@ -26,11 +28,17 @@ const TicketTypes = () => {
         requestSucceeded: false,
     })
 
-    const showButton = false
     const pageTitle = "Ticket Types"
 
+    // Header button
+    const showButton = true
+    const buttonTitle = "Create Type"
+    const buttonIcon = true
+    const iconType = "fas fa-plus-circle"
+    const buttonLink = featuresRoutes[2].path
+
     const breadCrumb = [
-        { linkItem: true, title: "Ticket Features", url: "" },
+        { linkItem: true, title: "Ticket Settings", url: "" },
         { linkItem: false, title: pageTitle },
     ]
 
@@ -217,29 +225,22 @@ const TicketTypes = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <Header title={pageTitle}
-                showButton={showButton}
-            />
+                <Header title={pageTitle}
+                    showButton={showButton}
+                    buttonTitle={buttonTitle}
+                    buttonIcon={buttonIcon}
+                    iconType={iconType}
+                    buttonLink={buttonLink}
+                />
 
-            <div className="w-full form-group">
+                <HeaderParagraph title="Create ticket types to group all the issues raised by your client base. Makes it easier to manage and classify all issues increasing productivity and workflow." />
+            </div>
+
+            <div className="w-full px-12 py-3 form-group">
                 <div className="w-12/12 mb-5">
-                    <p className="text-sm form-group mb-0 text-gray-600">
-                        Create ticket types to group all the issues raised by your client base. Makes it easier to manage and classify all issues increasing productivity and workflow.
-                    </p>
-
-                    <div className="mt-5 flex w-full flex-row mb-5">
-                        <span className="hidden sm:block">
-                            <Link to={featuresRoutes[2].path} className="inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
-                                <span className="text-sm">
-                                    Create Type
-                                </span>
-
-                                <span className={`ml-2 fas fa-plus-circle`}></span>
-                            </Link>
-                        </span>
-                    </div>
 
                     {
                         state.requestFailed ? (

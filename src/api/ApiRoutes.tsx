@@ -21,3 +21,12 @@ export const TICKET_TYPES_CHECK_API_ROUTE = 'portal/a/site-master/tickets/types/
 export const TICKET_TYPES_CREATE_API_ROUTE = 'portal/a/site-master/tickets/types/create'
 export const TICKET_TYPES_SUSPEND_API_ROUTE = 'portal/a/site-master/tickets/types/suspend'
 export const TICKET_TYPES_REINSTATE_API_ROUTE = 'portal/a/site-master/tickets/types/reinstate'
+
+// Ticket Features
+export const TICKET_FEATURES_LIST_API_ROUTE = 'portal/a/site-master/features/tickets/all'
+export const TICKET_FEATURES_CONFIGURE_API_ROUTE = 'portal/a/site-master/features/tickets/configure'
+
+// Support Features
+export const SUPPORT_FEATURES_CONFIGURE_API_ROUTE = 'portal/a/site-master/features/support/configure'
+export const SUPPORT_FEATURES_AGENT_API_ROUTE = 'portal/a/site-master/features/support/agents'
+export const SUPPORT_FEATURES_CLIENT_API_ROUTE = 'portal/a/site-master/features/support/clients'

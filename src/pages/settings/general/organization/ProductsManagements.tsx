@@ -15,6 +15,8 @@ import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 import HttpServices from "../../../../services/HttpServices"
 import Error500 from "../../../errors/Error500"
 import DateFormating from "../../../../lib/hooks/DateFormating";
+import HeaderParagraph from "../../../../components/settings/HeaderParagraph";
+import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry";
 
 const ProductManagement = () => {
     const [state, setstate] = useState({
@@ -22,10 +24,16 @@ const ProductManagement = () => {
         isLoading: true,
     })
 
-    const showButton = false
     const dispatch = useDispatch()
     const pageTitle = "Product Management"
     const orgDetailsRoute = generalRoutes[2].path
+
+    // Header button
+    const showButton = true
+    const buttonTitle = "Create Product"
+    const buttonIcon = true
+    const iconType = "fas fa-plus-circle"
+    const buttonLink = generalRoutes[3].path
 
     const breadCrumb = [
         { linkItem: true, title: "General Settings", url: orgDetailsRoute },
@@ -39,7 +47,7 @@ const ProductManagement = () => {
 
         if (response.status !== 200) {
             throw new Error("Something went wrong while fecthing products list.");
-        }        
+        }
 
         return response.data.data
     }, [dispatch])
@@ -53,7 +61,7 @@ const ProductManagement = () => {
                         <span className="block text-black text-sm">
                             {data.name}
                         </span>
-    
+
                         <span className="block text-gray-500 mb-0 text-sm">
                             {data.description}
                         </span>
@@ -100,31 +108,22 @@ const ProductManagement = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <Header title={pageTitle}
-                showButton={showButton}
-            />
+                <Header title={pageTitle}
+                    showButton={showButton}
+                    buttonTitle={buttonTitle}
+                    buttonIcon={buttonIcon}
+                    iconType={iconType}
+                    buttonLink={buttonLink}
+                />
 
-            <div className="w-full form-group">
-                <div className="w-12/12">
-                    <p className="text-sm mb-5 text-gray-700">Configure the various products your team(s) support within your business workflow to Odyssey's workstreams and track the tickets raised on each.</p>
+                <HeaderParagraph title="Configure the various products your team(s) support within your business workflow to Odyssey's workstreams and track the tickets raised on each." />
 
-                    {
-                        productsListApiCall.status === 'fulfilled' &&
-                        <div className="mt-5 flex w-full flex-row mb-5">
-                            <span className="hidden sm:block">
-                                <Link to={generalRoutes[3].path} className="inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
-                                    <span className="text-sm">
-                                        Add Product
-                                    </span>
+            </div>
 
-                                    <span className={`ml-2 fas fa-plus-circle`}></span>
-                                </Link>
-                            </span>
-                        </div>
-                    }
-                </div>
+            <div className="w-full form-group px-12 mb-14">
 
                 <div className="w-full">
                     {

@@ -6,6 +6,8 @@ import { COMPANY_GROUP_LIST_API_ROUTE } from "../../../../api/ApiRoutes"
 import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
+import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
+import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import DateFormating from "../../../../lib/hooks/DateFormating"
 import NoDataReactTable from "../../../../lib/hooks/NoDataReactTable"
 import ReactTable from "../../../../lib/hooks/ReactTable"
@@ -15,10 +17,16 @@ import HttpServices from "../../../../services/HttpServices"
 import Error500 from "../../../errors/Error500"
 
 const CompanyGroups = () => {
-    const showButton = false
     const dispatch = useDispatch()
     const pageTitle = "Company Groups"
     const orgDetailsRoute = generalRoutes[5].path
+
+    // Header button
+    const showButton = true
+    const buttonTitle = "Create Company"
+    const buttonIcon = true
+    const iconType = "fas fa-plus-circle"
+    const buttonLink = generalRoutes[6].path
 
     const breadCrumb = [
         { linkItem: true, title: "General Settings", url: orgDetailsRoute },
@@ -37,10 +45,10 @@ const CompanyGroups = () => {
         return response.data.data
     }, [dispatch])
 
-    const columns =  [
+    const columns = [
         {
             Header: 'Company Name',
-            accessor: (data: {name: any, description: any}) => (
+            accessor: (data: { name: any, description: any }) => (
                 <span>
                     <span className="block text-black text-sm">
                         {data.name}
@@ -58,7 +66,7 @@ const CompanyGroups = () => {
                 data.suspended === 'Y' ? (
                     <span className="flex items-center">
                         <span className="h-3 w-3 align-middle bg-red-500 rounded-full mr-3"></span>
-                        
+
                         <span className="text-gray-500 text-sm align-middle">
                             Suspended
                         </span>
@@ -66,7 +74,7 @@ const CompanyGroups = () => {
                 ) : (
                     <span className="flex items-center">
                         <span className="h-3 w-3 align-middle bg-green-500 rounded-full mr-3"></span>
-                        
+
                         <span className="text-gray-500 text-sm align-middle">
                             Active
                         </span>
@@ -98,32 +106,21 @@ const CompanyGroups = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <Header title={pageTitle}
-                showButton={showButton}
-            />
+                <Header title={pageTitle}
+                    showButton={showButton}
+                    buttonTitle={buttonTitle}
+                    buttonIcon={buttonIcon}
+                    iconType={iconType}
+                    buttonLink={buttonLink}
+                />
 
-            <div className="w-full form-group">
-                <div className="w-12/12">
-                    <p className="text-sm mb-5 text-gray-500">Create companies and make it easier to manage support requests from the same. Add contact information for your support team to easily seek assitance on issues raised by each company group.</p>
+                <HeaderParagraph title="Create companies and make it easier to manage support requests from the same. Add contact information for your support team to easily seek assitance on issues raised by each company group." />
+            </div>
 
-                    {/* {
-                        companyGroupsApiCall.status === 'fulfilled' && */}
-                        <div className="mt-5 flex w-full flex-row mb-5">
-                            <span className="hidden sm:block">
-                                <Link to={generalRoutes[6].path} className="inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
-                                    <span className="text-sm">
-                                        Add Company
-                                    </span>
-
-                                    <span className={`ml-2 fas fa-plus-circle`}></span>
-                                </Link>
-                            </span>
-                        </div>
-                    {/* } */}
-                </div>
-
+            <div className="w-full px-12 form-group py-3">
                 <div className="w-full">
                     {
                         companyGroupsApiCall.status === 'rejected' ? (
