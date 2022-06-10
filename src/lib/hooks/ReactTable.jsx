@@ -43,7 +43,7 @@ export default function ReactTable({ columns, data }) {
 
     return (
         <>
-            <pre>
+            {/* <pre>
                 <code>
                     {JSON.stringify(
                         {
@@ -57,7 +57,7 @@ export default function ReactTable({ columns, data }) {
                         2
                     )}
                 </code>
-            </pre>
+            </pre> */}
 
             <div className="w-12/12 mb-3 flex items-center align-middle">
                 <div className="">
@@ -112,19 +112,19 @@ export default function ReactTable({ columns, data }) {
             </table>
 
             <div className="pagination mt-6">
-                <div className="bg-white px-4 py-3 flex items-center justify-between sm:px-6">
+                <div className="bg-gray-50 px-4 py-3 flex items-center justify-between sm:px-6">
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                         <div>
-                            <p className="text-sm text-gray-700">
-                                Showing <span className="font-medium">{firstItemOnPageFromData}</span> to <span className="font-medium">{lastItemOnPageFromData}</span> of{' '} <span className="text-green-600 font-medium">{dataLength}</span> results
+                            <p className="text-sm text-gray-500">
+                                {firstItemOnPageFromData} - {lastItemOnPageFromData} of {dataLength} results
                             </p>
                         </div>
                         <div>
-                            <nav className="relative z-0 inline-flex rounded-md text-green-700 font-medium" aria-label="Pagination">
+                            <nav className="relative z-0 inline-flex rounded-md text-green-700 text-sm" aria-label="Pagination">
                                 <button
-                                onClick={() => previousPage()}
-                                disabled={!canPreviousPage}
-                                className="relative inline-flex items-center px-2 py-1 shadow-sm rounded-l border border-gray-300 bg-white text-sm hover:bg-gray-100">
+                                    onClick={() => previousPage()}
+                                    disabled={!canPreviousPage}
+                                    className="relative inline-flex items-center px-2 py-1 shadow-sm rounded-l border border-gray-300 bg-white text-xs hover:bg-gray-100">
                                     <span className="">Previous</span>
                                 </button>
 
@@ -149,7 +149,7 @@ export default function ReactTable({ columns, data }) {
                                                                 className={
                                                                     classNames(
                                                                         (pageNumber - 1) === pageIndex ? 'bg-green-50 border-green-500 text-green-600' : 'bg-white border-gray-300  hover:bg-gray-100',
-                                                                        'z-10 relative px-3 py-1 border text-xs font-medium'
+                                                                        'z-10 relative px-3 py-1 border text-xs'
                                                                     )
                                                                 }>
                                                                 {pageNumber}
@@ -176,7 +176,7 @@ export default function ReactTable({ columns, data }) {
                                                                         className={
                                                                             classNames(
                                                                                 (pageNumber - 1) === pageIndex ? 'bg-green-50 border-green-500 text-green-600' : 'bg-white border-gray-300  hover:bg-gray-100',
-                                                                                'z-10 relative px-3 py-1 border text-xs font-medium'
+                                                                                'z-10 relative px-3 py-1 border text-xs'
                                                                             )
                                                                         }>
                                                                         {pageNumber}
@@ -188,7 +188,7 @@ export default function ReactTable({ columns, data }) {
                                                 })
                                             }
 
-                                            <span className="z-10 relative px-3 py-1 border text-xs font-medium bg-white border-gray-300  hover:bg-gray-100">
+                                            <span className="z-10 relative px-3 py-1 border text-xs bg-white border-gray-300  hover:bg-gray-100">
                                                 ...
                                             </span>
 
@@ -207,7 +207,7 @@ export default function ReactTable({ columns, data }) {
                                                                         className={
                                                                             classNames(
                                                                                 (pageNumber - 1) === pageIndex ? 'bg-green-50 border-green-500 text-green-600' : 'bg-white border-gray-300  hover:bg-gray-100',
-                                                                                'z-10 relative px-3 py-1 border text-xs font-medium'
+                                                                                'z-10 relative px-3 py-1 border text-xs'
                                                                             )
                                                                         }>
                                                                         {pageNumber}
@@ -225,7 +225,7 @@ export default function ReactTable({ columns, data }) {
                                 <button
                                     onClick={() => nextPage()}
                                     disabled={!canNextPage}
-                                    className="relative inline-flex items-center px-2 py-1 rounded-r border border-gray-300 bg-white text-sm hover:bg-gray-100">
+                                    className="relative inline-flex items-center px-2 py-1 rounded-r border border-gray-300 bg-white text-xs hover:bg-gray-100">
                                     <span className="">Next</span>
                                 </button>
                             </nav>
