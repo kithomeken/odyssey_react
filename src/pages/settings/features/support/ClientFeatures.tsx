@@ -107,7 +107,7 @@ const ClientFeatures = () => {
                         <Error500 />
                     ) : clientSupportFeaturesPromise.status === 'fulfilled' ? (
                         <div>
-                            <h2 className="text-lg leading-7 text-green-500 sm:text-lg sm: mb-2">
+                            <h2 className="text-lg leading-7 text-gray-700 sm:text-lg sm: mb-2">
                                 Client Features
                             </h2>
         
@@ -136,7 +136,7 @@ const ClientFeatures = () => {
                                 <div className="flex flex-row">
                                     <div className="w-10 mr-2"></div>
         
-                                    <span className="text-gray-500 text-sm ml-6 w-12/12">
+                                    <span className="text-gray-500 text-sm ml-6 w-9/12">
                                         Activating this feature allows you to create user accounts for your clients and enable them to raise tickets, add comments, attachments and follow the Ticket's Odyssey until closure. {/* In retrospect only clients will create tickets.  */}
                                     </span>
                                 </div>
@@ -161,7 +161,7 @@ const ClientFeatures = () => {
                                 <div className="flex flex-row">
                                     <div className="w-10 mr-2"></div>
         
-                                    <span className="text-gray-500 text-sm ml-6 w-12/12">
+                                    <span className="text-gray-500 text-sm ml-6 w-9/12">
                                         Create a company profile and make it easier to manage support requests from one single client company. Add more detailed information about the companies for your support team to easily get in touch with them. 
                                     </span>
                                 </div>
@@ -187,7 +187,7 @@ const ClientFeatures = () => {
                                 <div className="flex flex-row">
                                     <div className="w-10 mr-2"></div>
         
-                                    <span className="text-gray-500 text-sm ml-6 w-12/12">
+                                    <span className="text-gray-500 text-sm ml-6 w-9/12">
                                         Create regions and make it easier to manage support requests from one single region. You can have as many regions as you want. Most useful if tickets are coming from multiple regions.
                                     </span>
                                 </div>

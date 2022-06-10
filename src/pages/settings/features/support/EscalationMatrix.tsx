@@ -145,7 +145,7 @@ const EscalationMatrix = () => {
                         <Error500 />
                     ) : escalationSupportFeaturesPromise.status === 'fulfilled' ? (
                         <div>
-                            <h2 className="text-lg leading-7 text-green-500 sm:text-lg sm: mb-2">
+                            <h2 className="text-lg leading-7 text-gray-700 sm:text-lg sm: mb-2">
                                 Escalation Matrix
                             </h2>
 
@@ -175,7 +175,7 @@ const EscalationMatrix = () => {
                                 <div className="flex flex-row">
                                     <div className="w-10 mr-2"></div>
         
-                                    <span className="text-gray-500 text-sm ml-6 w-12/12">
+                                    <span className="text-gray-500 text-sm ml-6 w-9/12">
                                         At times, agents face a 'deadlock' when it comes to issue resolution and as such no workaround can be found. We offer agents (and clients) the ability to escalate issues to a higher level of your organization for a quicker resolution.
                                     </span>
                                 </div>
@@ -203,7 +203,7 @@ const EscalationMatrix = () => {
                                 <div className="flex flex-row">
                                     <div className="w-10 mr-2"></div>
         
-                                    <span className="text-gray-500 text-sm ml-6 w-12/12">
+                                    <span className="text-gray-500 text-sm ml-6 w-9/12">
                                         Allows clients to escalate tickets to your escalation team. <span className="text-red-500">But be warned</span>, as all clients want their issues to be sorted as quickly as possible and might end up misusing this god-given gift. 
                                     </span>
                                 </div>

@@ -67,7 +67,7 @@ const AgentFeatures = () => {
                         <Error500 />
                     ) : agentSupportState.status === 'fulfilled' ? (
                         <div>
-                            <h2 className="text-lg leading-7 text-green-500 sm: mb-2">
+                            <h2 className="text-lg leading-7 text-gray-700 sm: mb-2">
                                 Agent Features
                             </h2>
 
