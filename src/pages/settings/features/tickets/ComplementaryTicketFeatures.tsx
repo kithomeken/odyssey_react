@@ -1,5 +1,4 @@
 import React from "react"
-import { useState } from "react"
 import Error500 from "../../../errors/Error500"
 
 const ComplementaryTicketFeatures = ({ state, onChangeToggleHandler }: { state: any, onChangeToggleHandler: any }) => {
