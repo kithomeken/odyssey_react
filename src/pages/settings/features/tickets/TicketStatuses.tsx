@@ -6,7 +6,6 @@ import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
 import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
-import DateFormating from "../../../../lib/hooks/DateFormating"
 import NoDataReactTable from "../../../../lib/hooks/NoDataReactTable"
 import ReactTable from "../../../../lib/hooks/ReactTable"
 import HttpServices from "../../../../services/HttpServices"
@@ -17,6 +16,7 @@ const TicketStatuses = () => {
     const [state, setstate] = useState({
         uuid: null,
         data: null,
+        dataLength: 0,
         status: 'pending',
         show: false,
         requestFailed: false,
@@ -62,26 +62,23 @@ const TicketStatuses = () => {
                 )
             },
             {
-                Header: 'Created At',
-                accessor: (data: { created_at: any }) => (
-                    <span className="block text-gray-500 mb-0 text-sm">
-                        <DateFormating dateString={data.created_at} />
-                    </span>
-                )
-            },
-            {
                 Header: 'Order',
                 accessor: (data: { uuid: any, order: any }) => (
-                    <>                    
+                    <>
                         {
                             data.order === 1 ? (
                                 <span className="flex items-center">
+                                    <span className="flex-shrink-0 h-5 w-4 mx-1"></span>
+                                    <span className="flex-shrink-0 h-5 w-4 rounded text-gray-500 fa-sm mx-1 fas fa-arrow-down"></span>
+                                </span>
+                            ) : data.order !== state.dataLength ? (
+                                <span className="flex items-center">
+                                    <span className="flex-shrink-0 h-5 w-4 rounded text-gray-500 fa-sm mx-1 fas fa-arrow-up"></span>
                                     <span className="flex-shrink-0 h-5 w-4 rounded text-gray-500 fa-sm mx-1 fas fa-arrow-down"></span>
                                 </span>
                             ) : (
                                 <span className="flex items-center">
                                     <span className="flex-shrink-0 h-5 w-4 rounded text-gray-500 fa-sm mx-1 fas fa-arrow-up"></span>
-                                    <span className="flex-shrink-0 h-5 w-4 rounded text-gray-500 fa-sm mx-1 fas fa-arrow-down"></span>
                                 </span>
                             )
                         }
@@ -90,20 +87,14 @@ const TicketStatuses = () => {
             },
             {
                 Header: '-',
-                accessor: (data: { uuid: any, deleted_at: any }) => (
-                    data.deleted_at === null ? (
-                        <button type="button" className="text-red-600 m-auto text-right float-right cursor-pointer hover:text-red-800 text-sm hover:bg-red-100 px-2 rounded">
-                            Suspend
-                        </button>
-                    ) : (
-                        <button type="button" className="text-green-600 m-auto text-right float-right cursor-pointer hover:text-green-800 text-sm hover:bg-green-100 px-2 rounded">
-                            Reinstate
-                        </button>
-                    )
+                accessor: (data: { uuid: any }) => (
+                    <button type="button" className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm hover:bg-blue-100 px-2 rounded">
+                        Edit
+                    </button>
                 )
             },
         ],
-        []
+        [state.dataLength]
     )
 
     const showOrHideModal = () => {
@@ -119,14 +110,19 @@ const TicketStatuses = () => {
             const response: any = await HttpServices.httpGet(apiCall)
 
             let { data } = state
+            let { dataLength } = state
             let status = state.status
 
             data = response.data.data
+            dataLength = response.data.data.length 
             status = 'fulfilled'
 
             setstate({
-                ...state, data, status,
+                ...state, data, status, dataLength
             })
+
+           
+            
         } catch (e) {
             console.warn(e);
             let status = state.status
@@ -142,6 +138,7 @@ const TicketStatuses = () => {
 
     React.useEffect(() => {
         fetchTicketStatusListApiCall();
+        
     }, []);
 
     const refetchTicketStatusListAfterCreatingStatus = async () => {
@@ -151,11 +148,15 @@ const TicketStatuses = () => {
             const response: any = await HttpServices.httpGet(apiCall)
 
             let { data } = state
+            let { dataLength } = state
+
             data = response.data.data
+            dataLength = response.data.data.length
 
             setstate({
-                ...state, data, show: false
+                ...state, data, dataLength, show: false
             })
+
         } catch (e) {
             console.warn(e);
             let status = state.status
@@ -186,6 +187,7 @@ const TicketStatuses = () => {
                 />
 
                 <HeaderParagraph title="Create ticket types to group all the issues raised by your client base. Makes it easier to manage and classify all issues increasing productivity and workflow." />
+
             </div>
 
             <div className="w-full px-12 py-3 form-group">

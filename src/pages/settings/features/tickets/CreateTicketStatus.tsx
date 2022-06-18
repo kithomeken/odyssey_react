@@ -281,16 +281,16 @@ const CreateTicketStatus = ({ show, hideModal, reloadTicketStatusFunc }: { show:
                                                                         listButton={
                                                                             <>
                                                                                 {scrumCategoriesListApiCall.value.map((selectedItem: any, index: any) => (
-                                                                                    <>
+                                                                                    <span key={index}>
                                                                                         {
                                                                                             state.input.category === selectedItem.id ? (
-                                                                                                <span className="flex items-center" key={index}>
+                                                                                                <span className="flex items-center">
                                                                                                     <span className={`flex-shrink-0 h-5 w-4 rounded ${selectedItem.color_code}`}></span>
                                                                                                     <span className="ml-2 text-sm text-gray-700 truncate">{selectedItem.name}</span>
                                                                                                 </span>
                                                                                             ) : null
                                                                                         }
-                                                                                    </>
+                                                                                    </span>
                                                                                 ))}
 
                                                                                 <span className="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -340,21 +340,13 @@ const CreateTicketStatus = ({ show, hideModal, reloadTicketStatusFunc }: { show:
                                                             Identifies where an issue is in it's lifecycle. Issue's lifecycles is as shown below
                                                         </span>
 
-                                                        <input type="hidden" className="bg-amber-300 border-amber-300" />
-                                                        <input type="hidden" className="bg-blue-300 border-blue-300" />
-                                                        <input type="hidden" className="bg-fuchsia-300 border-fuchsia-300" />
-                                                        <input type="hidden" className="bg-emerald-300 border-emerald-300" />
-                                                        <input type="hidden" className="bg-gray-300 border-gray-300" />
-
                                                         <ul className="steps w-full pt-3 z-50">
                                                             {
                                                                 scrumCategoriesListApiCall.value.map((listItem: any, index: any) => (
-                                                                    <>
-                                                                        <li className="step relative has-tooltip" key={listItem.color_code}>
-                                                                            <div className={`h-4 w-4 ${listItem.color_code} hover:border-4 hover:border-${listItem.color_code}-600 absolute rounded-full grid row-start-1`}></div>
-                                                                            <span className='tooltip rounded shadow-lg p-1 text-xs bg-gray-100 text-gray-500 -mt-8 z-50'>{listItem.name}</span>
-                                                                        </li>
-                                                                    </>
+                                                                    <li className="step relative has-tooltip" key={index}>
+                                                                        <div className={`h-4 w-4 ${listItem.color_code} hover:border-4 hover:border-${listItem.color_code}-600 absolute rounded-full grid row-start-1`}></div>
+                                                                        <span className='tooltip rounded shadow-lg p-1 text-xs bg-gray-100 text-gray-500 -mt-8 z-50'>{listItem.name}</span>
+                                                                    </li>
                                                                 ))
                                                             }
                                                         </ul>
