@@ -14,6 +14,8 @@ import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import SuccessBanner from "../../../../components/layouts/SuccessBanner";
 import ErrorBanner from "../../../../components/layouts/ErrorBanner";
 import ProductEdit from "./ProductChange";
+import HeaderParagraph from "../../../../components/settings/HeaderParagraph";
+import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry";
 
 const Productview = () => {
     const [state, setstate] = useState({
@@ -91,10 +93,9 @@ const Productview = () => {
     }, []);
 
     function setStatusAsPending() {
-        let status = state.status
         setstate({
             ...state,
-            status: 'Pending'
+            status: 'pending'
         })
     }
 
@@ -193,35 +194,35 @@ const Productview = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            {
-                state.banner.show ? (
-                    <div className="w-10/12 pt-3">
-                        {
-                            state.banner.type === 'error' ? (
-                                <ErrorBanner
-                                    message={state.banner.message}
-                                />
-                            ) : state.banner.type === 'success' ? (
-                                <SuccessBanner
-                                    message={state.banner.message}
-                                />
-                            ) : null
-                        }
-                    </div>
-                ) : null
-            }
+                {
+                    state.banner.show ? (
+                        <div className="w-10/12 pt-3">
+                            {
+                                state.banner.type === 'error' ? (
+                                    <ErrorBanner
+                                        message={state.banner.message}
+                                    />
+                                ) : state.banner.type === 'success' ? (
+                                    <SuccessBanner
+                                        message={state.banner.message}
+                                    />
+                                ) : null
+                            }
+                        </div>
+                    ) : null
+                }
 
-            <Header title={pageTitle}
-                showButton={showButton}
-            />
+                <Header title={pageTitle}
+                    showButton={showButton}
+                />
 
-            <div className="w-full form-group">
-                <div className="w-10/12">
-                    <p className="text-sm mb-5 text-gray-500">Review and update your product details. Please make sure these details are up to date as they'll be used to create tickets</p>
-                </div>
+                <HeaderParagraph title="Review and update your product details. Please make sure these details are up to date as they'll be used to create tickets." />
+            </div>
 
+            <div className="w-full px-12 form-group">
                 <div className="w-12/12">
                     <div className="mb-5">
                         {
