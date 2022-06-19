@@ -25,7 +25,7 @@ class Navigation extends Component<Props> {
 
         return (
             <React.Fragment>
-                <div className="flex flex-col h-screen md:w-28 lg:w-72 text-gray-900 border-r-2 flex-shrink-0 z-20 bg-white decoration-clone fixed">
+                <div className="flex flex-col h-screen lg:w-72 text-gray-900 border-r-2 flex-shrink-0 z-20 bg-white decoration-clone fixed">
                     <div className="block px-5">
                         <Link to="" className="my-0 p-2 pl-0 w-full block mx-0 border-none">
                             <span className="lan-1 mb-0 lolrtn nunito text-green-500 text-2xl font-bold block">
