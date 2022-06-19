@@ -14,7 +14,6 @@ import CreateTicketStatus from "./CreateTicketStatus"
 
 const TicketStatuses = () => {
     const [state, setstate] = useState({
-        uuid: null,
         data: null,
         dataLength: 0,
         status: 'pending',
@@ -216,7 +215,7 @@ const TicketStatuses = () => {
 
             <CreateTicketStatus
                 show={state.show}
-                hideModal={showOrHideModal}
+                showOrHideModal={showOrHideModal}
                 reloadTicketStatusFunc={refetchTicketStatusListAfterCreatingStatus}
             />
         </React.Fragment>

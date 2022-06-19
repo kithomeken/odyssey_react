@@ -11,7 +11,7 @@ import HttpServices from "../../../../services/HttpServices"
 import Error500 from "../../../errors/Error500"
 import { TICKET_STATUS_CHECK_API_ROUTE, TICKET_STATUS_CREATE_API_ROUTE, TICKET_STATUS_SCRM_CAT_API_ROUTE } from "../../../../api/ApiRoutes"
 
-const CreateTicketStatus = ({ show, hideModal, reloadTicketStatusFunc }: { show: any, hideModal: any, reloadTicketStatusFunc: any }) => {
+const CreateTicketStatus = ({ show, showOrHideModal, reloadTicketStatusFunc }: { show: any, showOrHideModal: any, reloadTicketStatusFunc: any }) => {
     const [state, setstate] = useState({
         requestFailed: false,
         isPostingForm: false,
@@ -40,7 +40,7 @@ const CreateTicketStatus = ({ show, hideModal, reloadTicketStatusFunc }: { show:
         const response: any = await HttpServices.httpGet(apiCall)
 
         if (response.status !== 200) {
-            throw new Error("Something went wrong while fecthing products list.");
+            throw new Error("Something went wrong while fecthing data.");
         }
 
         return response.data.data
@@ -218,7 +218,7 @@ const CreateTicketStatus = ({ show, hideModal, reloadTicketStatusFunc }: { show:
 
     return (
         <Transition.Root show={show} as={Fragment}>
-            <Dialog as="div" className="relative z-20" onClose={hideModal}>
+            <Dialog as="div" className="relative z-20" onClose={showOrHideModal}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -256,7 +256,7 @@ const CreateTicketStatus = ({ show, hideModal, reloadTicketStatusFunc }: { show:
 
                                                     <div className="w-12/12 rounded-md shadow-none space-y-px">
                                                         <div className="flex flex-row-reverse pt-3 items-center align-middle">
-                                                            <p className="text-blue-500 text-sm text-right mr-3 ml-5 hover:underline" onClick={hideModal}>Cancel</p>
+                                                            <p className="text-blue-500 text-sm text-right mr-3 ml-5 hover:underline" onClick={showOrHideModal}>Cancel</p>
                                                         </div>
                                                     </div>
                                                 </>
@@ -397,14 +397,14 @@ const CreateTicketStatus = ({ show, hideModal, reloadTicketStatusFunc }: { show:
                                                             </div>
                                                         </div>
 
-                                                        <sub className="text-slate-400 text-xs">
+                                                        <sub className="text-slate-500 text-xs">
                                                             The relevance of the issue when moved into this status. This will also appear in tooltips
                                                         </sub>
                                                     </div>
 
                                                     <div className="w-12/12 rounded-md shadow-none space-y-px">
                                                         <div className="flex flex-row-reverse pt-3 items-center align-middle">
-                                                            <p className="text-blue-500 text-sm text-right mr-3 ml-5 hover:underline" onClick={hideModal}>Cancel</p>
+                                                            <p className="text-blue-500 text-sm text-right mr-3 ml-5 hover:underline" onClick={showOrHideModal}>Cancel</p>
                                                             {
                                                                 state.isPostingForm ? (
                                                                     <button type="button" className={`inline-flex items-center px-4 py-1 border border-emerald-300 rounded shadow-sm text-sm text-white bg-emerald-500 hover:bg-emerald-600 focus:outline-none focus:ring focus:ring-offset-2 focus:ring-emerald-500 disabled:bg-emerald-300`} disabled={true}>
