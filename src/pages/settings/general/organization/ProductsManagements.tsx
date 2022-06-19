@@ -1,8 +1,6 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
-import { useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
-import Moment from 'moment';
 
 import { PRODUCT_LIST_API_ROUTE } from "../../../../api/ApiRoutes"
 import ApiServices from "../../../../api/ApiServices"
@@ -10,26 +8,28 @@ import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import NoDataReactTable from "../../../../lib/hooks/NoDataReactTable"
 import ReactTable from "../../../../lib/hooks/ReactTable"
-import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
 import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 import HttpServices from "../../../../services/HttpServices"
 import Error500 from "../../../errors/Error500"
 import DateFormating from "../../../../lib/hooks/DateFormating";
 import HeaderParagraph from "../../../../components/settings/HeaderParagraph";
 import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry";
+import AddProduct from "./AddProduct";
 
 const ProductManagement = () => {
     const [state, setstate] = useState({
+        data: null,
+        show: false,
+        status: 'pending',
         requestFailed: '',
-        isLoading: true,
     })
 
-    const dispatch = useDispatch()
     const pageTitle = "Product Management"
     const orgDetailsRoute = generalRoutes[2].path
 
     // Header button
     const showButton = true
+    const actionButton = true
     const buttonTitle = "Create Product"
     const buttonIcon = true
     const iconType = "fas fa-plus-circle"
@@ -40,17 +40,62 @@ const ProductManagement = () => {
         { linkItem: false, title: pageTitle },
     ]
 
-    const productsListApiCall = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + PRODUCT_LIST_API_ROUTE
-        const response: any = await HttpServices.httpGet(apiCall)
+    function fetchProductListWithSetState() {
+        setstate({
+            ...state,
+            status: 'pending'
+        })
 
-        if (response.status !== 200) {
-            throw new Error("Something went wrong while fecthing products list.");
+        fetchProductListApiCall()
+    }
+
+    async function fetchProductListApiCall(hideModal = 'Y') {
+        try {
+            const apiDomain = ApiServices.apiDomain()
+            const apiCall = apiDomain + PRODUCT_LIST_API_ROUTE
+            const response: any = await HttpServices.httpGet(apiCall)
+
+            let { data } = state
+            let status = state.status
+            let show = state.show
+
+            data = response.data.data
+            status = 'fulfilled'
+
+            hideModal === 'Y' ? (
+                setstate({
+                    ...state, data, status, show: false
+                })
+            ) : (
+                setstate({
+                    ...state, data, status
+                })
+            )
+        } catch (e) {
+            console.warn(e);
+            let status = state.status
+            let show = state.show
+            
+            status = 'rejected'
+            show = false
+
+            setstate({
+                ...state, status, show
+            })
+        } finally {
+            // Do nothing            
         }
+    }
 
-        return response.data.data
-    }, [dispatch])
+    React.useEffect(() => {
+        fetchProductListWithSetState();
+    }, []);
+
+    const showOrHideModal = () => {
+        setstate({
+            ...state, show: !state.show
+        })
+    }
 
     const columns = React.useMemo(
         () => [
@@ -113,6 +158,8 @@ const ProductManagement = () => {
 
                 <Header title={pageTitle}
                     showButton={showButton}
+                    actionButton={actionButton}
+                    actionEvent={showOrHideModal}
                     buttonTitle={buttonTitle}
                     buttonIcon={buttonIcon}
                     iconType={iconType}
@@ -127,15 +174,15 @@ const ProductManagement = () => {
 
                 <div className="w-full">
                     {
-                        productsListApiCall.status === 'rejected' ? (
+                        state.status === 'rejected' ? (
                             <Error500 />
-                        ) : productsListApiCall.status === 'fulfilled' ? (
+                        ) : state.status === 'fulfilled' ? (
                             <div>
                                 {
-                                    productsListApiCall.value === null ? (
+                                    state.data === null ? (
                                         <NoDataReactTable columns={columns} />
                                     ) : (
-                                        <ReactTable columns={columns} data={productsListApiCall.value} />
+                                        <ReactTable columns={columns} data={state.data} />
                                     )
                                 }
                             </div>
@@ -147,6 +194,12 @@ const ProductManagement = () => {
                     }
                 </div>
             </div>
+
+            <AddProduct
+                show={state.show}
+                showOrHideModal={showOrHideModal}
+                reloadReactTable={fetchProductListApiCall}
+            />
 
         </React.Fragment>
     )
