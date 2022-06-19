@@ -31,7 +31,7 @@ export default function SuccessBanner({ message }: { message: any }) {
                                     <i className="fad fa-lg fa-check-circle text-green-500"></i>
                                 </span>
 
-                                <p className="ml-3 font-medium text-green-500 text-sm truncate">
+                                <p className="ml-3 text-green-500 text-sm truncate">
                                     <span className="md:hidden"> {message} </span>
                                     <span className="hidden md:inline"> {message} </span>
                                 </p>

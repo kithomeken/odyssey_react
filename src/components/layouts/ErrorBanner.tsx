@@ -31,7 +31,7 @@ export default function ErrorBanner({ message }: { message: any }) {
                                     <i className="fad fa-lg fa-exclamation-circle text-red-500"></i>
                                 </span>
 
-                                <p className="ml-3 font-medium text-red-500 text-sm truncate">
+                                <p className="ml-3 text-red-500 text-sm truncate">
                                     <span className="md:hidden"> {message} </span>
                                     <span className="hidden md:inline"> {message} </span>
                                 </p>
