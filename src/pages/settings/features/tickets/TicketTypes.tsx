@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
-import { Link } from "react-router-dom"
 import swal from 'sweetalert';
 
 import { TICKET_TYPES_LIST_API_ROUTE, TICKET_TYPES_REINSTATE_API_ROUTE, TICKET_TYPES_SUSPEND_API_ROUTE } from "../../../../api/ApiRoutes"

@@ -12,7 +12,6 @@ export const generalRoutes = [
    /* 1 */ { path: "/a/default/settings/general/announcements", element: <Announcements />, activeMenu: 'announcements' },
    
    /* 2 */ { path: "/a/default/settings/general/products", element: <ProductManagement />, activeMenu: 'products' },
-   /* 3 */ { path: "/a/default/settings/general/products/create", element: <AddProduct />, activeMenu: 'products' },
    /* 4 */ { path: "/a/default/settings/general/products/:uuid", element: <Productview />, activeMenu: 'products' },
    
    /* 5 */ { path: "/a/default/settings/general/company-groups", element: <CompanyGroups />, activeMenu: 'company' },

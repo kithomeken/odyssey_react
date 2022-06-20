@@ -19,6 +19,7 @@ import { securityRoutes } from './routes/settings/securityRoutes';
 import { featuresRoutes } from './routes/settings/featuresRoutes';
 import CheckAuthentication from './lib/router/CheckAuthentication';
 import PostAuthentication from './pages/auth/PostAuthentication';
+import { accountRoutes } from './routes/settings/accountRoutes';
 
 const redirectedRoutes = [
     { path: "/home", element: <Home />, activeMenu: 'Y' },
@@ -32,6 +33,7 @@ protectedRoutes = redirectedRoutes.concat(
     generalRoutes,
     securityRoutes,
     featuresRoutes,
+    accountRoutes,
 );
 
 interface RouteContextType {

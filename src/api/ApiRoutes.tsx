@@ -1,4 +1,5 @@
-
+// Master Accounts
+export const MASTER_ACCOUNTS_LIST_API_ROUTE = 'portal/a/site-master/accounts/master/all'
 
 // Product Management
 export const PRODUCT_CHECK_API_ROUTE = 'portal/a/site-master/general/products/check'
@@ -30,3 +31,9 @@ export const TICKET_FEATURES_CONFIGURE_API_ROUTE = 'portal/a/site-master/feature
 export const SUPPORT_FEATURES_CONFIGURE_API_ROUTE = 'portal/a/site-master/features/support/configure'
 export const SUPPORT_FEATURES_AGENT_API_ROUTE = 'portal/a/site-master/features/support/agents'
 export const SUPPORT_FEATURES_CLIENT_API_ROUTE = 'portal/a/site-master/features/support/clients'
+
+// Ticket Statuses
+export const TICKET_STATUS_SCRM_CAT_API_ROUTE = 'portal/a/site-master/tickets/status/scrum-categories'
+export const TICKET_STATUS_LIST_API_ROUTE = 'portal/a/site-master/tickets/status/all'
+export const TICKET_STATUS_CHECK_API_ROUTE = 'portal/a/site-master/tickets/status/check'
+export const TICKET_STATUS_CREATE_API_ROUTE = 'portal/a/site-master/tickets/status/create'

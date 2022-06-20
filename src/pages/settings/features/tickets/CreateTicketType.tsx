@@ -118,7 +118,7 @@ const CreateTicketType = () => {
                 ...state, errors, ticket
             })
         } catch (error) {
-            errors.name = "Failed to check for company name availability..."
+            errors.name = "Failed to check for ticket type availability..."
             ticket.ticketExists = true
             ticket.checkTicket = false
 

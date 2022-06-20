@@ -5,6 +5,7 @@ import { Dialog, Transition } from '@headlessui/react'
 import { PRODUCT_B4_CHECK_API_ROUTE, PRODUCT_UPDATE_API_ROUTE } from '../../../../api/ApiRoutes';
 import ApiServices from '../../../../api/ApiServices';
 import HttpServices from '../../../../services/HttpServices';
+import { useEffect } from 'react';
 
 function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid: any, show: any, productProps: any, hidePanel: any, fetchFunc: any }) {
     const [state, setstate] = useState({
@@ -25,12 +26,22 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
         },
     })
 
-    const onInputBlur = (e: {target: {name: string; value: string}}) => {
-        const {isPostingForm} = state
+    useEffect(() => {
+        setstate({
+            ...state, input: {
+                name: productProps.name,
+                description: productProps.description,
+            },
+        })
+
+    }, [productProps])
+
+    const onInputBlur = (e: { target: { name: string; value: string } }) => {
+        const { isPostingForm } = state
 
         if (!isPostingForm) {
-            let {input}: any = state
-            let {errors}: any = state
+            let { input }: any = state
+            let { errors }: any = state
             let disableSubmitBtn = state.disableSubmitBtn
 
             let targetValue = e.target.value
@@ -51,10 +62,9 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
                         } else {
                             input[e.target.name] = targetValue
                             errors[e.target.name] = ''
-                            checkProductNameBeforeUpdate()
                         }
-                    break;
-                
+                        break;
+
                     case 'description':
                         if (targetValue.length > 100) {
                             input[e.target.name] = targetValue
@@ -63,7 +73,7 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
                             input[e.target.name] = targetValue
                             errors[e.target.name] = ''
                         }
-                    break;
+                        break;
                 }
             }
 
@@ -74,18 +84,18 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
             }
 
             setstate({
-                ...state, 
-                input, 
-                errors, 
+                ...state,
+                input,
+                errors,
                 disableSubmitBtn
             })
         }
     }
 
     const checkProductNameBeforeUpdate = async () => {
-        let {input}: any = state
-        let {errors}: any = state
-        let {product}: any = state
+        let { input }: any = state
+        let { errors }: any = state
+        let { product }: any = state
         product.checkProduct = true
 
         const requestData = {
@@ -93,15 +103,24 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
             uuid: uuid
         }
 
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + PRODUCT_B4_CHECK_API_ROUTE
-        const response: any = await HttpServices.httpPost(apiCall, requestData)
-        product.checkProduct = false
+        try {
+            const apiDomain = ApiServices.apiDomain()
+            const apiCall = apiDomain + PRODUCT_B4_CHECK_API_ROUTE
+            const response: any = await HttpServices.httpPost(apiCall, requestData)
+            product.checkProduct = false
 
-        if (response.data.success) {
-            product.productExists = false
-        } else {
-            errors.name = "Product name already exists"
+            if (response.data.success) {
+                product.productExists = false
+
+                // Update the product details
+                postFormData()
+            } else {
+                errors.name = "Product name already exists"
+                input.name = productProps.name
+                product.productExists = true
+            }
+        } catch (error) {
+            errors.name = "Could not update product details. Try again later"
             input.name = productProps.name
             product.productExists = true
         }
@@ -112,13 +131,13 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
     }
 
     const onChangeHandler = (e: any) => {
-        const {isPostingForm} = state
+        const { isPostingForm } = state
         let isCheckbox: any = (e.target.type === 'checkbox') ? true : false;
 
         if (!isPostingForm) {
-            let {input}: any = state
-            let {errors}: any = state
-            
+            let { input }: any = state
+            let { errors }: any = state
+
             input[e.target.name] = e.target.value
             errors[e.target.name] = ''
 
@@ -129,7 +148,7 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
                     input[e.target.name] = "N"
                 }
             }
-    
+
             setstate({
                 ...state, input, errors
             })
@@ -138,38 +157,49 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
 
     const onFormSubmitHandler = (e: any) => {
         e.preventDefault()
-        let {product}: any = state
-        let {errors}: any = state
-        let {input}: any = state
+        let { product }: any = state
+        let { errors }: any = state
+        let { input }: any = state
 
-        if (!product.productExists) {
-            if (errors.name.length > 0 || errors.description.length > 0) {
-                // Do nothing
-            } else {
-                // Check if data is changed
-                if (input.name === productProps.name && input.description === productProps.description) {
-                    // Do nothing
-                } else {
-                    // Post form data
-                    let {isPostingForm} = state
-                    let requestFailed = state.requestFailed
-                    isPostingForm = true
-                    requestFailed = false
-    
-                    setstate({
-                        ...state, isPostingForm, requestFailed
-                    })
-    
-                    return postFormData()
-                }                
+        if (errors.name.length > 0 || errors.description.length > 0) {
+            // Do nothing
+        } else {
+            if (input.name !== productProps.name) {
+                // Post form data
+                let { isPostingForm } = state
+                let requestFailed = state.requestFailed
+                isPostingForm = true
+                requestFailed = false
+
+                setstate({
+                    ...state, isPostingForm, requestFailed
+                })
+
+                // Since product name as been updated
+                // Check if it exists in database
+                // If does not exist proceed and update 
+                // the product details from checkProductNameBeforeUpdate
+                checkProductNameBeforeUpdate()
+            } else if (input.description !== productProps.description) {
+                // Post form data
+                let { isPostingForm } = state
+                let requestFailed = state.requestFailed
+                isPostingForm = true
+                requestFailed = false
+
+                setstate({
+                    ...state, isPostingForm, requestFailed
+                })
+
+                return postFormData()
             }
         }
     }
 
     const postFormData = async () => {
-        let {requestFailed}: any = state
-        let {isPostingForm} = state
-        let {input}: any = state
+        let { requestFailed }: any = state
+        let { isPostingForm } = state
+        let { input }: any = state
 
         const requestData = {
             name: input.name,
@@ -254,7 +284,7 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
                                         <div className="relative mt-6 flex-1 px-4 sm:px-6">
                                             <div className="absolute inset-0 px-4 sm:px-6">
                                                 <p className="text-black text-sm form-group">
-                                                    Update your product's details 
+                                                    Update your product's details
                                                 </p>
 
 
@@ -271,16 +301,6 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
                                                                     <span className='invalid-feedback font-small text-red-600 pl-0'>
                                                                         {state.errors.name}
                                                                     </span>
-                                                                }
-                                                            </div>
-
-                                                            <div className="w-5 pl-2">
-                                                                {
-                                                                    state.product.checkProduct ? (
-                                                                        <span className="fad text-green-500 fa-spinner-third fa-lg block fa-spin"></span>
-                                                                    ) : (
-                                                                        null
-                                                                    )
                                                                 }
                                                             </div>
                                                         </div>
@@ -301,8 +321,6 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
                                                                 }
                                                             </div>
                                                         </div>
-
-                                                        <div className="w-5"></div>
                                                     </div>
 
                                                     <div className="flex flex-row w-11/12 pt-2">
@@ -322,7 +340,12 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
                                                                     </span>
                                                                 </button>
                                                             ) : (
-                                                                <button type="submit" className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white mb-6 bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50`}>
+                                                                <button 
+                                                                type="submit"
+                                                                disabled={
+                                                                    (state.input.name !== productProps.name || state.input.description !== productProps.description) ? false : true
+                                                                }
+                                                                className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white mb-6 bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50`}>
                                                                     <span className="text-sm">
                                                                         Update
                                                                     </span>

@@ -8,7 +8,7 @@ const Error500 = () => {
                 <img src={emptyBox} alt="broken_robot" width="300px" className="block text-center m-auto" />
             </div>
 
-            <div className="w-6/12 m-auto">
+            <div className=" m-auto">
                 <p className="text-center text-xl mb-0 text-red-600">
                     Something went wrong.
                 </p>
