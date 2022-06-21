@@ -26,7 +26,7 @@ const CompanyGroups = () => {
     const buttonTitle = "Create Company"
     const buttonIcon = true
     const iconType = "fas fa-plus-circle"
-    const buttonLink = generalRoutes[6].path
+    const buttonLink = (generalRoutes.find((routeName) => routeName.name === 'CMPNY-CRT'))?.path
 
     const breadCrumb = [
         { linkItem: true, title: "General Settings", url: orgDetailsRoute },
@@ -131,7 +131,7 @@ const CompanyGroups = () => {
                                     companyGroupsApiCall.value === null ? (
                                         <NoDataReactTable columns={columns} />
                                     ) : (
-                                        <ReactTable columns={columns} data={companyGroupsApiCall.value.data} />
+                                        <ReactTable columns={columns} data={companyGroupsApiCall.value} />
                                     )
                                 }
                             </div>

@@ -9,6 +9,9 @@ import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 import HttpServices from "../../../../services/HttpServices"
+import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
+import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
+import ErrorBanner from "../../../../components/layouts/ErrorBanner"
 
 const CreateCompanyGroup = () => {
     const [state, setstate] = useState({
@@ -26,7 +29,6 @@ const CreateCompanyGroup = () => {
             poc1: '',
             poc2: '',
             poc3: '',
-            create_another: 'N',
         },
         errors: {
             name: '',
@@ -96,7 +98,7 @@ const CreateCompanyGroup = () => {
 
         input[e.target.name] = e.target.files[0]
         errors[e.target.name] = ''
-
+        
         setstate({
             ...state, input, errors
         })
@@ -263,19 +265,31 @@ const CreateCompanyGroup = () => {
         let { input }: any = state
 
         try {
+            let formData = new FormData()
+            formData.append("company_logo", input.logo)
+            formData.append("name", input.name)
+            formData.append("description", input.description)
+            formData.append("domain", input.domain)
+            formData.append("poc1", input.poc1)
+            formData.append("poc2", input.poc2)
+            formData.append("poc3", input.poc3) 
+
             const apiDomain = ApiServices.apiDomain()
             const apiToBeConsumed = apiDomain + COMPANY_GROUP_CREATE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, input)
+            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
 
             if (response.data.success) {
-                if (state.input.create_another === 'Y') {
-                    input.name = ''
-                    input.description = ''
-                    input.another = 'N'
-                } else {
-                    const companyGroupsRoute = generalRoutes[5].path
-                    navigate(companyGroupsRoute, { replace: true });
-                }
+                input.name = ''
+                input.description = ''
+                input.domain = ''
+                input.logo = null
+                input.another = 'N'
+
+                // TO DO: Navigate to newly created company and 
+                // Add products the company will have visibility to
+                const COMPANY_LIST_ROUTE: any = (generalRoutes.find((routeName) => routeName.name === 'CMPNY'))?.path
+                const redirectToRoute = COMPANY_LIST_ROUTE + '/' + response.data.data.uuid
+                navigate(redirectToRoute, { replace: true });
             } else {
                 requestFailed = true
             }
@@ -290,189 +304,177 @@ const CreateCompanyGroup = () => {
         })
     }
 
-
     return (
         <React.Fragment>
             <Helmet>
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <BreadCrumbs breadCrumbDetails={breadCrumb} />
+            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+                <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
-            <Header title={pageTitle}
-                showButton={showButton}
-            />
+                <Header title={pageTitle}
+                    showButton={showButton}
+                />
 
-            <div className="w-full form-group">
-                <div className="w-10/12">
-                    <p className="text-sm text-gray-500 mb-4">
-                        Create a new company and add contact information
-                    </p>
+                <HeaderParagraph title="Create a new company and add contact information" />
+            </div>
 
-                    <form className="w-7/12 form-group" onSubmit={onFormSubmitHandler}>
-                        <div className="w-12/12 rounded-md shadow-none space-y-px mb-5">
-                            <label htmlFor="name" className="block mb-1 text-sm text-gray-700">Company Name:</label>
+            <div className="w-full px-12 form-group">
+                <div className="w-8/12">
+                    {
+                        state.requestFailed ? (
+                            <ErrorBanner message="Failed to add company group, please try again later..." />
+                        ) : null
+                    }
 
-                            <div className="w-full flex items-center align-middle">
-                                <div className="w-full">
-                                    <input type="text" name="name" id="name" autoComplete="off" className="focus:ring-1 w-full focus:ring-green-500 text-gray-700 p-2 capitalize flex-1 block text-sm rounded-md sm:text-sm border border-gray-400" placeholder="Company Name" onChange={onChangeHandler} value={state.input.name} onBlur={onInputBlur} required />
-
-                                    {
-                                        state.errors.name.length > 0 &&
-                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                            {state.errors.name}
-                                        </span>
-                                    }
-                                </div>
-
-                                <div className="w-12 pl-2">
-                                    {
-                                        state.company.checkCompany ? (
-                                            <span className="fad text-green-500 fa-spinner-third fa-lg block fa-spin"></span>
-                                        ) : (
-                                            null
-                                        )
-                                    }
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-12/12 rounded-md shadow-none space-y-px form-group flex items-center">
-                            <div className="w-full">
-                                <label htmlFor="description" className="block mb-1 text-sm text-gray-700">Description:</label>
-
-                                <div className="w-full">
-                                    <textarea id="description" name="description" rows={3} className="shadow-sm focus:ring-1 focus:ring-green-500 focus:border-green-500 text-gray-700 mt-1 block w-full sm:text-sm border border-gray-400 rounded-md resize-none p-2" placeholder="Company Description" required onChange={onChangeHandler} onBlur={onInputBlur} value={state.input.description}></textarea>
-
-                                    {
-                                        state.errors.description.length > 0 &&
-                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                            {state.errors.description}
-                                        </span>
-                                    }
-                                </div>
-                            </div>
-
-                            <div className="w-12"></div>
-                        </div>
-
-                        <div className="w-11/12 rounded-md shadow-none space-y-px form-group text-gray-600">
-                            <label htmlFor="company-name" className="block mb-1 text-sm">
-                                Company Domain
-                                <sup className="text-gray-500 ml-2">(Optional)</sup>
-                            </label>
-
-                            <div className="w-full form-group">
-                                <div className="w-12/12">
-                                    <input type="url" name="domain" id="company-domain" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50" placeholder="https://company-domain.com" value={state.input.domain} />
-
-                                    {state.errors.domain.length > 0 &&
-                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                            {state.errors.domain}
-                                        </span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="w-11/12 form-group">
-                            <label className="block text-sm text-gray-600">
-                                Company Logo
-                                <sup className="text-gray-500 ml-2">(Optional)</sup>
-                            </label>
-                            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-400 border-dashed rounded-md">
-                                <div className="space-y-1 text-center">
-                                    <svg
-                                        className="mx-auto h-12 w-12 text-gray-400"
-                                        stroke="currentColor"
-                                        fill="none"
-                                        viewBox="0 0 48 48"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                            strokeWidth={2}
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </svg>
-                                    <div className="flex text-sm text-gray-600">
-                                        <label
-                                            htmlFor="file-upload"
-                                            className="relative cursor-pointer bg-white rounded-md text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                                        >
-                                            <span>Upload a file</span>
-                                            <input id="file-upload" name="logo" type="file" onChange={onFileChangeHandler} className="sr-only" />
-                                        </label>
-                                        <p className="pl-1">or drag and drop</p>
-                                    </div>
-                                    <p className="text-xs text-gray-500">png, jpg, jpeg, gif up to 1MB</p>
-                                </div>
-                            </div>
-
-                            {state.errors.logo.length > 0 &&
-                                <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                    {state.errors.logo}
-                                </span>
-                            }
-                        </div>
-
-                        <hr className="mb-3 w-11/12" />
-
-                        <div className="w-full form-group">
-                            <p className="text-sm text-gray-600">
-                                Piont(s) Of Contacts
+                    <form className="w-full form-group" onSubmit={onFormSubmitHandler}>
+                        <div className="w-full mb-2">
+                            <p className="text-sm text-emerald-500">
+                                Company Details
                             </p>
                         </div>
 
-                        <div className="w-full">
-                            <div className="w-11/12 form-group">
-                                <input type="email" name="poc1" id="poc-1" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={onPointOfContactBlur} placeholder="contact@email.com" value={state.input.poc1} />
+                        <div className="w-full flex mb-3">
+                            {/* Left Half */}
+                            <div className="w-6/12 px-4 border-r">
+                                <div className="w-10/12 rounded-md shadow-none space-y-px mb-5">
+                                    <label htmlFor="name" className="block mb-1 text-sm text-gray-500">Name:</label>
 
-                                {state.errors.poc1.length > 0 &&
-                                    <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                        {state.errors.poc1}
-                                    </span>
-                                }
+                                    <div className="w-full flex items-center align-middle">
+                                        <div className="w-full">
+                                            <input type="text" name="name" id="name" autoComplete="off" className="focus:ring-1 w-full focus:ring-green-500 text-gray-500 p-2 capitalize flex-1 block text-sm rounded-md sm:text-sm border border-gray-400" placeholder="Company Name" onChange={onChangeHandler} value={state.input.name} onBlur={onInputBlur} required />
+
+                                            {
+                                                state.errors.name.length > 0 &&
+                                                <span className='invalid-feedback text-xs    text-red-600 pl-0'>
+                                                    {state.errors.name}
+                                                </span>
+                                            }
+                                        </div>
+
+                                        <div className="w-12 pl-2">
+                                            {
+                                                state.company.checkCompany ? (
+                                                    <span className="fad text-green-500 fa-spinner-third fa-lg block fa-spin"></span>
+                                                ) : (
+                                                    null
+                                                )
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="w-12/12 rounded-md shadow-none space-y-px form-group flex items-center">
+                                    <div className="w-full">
+                                        <label htmlFor="description" className="block mb-1 text-sm text-gray-500">Description:</label>
+
+                                        <div className="w-full">
+                                            <textarea id="description" name="description" rows={3} className="shadow-sm focus:ring-1 focus:ring-green-500 focus:border-green-500 text-gray-500 mt-1 block w-full sm:text-sm border border-gray-400 rounded-md resize-none p-2" placeholder="Company Description" required onChange={onChangeHandler} onBlur={onInputBlur} value={state.input.description}></textarea>
+
+                                            {
+                                                state.errors.description.length > 0 &&
+                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                    {state.errors.description}
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div className="w-11/12 form-group">
-                                <input type="email" name="poc2" id="poc-2" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={onPointOfContactBlur} placeholder="contact@email.com" value={state.input.poc2} />
-
-                                {state.errors.poc2.length > 0 &&
-                                    <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                        {state.errors.poc2}
-                                    </span>
-                                }
-                            </div>
-
-                            <div className="w-11/12 form-group">
-                                <input type="email" name="poc3" id="poc-3" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={onPointOfContactBlur} placeholder="contact@email.com" value={state.input.poc3} />
-
-                                {state.errors.poc3.length > 0 &&
-                                    <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                        {state.errors.poc3}
-                                    </span>
-                                }
-                            </div>
-                        </div>
-
-                        <div className="w-full rounded-md shadow-none space-y-px form-group flex items-center">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center">
-                                    <input id="add-another" name="another" type="checkbox" onChange={onChangeHandler}
-                                        checked={
-                                            state.input.create_another === 'Y' ? true : false
-                                        }
-                                        className="h-5 w-5 text-green-600 focus:ring-green-500 checked:bg-green-500 focus:bg-green-500 form-tick appearance-none border border-gray-300 rounded-md checked:border-transparent focus:outline-none" />
-                                    <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-500">
-                                        Create another company group
+                            {/* Right Half */}
+                            <div className="w-6/12 px-4">
+                                <div className="w-11/12 rounded-md shadow-none space-y-px form-group text-gray-600">
+                                    <label htmlFor="company-name" className="block mb-1 text-sm">
+                                        Company Domain
+                                        <sup className="text-gray-500 ml-2">(Optional)</sup>
                                     </label>
+
+                                    <div className="w-full form-group">
+                                        <div className="w-12/12">
+                                            <input type="url" name="domain" id="company-domain" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50" placeholder="https://company-domain.com" value={state.input.domain} />
+
+                                            {state.errors.domain.length > 0 &&
+                                                <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                                    {state.errors.domain}
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="w-11/12 form-group">
+                                    <label className="block text-sm text-gray-600">
+                                        Company Logo
+                                        <sup className="text-gray-500 ml-2">(Optional)</sup>
+                                    </label>
+                                    <div className="mt-1 flex justify-center px-6 pt-4 pb-4 border-2 border-gray-400 border-dashed rounded-md">
+                                        <div className="space-y-1 text-center flex align-middle">
+                                            <svg
+                                                className="mx-auto h-12 w-12 text-gray-400"
+                                                stroke="currentColor"
+                                                fill="none"
+                                                viewBox="0 0 48 48"
+                                                aria-hidden="true"
+                                            >
+                                                <path
+                                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                                    strokeWidth={2}
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                />
+                                            </svg>
+                                            <div className="text-sm w-full ml-3 text-gray-600">
+                                                <label
+                                                    htmlFor="file-upload"
+                                                    className="relative cursor-pointer bg-white rounded-md text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                                                >
+                                                    <span>Upload a file</span>
+                                                    <input id="file-upload" name="logo" type="file" onChange={onFileChangeHandler} className="sr-only" />
+                                                </label>
+                                                <p className="pl-1"></p>
+                                                <p className="text-xs text-gray-500">png, jpg, jpeg, gif up to 1MB</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {state.errors.logo.length > 0 &&
+                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                            {state.errors.logo}
+                                        </span>
+                                    }
                                 </div>
                             </div>
                         </div>
 
-                        <div className="flex flex-row w-11/12 pt-3">
+                        <div className="w-full mb-2">
+                            <p className="text-sm text-emerald-500">
+                                Piont Of Contact
+                            </p>
+                        </div>
+
+                        <div className="w-full flex mb-3">
+                            <div className="w-6/12 px-4">
+                                <div className="w-full form-group">
+                                    <input type="email" name="poc1" id="poc-1" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={onPointOfContactBlur} placeholder="contact@email.com" value={state.input.poc1} />
+
+                                    {state.errors.poc1.length > 0 &&
+                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                            {state.errors.poc1}
+                                        </span>
+                                    }
+                                </div>
+
+                                <div className="mb-3" id="poc_extra"></div>
+
+                                <span className="text-blue-500 text-sm cursor-pointer">
+                                    Add another
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex flex-row pt-3 px-4">
                             {
                                 state.isPostingForm ? (
                                     <button type="button" className={`inline-flex items-center px-4 py-1 border border-green-300 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300`} disabled={true}>
@@ -497,34 +499,6 @@ const CreateCompanyGroup = () => {
                                 )
                             }
                         </div>
-
-                        {
-                            state.requestFailed ? (
-                                <Transition
-                                    show={true}
-                                    enter="transform transition ease-in-out duration-500 sm:duration-700"
-                                    enterFrom="translate-x-full"
-                                    enterTo="translate-x-0"
-                                    leave="transform transition ease-in-out duration-500 sm:duration-700"
-                                    leaveFrom="translate-x-0"
-                                    leaveTo="translate-x-full"
-                                >
-                                    <div className="p-4 border border-red-600 bg-red-100 rounded text-sm">
-                                        <div className="w-full flex items-center align-middle text-red-600">
-                                            <div className="w-10 pr-2">
-                                                <i className="fad fa-2x fa-ban mr-2 text-red-600"></i>
-                                            </div>
-
-                                            <div className="w-full text-xs">
-                                                <span>
-                                                    Failed to add company group, please try again later...
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Transition>
-                            ) : null
-                        }
                     </form>
                 </div>
             </div>
