@@ -1,10 +1,8 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 
 export default function ListBoxZero({label, listButton, listOptions, state, onChangeListBoxHandler}) {
-    const [selected, setSelected] = useState(state.input.category)
-
     return (
         <Listbox value={state.input.category} onChange={event => onChangeListBoxHandler(event)}>
             {({ open }) => (

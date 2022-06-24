@@ -40,7 +40,6 @@ const Productview = () => {
 
     const showButton = false
     const params = useParams();
-    const dispatch = useDispatch()
     const pageTitle = "Product View"
 
     const breadCrumb = [

@@ -23,6 +23,12 @@ class Navigation extends Component<Props> {
         const MSTR_ACCOUNT_RT: any = (accountRoutes.find((routeName) => routeName.name === 'MSTR'))?.path
         const TCKT_STATUS_RT: any = (featuresRoutes.find((routeName) => routeName.name === 'STT'))?.path
 
+        // General Settings Routes
+        const ORGANIZATION_DETS: any = (generalRoutes.find((routeName) => routeName.name === 'ORGNZ'))?.path
+        const ANNOUNCEMENTS: any = (generalRoutes.find((routeName) => routeName.name === 'ANNC'))?.path
+        const PRODUCT_MANAGEMENT: any = (generalRoutes.find((routeName) => routeName.name === 'PROD'))?.path
+        const COMPANY_GROUPS: any = (generalRoutes.find((routeName) => routeName.name === 'CMPNY'))?.path
+
         return (
             <React.Fragment>
                 <div className="flex flex-col h-screen lg:w-72 text-gray-900 border-r-2 flex-shrink-0 z-20 bg-white decoration-clone fixed">
@@ -63,7 +69,7 @@ class Navigation extends Component<Props> {
                                 General Settings
                             </span>
 
-                            <Link to={generalRoutes[0].path} className={this.classNames(
+                            <Link to={ORGANIZATION_DETS} className={this.classNames(
                                 activeMenu === 'organization' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
                                 'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
                             )}>
@@ -76,7 +82,7 @@ class Navigation extends Component<Props> {
                                 </p>
                             </Link>
 
-                            <Link to={generalRoutes[2].path} className={this.classNames(
+                            <Link to={PRODUCT_MANAGEMENT} className={this.classNames(
                                 activeMenu === 'products' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
                                 'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
                             )}>
@@ -89,7 +95,7 @@ class Navigation extends Component<Props> {
                                 </p>
                             </Link>
 
-                            <Link to={generalRoutes[5].path} className={this.classNames(
+                            <Link to={COMPANY_GROUPS} className={this.classNames(
                                 activeMenu === 'products' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
                                 'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
                             )}>
@@ -102,7 +108,7 @@ class Navigation extends Component<Props> {
                                 </p>
                             </Link>
 
-                            <Link to={generalRoutes[1].path} className={this.classNames(
+                            <Link to={ANNOUNCEMENTS} className={this.classNames(
                                 activeMenu === 'announcements' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
                                 'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
                             )}>
