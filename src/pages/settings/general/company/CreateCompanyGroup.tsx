@@ -1,7 +1,9 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
-import { Transition } from "@headlessui/react"
 import { useNavigate } from "react-router-dom"
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
+// import { useCountries } from 'use-react-countries'
+import '../../../../assets/css/react_phone_number_input.css'
 
 import { COMPANY_GROUP_CHECK_API_ROUTE, COMPANY_GROUP_CREATE_API_ROUTE } from "../../../../api/ApiRoutes"
 import ApiServices from "../../../../api/ApiServices"
@@ -15,6 +17,7 @@ import ErrorBanner from "../../../../components/layouts/ErrorBanner"
 
 const CreateCompanyGroup = () => {
     const [state, setstate] = useState({
+        counter: 0,
         isPostingForm: false,
         requestFailed: false,
         company: {
@@ -26,19 +29,28 @@ const CreateCompanyGroup = () => {
             description: '',
             domain: '',
             logo: null,
-            poc1: '',
-            poc2: '',
-            poc3: '',
         },
         errors: {
             name: '',
             description: '',
             domain: '',
             logo: '',
-            poc1: '',
-            poc2: '',
-            poc3: '',
+            poc: {
+                name: ['', '', ''],
+                email: ['', '', ''],
+                phone: ['', '', ''],
+            },
         },
+        poc: [{
+            name: '',
+            email: '',
+            phone: '',
+        }],
+        pocErrors: [{
+            name: '',
+            email: '',
+            phone: '',
+        }]
     })
 
     const showButton = false
@@ -76,6 +88,89 @@ const CreateCompanyGroup = () => {
         }
     }
 
+    const onPointOfContactChangeHandler = (e: any, index: any) => {
+        const isPostingForm = state.isPostingForm
+
+        if (!isPostingForm) {
+            let { pocErrors } = state
+            let { poc }: any = state
+
+            const newPointOfContacts = state.poc.map((contact, mapIndex) => {
+                if (index !== mapIndex) return contact
+
+                switch (e.target.name) {
+                    case 'name':
+                        pocErrors[index].name = ''
+                        return { ...contact, name: e.target.value }
+
+                    case 'email':
+                        pocErrors[index].email = ''
+                        return { ...contact, email: e.target.value }
+                }
+            })
+
+            poc = newPointOfContacts
+
+            setstate({
+                ...state, poc, pocErrors
+            })
+        }
+    }
+
+    const onPhoneInputChange = (e: any, index: any) => {
+        const isPostingForm = state.isPostingForm
+
+        if (!isPostingForm) {
+            let { poc }: any = state
+
+            const newPointOfContacts = state.poc.map((contact, mapIndex) => {
+                if (index !== mapIndex) return contact
+                return { ...contact, phone: e.target.value }
+            })
+
+            poc = newPointOfContacts
+
+            setstate({
+                ...state, poc
+            })
+        }
+    }
+
+    const addPointOfContactHandler = () => {
+        // Add both data and error messages
+        let { poc }: any = state
+        let { pocErrors }: any = state
+        const isPostingForm = state.isPostingForm
+
+        if (!isPostingForm) {
+            if (poc.length < 3) {
+                poc = state.poc.concat([{
+                    name: '',
+                    email: '',
+                    phone: '',
+                }])
+        
+                pocErrors = state.pocErrors.concat([{
+                    name: '',
+                    email: '',
+                    phone: '',
+                }])
+        
+                setstate({
+                    ...state, poc, pocErrors
+                })
+            }
+        }
+    }
+
+    const removePointOfContactHandler = (index: any) => {
+        setstate({
+            ...state,
+            poc: state.poc.filter((s, varIdx) => index !== varIdx),
+            pocErrors: state.pocErrors.filter((s, varIdx) => index !== varIdx),
+        })
+    }
+
     const onFileChangeHandler = (e: any) => {
         let { input }: any = state
         let { errors }: any = state
@@ -98,7 +193,7 @@ const CreateCompanyGroup = () => {
 
         input[e.target.name] = e.target.files[0]
         errors[e.target.name] = ''
-        
+
         setstate({
             ...state, input, errors
         })
@@ -164,6 +259,50 @@ const CreateCompanyGroup = () => {
         }
     }
 
+    const onPointOfContactBlur = (e: any, index: any) => {
+        const { isPostingForm } = state
+
+        if (!isPostingForm) {
+            let { pocErrors }: any = state
+
+            let targetValue = e.target.value
+            targetValue = targetValue.trim()
+
+            switch (e.target.name) {
+                case 'name':
+                    if (targetValue.length < 1) {
+                        pocErrors[index].name = 'Name cannot be empty'
+                    } else if (targetValue.length < 5) {
+                        pocErrors[index].name = 'Name cannot be less than 5 characters'
+                    } else if (targetValue.length > 30) {
+                        pocErrors[index].name = 'Name cannot be more than 30 characters'
+                    } else {
+                        pocErrors[index].name = ''
+                    }
+                break
+
+                case 'email':
+                    if (targetValue.length < 1) {
+                        pocErrors[index].email = 'Email address cannot be empty'
+                    } else {
+                        let lastAtPos = targetValue.lastIndexOf('@')
+                        let lastDotPos = targetValue.lastIndexOf('.')
+
+                        if (!(lastAtPos < lastDotPos && lastAtPos > 0 && targetValue.indexOf('@@') === -1 && lastDotPos > 2 && (targetValue.length - lastDotPos) > 2)) {
+                            pocErrors[index].email = 'Please enter a valid email address'
+                        } else {
+                            pocErrors[index].email = ''
+                        }
+                    }
+                break
+            }
+
+            setstate({
+                ...state, pocErrors,
+            })
+        }
+    }
+
     const checkIfCompanyExists = async () => {
         let { input }: any = state
         let { errors }: any = state
@@ -198,26 +337,6 @@ const CreateCompanyGroup = () => {
                 ...state, errors, company
             })
         }
-    }
-
-    const onPointOfContactBlur = (e: any) => {
-        let { input }: any = state
-        let { errors }: any = state
-
-        if (input[e.target.name]) {
-            let lastAtPos = input[e.target.name].lastIndexOf('@')
-            let lastDotPos = input[e.target.name].lastIndexOf('.')
-
-            if (!(lastAtPos < lastDotPos && lastAtPos > 0 && input[e.target.name].indexOf('@@') === -1 && lastDotPos > 2 && (input[e.target.name].length - lastDotPos) > 2)) {
-                errors[e.target.name] = 'Please enter a valid email address'
-            } else {
-                errors[e.target.name] = ''
-            }
-        }
-
-        setstate({
-            ...state, errors
-        })
     }
 
     const onFormSubmitHandler = (e: any) => {
@@ -270,9 +389,9 @@ const CreateCompanyGroup = () => {
             formData.append("name", input.name)
             formData.append("description", input.description)
             formData.append("domain", input.domain)
-            formData.append("poc1", input.poc1)
-            formData.append("poc2", input.poc2)
-            formData.append("poc3", input.poc3) 
+            formData.append("poc_name", input.poc.name)
+            formData.append("poc_email", input.poc.email)
+            formData.append("poc_phone", input.poc.phone)
 
             const apiDomain = ApiServices.apiDomain()
             const apiToBeConsumed = apiDomain + COMPANY_GROUP_CREATE_API_ROUTE
@@ -324,7 +443,9 @@ const CreateCompanyGroup = () => {
                 <div className="w-8/12">
                     {
                         state.requestFailed ? (
-                            <ErrorBanner message="Failed to add company group, please try again later..." />
+                            <div className="mb-3">
+                                <ErrorBanner message="Failed to add company group, please try again later..." />
+                            </div>
                         ) : null
                     }
 
@@ -347,7 +468,7 @@ const CreateCompanyGroup = () => {
 
                                             {
                                                 state.errors.name.length > 0 &&
-                                                <span className='invalid-feedback text-xs    text-red-600 pl-0'>
+                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
                                                     {state.errors.name}
                                                 </span>
                                             }
@@ -448,29 +569,111 @@ const CreateCompanyGroup = () => {
                             </div>
                         </div>
 
-                        <div className="w-full mb-2">
+                        <div className="w-full mb-4">
                             <p className="text-sm text-emerald-500">
                                 Piont Of Contact
                             </p>
+
+                            <span className="text-slate-500 text-xs">
+                                Add a focal point of information to be contacted when there's a need be.
+                            </span>
                         </div>
 
-                        <div className="w-full flex mb-3">
-                            <div className="w-6/12 px-4">
-                                <div className="w-full form-group">
-                                    <input type="email" name="poc1" id="poc-1" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={onPointOfContactBlur} placeholder="contact@email.com" value={state.input.poc1} />
+                        <div className="w-full mb-3 pl-5">
+                            <div className="">
+                                <div className="w-full mb-4 text-sm text-slate-500 flex align-middle">
+                                    <div className="w-48 border-b pb-2 mr-3 pl-5 border-gray-200">
+                                        Name
+                                    </div>
 
-                                    {state.errors.poc1.length > 0 &&
-                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                            {state.errors.poc1}
-                                        </span>
-                                    }
+                                    <div className="w-48 border-b pb-2 mr-3 pl-5 border-gray-200">
+                                        Email
+                                    </div>
+
+                                    <div className="w-56 border-b pb-2 pl-5 border-gray-200">
+                                        Phone
+                                    </div>
                                 </div>
 
+                                <div className="w-full mb-3">
+                                    {
+                                        state.poc.map((contact: any, index: any) => {
+                                            return (
+                                                <div key={index}>
+                                                    <div className="w-full mb-3 flex align-middle">
+                                                        <div className="mr-3 w-48 mb-3">
+                                                            <input type="text" name="name" id="poc-1-name" autoComplete="off" onChange={(e) => onPointOfContactChangeHandler(e, index)} className="focus:ring-1 capitalize w-full focus:ring-green-500 p-1-5 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={(e) => onPointOfContactBlur(e, index)} placeholder="Contact Person" value={contact.name} />
+
+                                                            {
+                                                                state.pocErrors[index].name.length > 0 &&
+                                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                                    {state.pocErrors[index].name}
+                                                                </span>
+                                                            }
+                                                        </div>
+
+                                                        <div className="mr-5 w-48 mb-3">
+                                                            <input type="text" name="email" id="poc-1-email" autoComplete="off" onChange={(e) => onPointOfContactChangeHandler(e, index)} className="focus:ring-1 w-full focus:ring-green-500 p-1-5 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={(e) => onPointOfContactBlur(e, index)} placeholder="contact@email.com" value={contact.email} />
+
+                                                            {
+                                                                state.pocErrors[index].email.length > 0 &&
+                                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                                    {state.pocErrors[index].email}
+                                                                </span>
+                                                            }
+                                                        </div>
+
+                                                        <div className="mr-3 w-56 mb-3">
+                                                            <PhoneInput
+                                                                international
+                                                                defaultCountry="RU"
+                                                                placeholder="Enter phone number"
+                                                                value={state.poc[index].phone}
+                                                                onChange={(e) => onPhoneInputChange(e, index)}
+                                                                error={state.poc[index].phone ? (isValidPhoneNumber(state.poc[index].phone) ? undefined : 'Invalid phone number') : 'Phone number required'} />
+
+
+                                                            {/* <input type="text" name="phone" id="poc-1-phone" autoComplete="off" onChange={(e) => onPointOfContactChangeHandler(e, index)} className="focus:ring-1 w-full focus:ring-green-500 p-1-5 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={(e) => onPointOfContactBlur(e, index)} placeholder="+254 724 000 000" value={contact.phone} /> */}
+
+                                                            {
+                                                                state.pocErrors[index].phone.length > 0 &&
+                                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                                    {state.pocErrors[index].phone}
+                                                                </span>
+                                                            }
+                                                        </div>
+
+                                                        <div className="mb-3">
+                                                            {
+                                                                index !== 0 ? (
+                                                                    <p className="text-red-500 p-1-5 flex-1 text-sm cursor-pointer mb-0" onClick={() => removePointOfContactHandler(index)}>
+                                                                        Remove
+                                                                    </p>
+                                                                ) : (
+                                                                    null
+                                                                )
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+                            </div>
+
+                            <div className="w-6/12">
                                 <div className="mb-3" id="poc_extra"></div>
 
-                                <span className="text-blue-500 text-sm cursor-pointer">
-                                    Add another
-                                </span>
+                                {
+                                    state.poc.length < 3 ? (
+                                        <span className="text-blue-500 text-sm cursor-pointer" onClick={addPointOfContactHandler}>
+                                            Add another point of contact
+                                        </span>
+                                    ) : (
+                                        null
+                                    )
+                                }
                             </div>
                         </div>
 
