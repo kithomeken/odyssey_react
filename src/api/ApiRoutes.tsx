@@ -15,6 +15,7 @@ export const PRODUCT_UPDATE_API_ROUTE = 'portal/a/site-master/general/products/u
 export const COMPANY_GROUP_LIST_API_ROUTE = 'portal/a/site-master/general/company-groups/all'
 export const COMPANY_GROUP_CHECK_API_ROUTE = 'portal/a/site-master/general/company-groups/check'
 export const COMPANY_GROUP_CREATE_API_ROUTE = 'portal/a/site-master/general/company-groups/create'
+export const COMPANY_GROUP_VIEW_API_ROUTE = 'portal/a/site-master/general/company-groups'
 
 // Ticket Types
 export const TICKET_TYPES_LIST_API_ROUTE = 'portal/a/site-master/tickets/types/all'
