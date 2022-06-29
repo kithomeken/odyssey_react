@@ -1,10 +1,10 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useNavigate } from "react-router-dom"
-import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
-// import { useCountries } from 'use-react-countries'
-import '../../../../assets/css/react_phone_number_input.css'
+import PhoneInput, { isValidPhoneNumber, parsePhoneNumber } from 'react-phone-number-input'
+import { useCountries } from 'use-react-countries'
 
+import '../../../../assets/css/react_phone_number_input.css'
 import { COMPANY_GROUP_CHECK_API_ROUTE, COMPANY_GROUP_CREATE_API_ROUTE } from "../../../../api/ApiRoutes"
 import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
@@ -14,54 +14,61 @@ import HttpServices from "../../../../services/HttpServices"
 import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
 import ErrorBanner from "../../../../components/layouts/ErrorBanner"
+import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
+import { Listbox } from "@headlessui/react"
 
 const CreateCompanyGroup = () => {
     const [state, setstate] = useState({
-        counter: 0,
         isPostingForm: false,
         requestFailed: false,
         company: {
             checkCompany: false,
-            companyExists: false,
+            companyExists: true,
         },
         input: {
             name: '',
             description: '',
             domain: '',
             logo: null,
+            country: '',
         },
         errors: {
             name: '',
             description: '',
             domain: '',
             logo: '',
-            poc: {
-                name: ['', '', ''],
-                email: ['', '', ''],
-                phone: ['', '', ''],
-            },
+            country: '',
         },
         poc: [{
             name: '',
             email: '',
             phone: '',
+            country: '',
         }],
         pocErrors: [{
             name: '',
             email: '',
             phone: '',
+            country: '',
         }]
     })
 
     const showButton = false
     const navigate = useNavigate();
     const pageTitle = "Create Company"
+    const { countries } = useCountries()
 
     const breadCrumb = [
         { linkItem: true, title: "General Settings", url: "" },
         { linkItem: true, title: "Company Groups", url: "" },
         { linkItem: false, title: pageTitle },
     ]
+
+    /* 
+        TODO: Add useEffect to fetch the base organization's 
+            : country from organizational settings
+            : To be used as default in phone number input
+    */
 
     const onChangeHandler = (e: any) => {
         const isPostingForm = state.isPostingForm
@@ -125,7 +132,12 @@ const CreateCompanyGroup = () => {
 
             const newPointOfContacts = state.poc.map((contact, mapIndex) => {
                 if (index !== mapIndex) return contact
-                return { ...contact, phone: e.target.value }
+
+                return {
+                    ...contact,
+                    phone: e,
+                    country: parsePhoneNumber(e)?.country
+                }
             })
 
             poc = newPointOfContacts
@@ -148,14 +160,16 @@ const CreateCompanyGroup = () => {
                     name: '',
                     email: '',
                     phone: '',
+                    country: '',
                 }])
-        
+
                 pocErrors = state.pocErrors.concat([{
                     name: '',
                     email: '',
                     phone: '',
+                    country: '',
                 }])
-        
+
                 setstate({
                     ...state, poc, pocErrors
                 })
@@ -279,7 +293,7 @@ const CreateCompanyGroup = () => {
                     } else {
                         pocErrors[index].name = ''
                     }
-                break
+                    break
 
                 case 'email':
                     if (targetValue.length < 1) {
@@ -294,7 +308,7 @@ const CreateCompanyGroup = () => {
                             pocErrors[index].email = ''
                         }
                     }
-                break
+                    break
             }
 
             setstate({
@@ -339,35 +353,76 @@ const CreateCompanyGroup = () => {
         }
     }
 
+    const onChangeListBoxHandler = (e: any) => {
+        let { input }: any = state
+        console.log(e)
+
+        input.country = e
+        setstate({
+            ...state, input
+        })
+    }
+
+    function classNames(...classes: any) {
+        return classes.filter(Boolean).join(' ')
+    }
+
     const onFormSubmitHandler = (e: any) => {
         e.preventDefault()
-        let companyExists = state.company.companyExists
+        let isPostingForm = state.isPostingForm
 
-        if (!companyExists) {
-            let { input }: any = state
-            let { errors }: any = state
-            let errorArray: any[] = []
+        if (!isPostingForm) {
+            let companyExists = state.company.companyExists
 
-            if (!input['poc1']) {
-                errors['poc1'] = 'At least one point of contact is required'
-            }
+            if (!companyExists) {
+                let { input }: any = state
+                let { errors }: any = state
+                let errorArray: any[] = []
 
-            setstate({
-                ...state, errors
-            })
-
-            Object.keys(errors).forEach(function (key) {
-                if (errors[key].length > 0) {
-                    errorArray.push(errors[key])
+                if (!input['name']) {
+                    errors['name'] = 'Company name cannot be empty'
+                    errorArray.push(errors['name'])
                 }
-            });
 
-            if (errorArray.length > 0) {
-                // Show notification for clearing errors
-            } else {
-                let isPostingForm = state.isPostingForm
+                if (!input['description']) {
+                    errors['description'] = 'Company description cannot be empty'
+                    errorArray.push(errors['description'])
+                }
 
-                if (!isPostingForm) {
+                let { poc }: any = state
+                let { pocErrors }: any = state
+
+                // Validate point of contacts array
+                Object.keys(poc).forEach(function (key) {
+                    pocErrors[key].name = poc[key].name.length < 5 ? ('Name cannot be less than 5 charaters') : ''
+                    pocErrors[key].name = poc[key].name.length < 1 ? 'Name cannot be empty' : ''
+
+                    let lastAtPos = pocErrors[key].email.lastIndexOf('@')
+                    let lastDotPos = pocErrors[key].email.lastIndexOf('.')
+
+                    if (!(lastAtPos < lastDotPos && lastAtPos > 0 && pocErrors[key].email.indexOf('@@') === -1 && lastDotPos > 2 && (pocErrors[key].email.length - lastDotPos) > 2)) {
+                        pocErrors[key].email = 'Please enter a valid email address'
+                    }
+
+                    pocErrors[key].email = poc[key].name.length < 1 ? 'Email cannot be empty' : ''
+
+                    // Add errors into master array if they exist
+                    if (pocErrors[key].name.length > 0) {
+                        errorArray.push(pocErrors[key].name)
+                    }
+
+                    if (pocErrors[key].email.length > 0) {
+                        errorArray.push(pocErrors[key].email)
+                    }
+                });
+
+                setstate({
+                    ...state, errors, pocErrors
+                })
+
+                if (errorArray.length > 0) {
+                    // Show notification for clearing errors
+                } else {
                     setstate({
                         ...state, isPostingForm: true
                     })
@@ -382,6 +437,7 @@ const CreateCompanyGroup = () => {
         let { requestFailed }: any = state
         let { isPostingForm } = state
         let { input }: any = state
+        let { poc }: any = state
 
         try {
             let formData = new FormData()
@@ -389,9 +445,17 @@ const CreateCompanyGroup = () => {
             formData.append("name", input.name)
             formData.append("description", input.description)
             formData.append("domain", input.domain)
-            formData.append("poc_name", input.poc.name)
-            formData.append("poc_email", input.poc.email)
-            formData.append("poc_phone", input.poc.phone)
+            formData.append("country", input.country)
+
+            Object.keys(poc).forEach(function (key) {
+                formData.append("poc_name[]", poc[key].name)
+                formData.append("poc_email[]", poc[key].email)
+                formData.append("poc_phone[]", poc[key].phone)
+                formData.append("poc_country[]", poc[key].country)
+            })
+
+            console.log(formData);
+
 
             const apiDomain = ApiServices.apiDomain()
             const apiToBeConsumed = apiDomain + COMPANY_GROUP_CREATE_API_ROUTE
@@ -502,6 +566,67 @@ const CreateCompanyGroup = () => {
                                         </div>
                                     </div>
                                 </div>
+
+                                <div className="w-12/12 rounded-md shadow-none space-y-px form-group flex items-center">
+                                    <div className="w-full">
+                                        <ListBoxZero
+                                            onChangeListBoxHandler={onChangeListBoxHandler}
+                                            state={state.input.country}
+                                            label="Country:"
+                                            listButton={
+                                                <>
+                                                    {countries.map((selectedItem: any, index: any) => (
+                                                        <span key={index}>
+                                                            {
+                                                                state.input.country === selectedItem.country ? (
+                                                                    <span className="flex items-center">
+                                                                        <span className={`flex-shrink-0 h-5 w-4 rounded ${selectedItem.color_code}`}></span>
+                                                                        <span className="ml-2 text-sm text-gray-700 truncate">{selectedItem.name}</span>
+                                                                    </span>
+                                                                ) : null
+                                                            }
+                                                        </span>
+                                                    ))}
+
+                                                    <span className="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                                        <i className="far fa-chevron-down text-emerald-500"></i>
+                                                    </span>
+                                                </>
+                                            }
+                                            listOptions={
+                                                <>
+                                                    {countries.map((listItem: any, index: any) => (
+                                                        <Listbox.Option
+                                                            key={index}
+                                                            className={({ active }) =>
+                                                                classNames(
+                                                                    active ? 'text-white bg-gray-100' : 'text-gray-900',
+                                                                    'cursor-default select-none relative py-2 pl-3 pr-9'
+                                                                )
+                                                            }
+                                                            value={listItem.country}
+                                                        >
+                                                            {({ selected }) => (
+                                                                <>
+                                                                    <span className="flex items-center">
+                                                                        <span className={`flex-shrink-0 h-5 w-4 rounded`}>{listItem.emoji}</span>
+                                                                        <span className="ml-2 text-sm text-gray-700 truncate">{listItem.name}</span>
+                                                                    </span>
+
+                                                                    {selected ? (
+                                                                        <span className="text-green-600 absolute inset-y-0 right-0 flex items-center pr-4">
+                                                                            <i className="fad fa-check h-5 w-5"></i>
+                                                                        </span>
+                                                                    ) : null}
+                                                                </>
+                                                            )}
+                                                        </Listbox.Option>
+                                                    ))}
+                                                </>
+                                            }
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Right Half */}
@@ -602,7 +727,13 @@ const CreateCompanyGroup = () => {
                                                 <div key={index}>
                                                     <div className="w-full mb-3 flex align-middle">
                                                         <div className="mr-3 w-48 mb-3">
-                                                            <input type="text" name="name" id="poc-1-name" autoComplete="off" onChange={(e) => onPointOfContactChangeHandler(e, index)} className="focus:ring-1 capitalize w-full focus:ring-green-500 p-1-5 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={(e) => onPointOfContactBlur(e, index)} placeholder="Contact Person" value={contact.name} />
+                                                            <input type="text" name="name" id="poc-1-name" autoComplete="off" className="focus:ring-1 capitalize w-full focus:ring-green-500 p-1-5 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50"
+                                                                onChange={(e) => onPointOfContactChangeHandler(e, index)}
+                                                                onBlur={(e) => onPointOfContactBlur(e, index)}
+                                                                placeholder="Contact Person"
+                                                                required={index === 0 ? true : false}
+                                                                value={contact.name}
+                                                            />
 
                                                             {
                                                                 state.pocErrors[index].name.length > 0 &&
@@ -626,14 +757,12 @@ const CreateCompanyGroup = () => {
                                                         <div className="mr-3 w-56 mb-3">
                                                             <PhoneInput
                                                                 international
-                                                                defaultCountry="RU"
+                                                                defaultCountry="KE"
                                                                 placeholder="Enter phone number"
                                                                 value={state.poc[index].phone}
                                                                 onChange={(e) => onPhoneInputChange(e, index)}
-                                                                error={state.poc[index].phone ? (isValidPhoneNumber(state.poc[index].phone) ? undefined : 'Invalid phone number') : 'Phone number required'} />
-
-
-                                                            {/* <input type="text" name="phone" id="poc-1-phone" autoComplete="off" onChange={(e) => onPointOfContactChangeHandler(e, index)} className="focus:ring-1 w-full focus:ring-green-500 p-1-5 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={(e) => onPointOfContactBlur(e, index)} placeholder="+254 724 000 000" value={contact.phone} /> */}
+                                                                error={state.poc[index].phone ? (isValidPhoneNumber(state.poc[index].phone) ? undefined : 'Invalid phone number') : 'Phone number required'}
+                                                            />
 
                                                             {
                                                                 state.pocErrors[index].phone.length > 0 &&
