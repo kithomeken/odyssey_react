@@ -4,10 +4,10 @@ import { Listbox, Transition } from '@headlessui/react'
 
 export default function ListBoxZero({label, listButton, listOptions, state, onChangeListBoxHandler}) {
     return (
-        <Listbox value={state.input.category} onChange={event => onChangeListBoxHandler(event)}>
+        <Listbox value={state} onChange={event => onChangeListBoxHandler(event)}>
             {({ open }) => (
                 <>
-                    <Listbox.Label className="block text-sm font-medium text-gray-500">{label}</Listbox.Label>
+                    <Listbox.Label className="block text-sm text-gray-500">{label}</Listbox.Label>
                     <div className="mt-1 relative">
                         <Listbox.Button className="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm">
                             {listButton}

@@ -1,7 +1,10 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
-import { COMPANY_GROUP_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
+import { getCountryByNameOrShortName } from 'node-countries'
+// import Flag from 'react-flagpack'
+
+import { COMPANY_GROUP_PRODUCTS_SUBSCRIBED_API_ROUTE, COMPANY_GROUP_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
 import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
@@ -11,17 +14,28 @@ import DateFormating from "../../../../lib/hooks/DateFormating"
 import HttpServices from "../../../../services/HttpServices"
 import EmptyResultsReturned from "../../../errors/EmptyResultsReturned"
 import Error500 from "../../../errors/Error500"
+import PointsOfContactTab from "./PointsOfContactTab"
+import ProductsTab from "./ProductsTab"
 
 const CompanyView = () => {
     const [state, setstate] = useState({
         data: {
-            contacts: '',
             name: '',
             logo: '',
             domain: '',
             deleted_at: '',
             description: '',
             created_at: '',
+            country: '',
+            country_name: '',
+            country_code: '',
+            orgnztn_country: '',
+            contacts: '',
+            products: '',
+        },
+        tabStatus: {
+            poc: 'pending',
+            products: 'pending',
         },
         show: false,
         activeTab: 'poc',
@@ -63,6 +77,8 @@ const CompanyView = () => {
 
             data = response.data.data
             status = 'fulfilled'
+            data.country_name = getCountryByNameOrShortName(response.data.data.country).name
+            data.country_code = getCountryByNameOrShortName(response.data.data.country).countryCallingCodes[0]
 
             setstate({
                 ...state, data, status
@@ -89,6 +105,86 @@ const CompanyView = () => {
 
     const classNames = (...classes: any[]) => {
         return classes.filter(Boolean).join(' ')
+    }
+
+    const activateTab = (tabName: any) => {
+        setstate({
+            ...state,
+            activeTab: tabName
+        })
+    }
+
+    const updateTabDataState = (tabName: any, dataFromTab: any) => {
+        let { data } = state
+        data[tabName] = dataFromTab
+
+        setstate({
+            ...state, data
+        })
+    }
+
+    const updateTabStatus = (tabName: any, status: any) => {
+        let { tabStatus } = state
+        tabStatus[tabName] = status
+
+        setstate({
+            ...state, tabStatus
+        })
+    }
+
+    const loadRespectiveTab = (tabName = 'poc') => {
+        switch (tabName) {
+            case 'poc':
+                return <PointsOfContactTab
+                    orgnztn_country={state.data.orgnztn_country}
+                    updateTabDataState={updateTabDataState}
+                    updateTabStatus={updateTabStatus}
+                    status="fulfilled"
+                    data={state.data.contacts}
+                    companyId={params.uuid}
+                />
+
+            case 'products':
+                return <ProductsTab
+                    updateTabDataState={updateTabDataState}
+                    updateTabStatus={updateTabStatus}
+                    status={state.tabStatus.products}
+                    data={state.data.products}
+                    companyId={params.uuid}
+                />
+
+            default:
+                return null
+        }
+    }
+
+    const fetchProductsSubscribedToApiCall = async () => {
+        try {
+            const companyId = params.uuid
+            const apiDomain = ApiServices.apiDomain()
+            const apiCall = apiDomain + COMPANY_GROUP_PRODUCTS_SUBSCRIBED_API_ROUTE + '/' + companyId
+            const response: any = await HttpServices.httpGet(apiCall)
+
+            let { data } = state
+            let { tabStatus } = state
+
+            data.products = response.data.data
+            tabStatus.products = 'fulfilled'
+
+            setstate({
+                ...state, data, tabStatus
+            })
+        } catch (e) {
+            console.warn(e);
+            let { tabStatus } = state
+            tabStatus.products = 'rejected'
+
+            setstate({
+                ...state, tabStatus
+            })
+        } finally {
+            // Do nothing            
+        }
     }
 
     return (
@@ -132,20 +228,31 @@ const CompanyView = () => {
 
                                                     {
                                                         state.data.domain === null ? (
-                                                            <p className="text-blue-500 text-sm mb-4">
+                                                            <p className="text-blue-500 text-sm mb-3">
                                                                 <span className="cursor-pointer">
                                                                     <span className="fas fa-plus mr-2"></span>
                                                                     Add company domain
                                                                 </span>
                                                             </p>
                                                         ) : (
-                                                            <div className="w-full mb-5">
+                                                            <div className="w-full mb-3">
                                                                 <a target="blank" href={state.data.domain} className="text-sm form-group mb-3 hover:underline text-blue-500">
                                                                     {state.data.domain}
                                                                 </a>
                                                             </div>
                                                         )
                                                     }
+
+                                                    <h2 className="flex items-center mb-3">
+                                                        <div className="w-10">
+                                                            {/* <Flag code={state.data.country}  size="L" hasDropShadow hasBorderRadius  gradient="real-linear"/> */}
+                                                        </div>
+
+                                                        <span className="ml-3">
+                                                            {state.data.country_name}
+                                                        </span>
+                                                    </h2>
+
 
                                                     {/* <div className="w-full form-group">
                                                         <p className="text-sm mb-1">
@@ -229,8 +336,8 @@ const CompanyView = () => {
                                                 </div>
                                             </div>
 
-                                            <div className="w-10/12 pb-6 flex flex-row">
-                                                <div className="w-auto cursor-pointer" /* onClick={() => activateTab('main')} */>
+                                            <div className="w-10/12 pb-3 flex flex-row">
+                                                <div className="w-auto cursor-pointer" onClick={() => activateTab('poc')}>
                                                     <button className={classNames(
                                                         state.activeTab === 'poc' ? 'text-green-700 border-b-2 border-green-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
                                                         "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
@@ -239,27 +346,31 @@ const CompanyView = () => {
                                                     </button>
                                                 </div>
 
-                                                <div className="w-auto cursor-pointer" /* onClick={() => activateTab('complementary')} */>
+                                                <div className="w-auto cursor-pointer" onClick={() => activateTab('products')}>
                                                     <button className={classNames(
-                                                        state.activeTab === 'complementary' ? 'text-green-700 border-b-2 border-green-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
+                                                        state.activeTab === 'products' ? 'text-green-700 border-b-2 border-green-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
                                                         "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
                                                     )}>
-                                                        <span className="lolrtn robot">Products Allocated</span>
+                                                        <span className="lolrtn robot">Products Subscribed</span>
                                                     </button>
                                                 </div>
 
                                                 <div className="w-auto cursor-pointer" /* onClick={() => activateTab('complementary')} */>
                                                     <button className={classNames(
-                                                        state.activeTab === 'complementary' ? 'text-green-700 border-b-2 border-green-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
+                                                        state.activeTab === 'client' ? 'text-green-700 border-b-2 border-green-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
                                                         "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
                                                     )}>
-                                                        <span className="lolrtn robot">Client Users</span>
+                                                        <span className="lolrtn robot">Client Accounts</span>
                                                     </button>
                                                 </div>
 
                                                 <div className="flex-grow border-b-2">
 
                                                 </div>
+                                            </div>
+
+                                            <div className="w-10/12 pb-6 px-3">
+                                                {loadRespectiveTab(state.activeTab)}
                                             </div>
                                         </div>
                                     )
