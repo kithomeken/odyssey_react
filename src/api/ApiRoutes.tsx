@@ -20,6 +20,9 @@ export const COMPANY_GROUP_PRODUCTS_SUBSCRIBED_API_ROUTE = 'portal/a/site-master
 export const COMPANY_GROUP_ALL_PRODUCTS_API_ROUTE = 'portal/a/site-master/general/company-groups/products/active'
 export const COMPANY_GROUP_SUBSCRIBE_TO_PRODUCT_API_ROUTE = 'portal/a/site-master/general/company-groups/products/subscribe'
 export const COMPANY_GROUP_UNSUBSCRIBE_TO_PRODUCT_API_ROUTE = 'portal/a/site-master/general/company-groups/products/unsubscribe'
+export const COMPANY_GROUP_CONTACT_LIST_API_ROUTE = 'portal/a/site-master/general/company-groups/point-of-contacts'
+export const COMPANY_GROUP_CONTACT_ADD_API_ROUTE = 'portal/a/site-master/general/company-groups/point-of-contact/add'
+export const COMPANY_GROUP_CONTACT_REMOVE_API_ROUTE = 'portal/a/site-master/general/company-groups/point-of-contact/delete'
 
 // Ticket Types
 export const TICKET_TYPES_LIST_API_ROUTE = 'portal/a/site-master/tickets/types/all'
