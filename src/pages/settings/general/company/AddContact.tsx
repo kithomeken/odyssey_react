@@ -263,10 +263,7 @@ const AddContact = ({ show, showOrHideModal, companyId, orgnztn_country, reloadC
                                 leaveTo="opacity-0 translate-y-4 md:translate-y-0 md:scale-95"
                             >
                                 <Dialog.Panel className="flex text-base text-left transform transition w-full md:max-w-xl md:px-4 md:my-8 lg:max-w-sm">
-                                    <div className={classNames(
-                                        state.productsListIsEmpty ? 'bg-white' : 'bg-white',
-                                        'w-full rounded relative flex items-center px-4 pt-14 pb-8 overflow-hidden shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8'
-                                    )}>
+                                    <div className="w-full rounded bg-white relative flex items-center px-4 pt-14 pb-8 overflow-hidden shadow-2xl sm:px-6 sm:pt-8 md:p-6 lg:p-8">
                                         <div className="w-full grid-cols-1 gap-y-8 gap-x-6 items-start sm:grid-cols-12 lg:gap-x-8">
                                             <div className="w-full">
                                                 <div className="sm:col-span-8 lg:col-span-7 mb-3">

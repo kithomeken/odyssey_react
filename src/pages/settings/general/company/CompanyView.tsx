@@ -3,8 +3,9 @@ import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
 import { getCountryByNameOrShortName } from 'node-countries'
 // import Flag from 'react-flagpack'
+import swal from 'sweetalert';
 
-import { COMPANY_GROUP_PRODUCTS_SUBSCRIBED_API_ROUTE, COMPANY_GROUP_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
+import { COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE, COMPANY_GROUP_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
 import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
@@ -16,6 +17,7 @@ import EmptyResultsReturned from "../../../errors/EmptyResultsReturned"
 import Error500 from "../../../errors/Error500"
 import PointsOfContactTab from "./PointsOfContactTab"
 import ProductsTab from "./ProductsTab"
+import UploadCompanyLogo from "./UploadLogoModal"
 
 const CompanyView = () => {
     const [state, setstate] = useState({
@@ -37,7 +39,9 @@ const CompanyView = () => {
             poc: 'pending',
             products: 'pending',
         },
-        show: false,
+        show: {
+            uploadModal: false
+        },
         activeTab: 'poc',
         status: 'pending',
         requestFailed: '',
@@ -73,12 +77,11 @@ const CompanyView = () => {
 
             let { data } = state
             let status = state.status
-            let show = state.show
 
             data = response.data.data
             status = 'fulfilled'
-            data.country_name = getCountryByNameOrShortName(response.data.data.country).name
-            data.country_code = getCountryByNameOrShortName(response.data.data.country).countryCallingCodes[0]
+            // data.country_name = getCountryByNameOrShortName(response.data.data.country).name
+            // data.country_code = getCountryByNameOrShortName(response.data.data.country).countryCallingCodes[0]
 
             setstate({
                 ...state, data, status
@@ -86,13 +89,10 @@ const CompanyView = () => {
         } catch (e) {
             console.warn(e);
             let status = state.status
-            let show = state.show
-
             status = 'rejected'
-            show = false
 
             setstate({
-                ...state, status, show
+                ...state, status
             })
         } finally {
             // Do nothing            
@@ -158,33 +158,65 @@ const CompanyView = () => {
         }
     }
 
-    const fetchProductsSubscribedToApiCall = async () => {
-        try {
-            const companyId = params.uuid
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + COMPANY_GROUP_PRODUCTS_SUBSCRIBED_API_ROUTE + '/' + companyId
-            const response: any = await HttpServices.httpGet(apiCall)
+    const showOrHideUploadLogoModal = () => {
+        let { show } = state
+        show.uploadModal = !state.show.uploadModal
 
-            let { data } = state
-            let { tabStatus } = state
+        setstate({
+            ...state, show
+        })
+    }
 
-            data.products = response.data.data
-            tabStatus.products = 'fulfilled'
+    const updateCompanyLogoState = (logo: any, _fromModal?: any) => {
+        let { data } = state
+        data.logo = logo
 
-            setstate({
-                ...state, data, tabStatus
-            })
-        } catch (e) {
-            console.warn(e);
-            let { tabStatus } = state
-            tabStatus.products = 'rejected'
-
-            setstate({
-                ...state, tabStatus
-            })
-        } finally {
-            // Do nothing            
+        if (_fromModal !== null && _fromModal !== undefined) {
+            showOrHideUploadLogoModal()
         }
+
+        setstate({
+            ...state, data
+        })
+    }
+
+    const removeCompanyLogoHandler = async () => {
+        swal({
+            title: "Are you sure?",
+            text: "Do you wish to remove the company's logo?",
+            dangerMode: true,
+            buttons: ["Cancel", "Proceed"],
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    removeCompanyLogoApiCall()
+                }
+            });
+    }
+
+    const removeCompanyLogoApiCall = async () => {
+        let { requestFailed }: any = state
+
+        try {
+            let formData = new FormData()
+            formData.append("company_uuid", params.uuid)
+
+            const apiDomain = ApiServices.apiDomain()
+            const apiToBeConsumed = apiDomain + COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE
+            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
+
+            if (response.data.success) {
+                updateCompanyLogoState(null)
+            } else {
+                requestFailed = true
+            }
+        } catch (error) {
+            requestFailed = true
+        }
+
+        setstate({
+            ...state, requestFailed,
+        })
     }
 
     return (
@@ -288,24 +320,27 @@ const CompanyView = () => {
                                                 {/* Company logo half */}
                                                 <div className="w-7/12 px-4">
                                                     <div className="w-full flex">
-                                                        <div className="w-full">
-                                                            <div className="bg-gray-100 rounded mr-4 h-44 mb-3 flex flex-col justify-center">
-                                                                <img src={`${FQDN}/uploads/company-logos/${state.data.logo}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} height="200" />
-                                                            </div>
+                                                        {
+                                                            state.data.logo !== null && state.data.logo !== undefined ? (
+                                                                <div className="w-full">
+                                                                    <div className="bg-gray-100 rounded mr-4 h-44 mb-3 flex flex-col justify-center">
+                                                                        <img src={`${FQDN}/uploads/company-logos/${state.data.logo}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} />
+                                                                    </div>
 
-                                                            <p className="text-red-500 text-sm mb-4">
-                                                                <span className="cursor-pointer">
-                                                                    <span className="fas fa-minus mr-2"></span>
-                                                                    Remove company logo
-                                                                </span>
-                                                            </p>
-                                                        </div>
+                                                                    <p className="text-red-500 text-xs mb-4">
+                                                                        <span className="cursor-pointer" onClick={removeCompanyLogoHandler}>
+                                                                            Remove Company Logo
+                                                                        </span>
+                                                                    </p>
+                                                                </div>
+                                                            ) : null
+                                                        }
 
-                                                        <div className="w-60 ">
+                                                        <div className="w-60">
                                                             <div className="h-44 border-2 border-gray-400 border-dashed rounded-md flex flex-col justify-center">
                                                                 <div className="space-y-1 text-center flex-col align-middle">
                                                                     <svg
-                                                                        className="mx-auto h-12 w-12 text-gray-400"
+                                                                        className="mx-auto h-12 w-12 text-slate-400"
                                                                         stroke="currentColor"
                                                                         fill="none"
                                                                         viewBox="0 0 48 48"
@@ -319,14 +354,12 @@ const CompanyView = () => {
                                                                         />
                                                                     </svg>
 
-                                                                    <span className="text-xs text-gray-500">Upload new company logo,</span>
+                                                                    <span className="text-xs text-gray-500">Upload company logo,</span>
                                                                     <div className="text-xs w-full m-0 text-gray-600">
                                                                         <label
-                                                                            htmlFor="file-upload"
                                                                             className="relative cursor-pointer bg-white rounded-md text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
                                                                         >
-                                                                            <span>click to browse</span>
-                                                                            <input id="file-upload" name="logo" type="file" /* onChange={onFileChangeHandler} */ className="sr-only" />
+                                                                            <span onClick={showOrHideUploadLogoModal}>Click to Browse</span>
                                                                         </label>
                                                                     </div>
                                                                 </div>
@@ -372,6 +405,13 @@ const CompanyView = () => {
                                             <div className="w-10/12 pb-6 px-3">
                                                 {loadRespectiveTab(state.activeTab)}
                                             </div>
+
+                                            <UploadCompanyLogo
+                                                companyId={params.uuid}
+                                                show={state.show.uploadModal}
+                                                showOrHideModal={showOrHideUploadLogoModal}
+                                                updateCompanyLogoState={updateCompanyLogoState}
+                                            />
                                         </div>
                                     )
                                 }
