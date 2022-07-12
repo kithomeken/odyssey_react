@@ -1,6 +1,12 @@
 // Master Accounts
 export const MASTER_ACCOUNTS_LIST_API_ROUTE = 'portal/a/site-master/accounts/master/all'
 
+// Organizational Details
+export const ORGANIZATION_FETCH_DETAILS_API_ROUTE = 'portal/a/site-master/general/organizational-details'
+export const ORGANIZATION_LOGO_APPEND_API_ROUTE = 'portal/a/site-master/general/organizational-details/logo/append'
+export const ORGANIZATION_LOGO_REMOVAL_API_ROUTE = 'portal/a/site-master/general/organizational-details/logo/remove'
+export const ORGANIZATION_DETAILS_UPDATE_API_ROUTE = 'portal/a/site-master/general/organizational-details/update'
+
 // Product Management
 export const PRODUCT_CHECK_API_ROUTE = 'portal/a/site-master/general/products/check'
 export const PRODUCT_ADD_API_ROUTE = 'portal/a/site-master/general/products/create'

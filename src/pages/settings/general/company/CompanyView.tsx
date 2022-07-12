@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
 import { getCountryByNameOrShortName } from 'node-countries'
-// import Flag from 'react-flagpack'
 import swal from 'sweetalert';
 
 import { COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE, COMPANY_GROUP_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
