@@ -2,13 +2,11 @@ import React from "react"
 import { Link } from "react-router-dom"
 import tempararyAvatar from '../../assets/avatars/C6C2E60B0A5CC3A09F638284A21571F3.png'
 import Crypto from "../../encryption/Crypto"
-import ConstantsRegistry from "../../global/ConstantsRegistry"
+import { ACCOUNT_NAME_COOKIE } from "../../global/CookieNames"
 import CookieService from "../../services/CookieServices"
 
 const TopHeader = () => {
-    const acNameCookie = ConstantsRegistry.accountNameCookie()
-    const encryptedAccountName = CookieService.get(acNameCookie)
-
+    const encryptedAccountName = CookieService.get(ACCOUNT_NAME_COOKIE)
     const decryptedAccountName = Crypto.decryptDataUsingAES256(encryptedAccountName)
     const displayNone = {display: 'none'}
     
