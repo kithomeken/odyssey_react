@@ -2,8 +2,8 @@ import React from "react"
 import { Helmet } from "react-helmet"
 import { useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
+
 import { COMPANY_GROUP_LIST_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
@@ -34,9 +34,7 @@ const CompanyGroups = () => {
     ]
 
     const companyGroupsApiCall = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + COMPANY_GROUP_LIST_API_ROUTE
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet(COMPANY_GROUP_LIST_API_ROUTE)
 
         if (response.status !== 200) {
             throw new Error("Something went wrong while fecthing products list.");

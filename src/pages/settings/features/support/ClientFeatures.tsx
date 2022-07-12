@@ -2,15 +2,13 @@ import React from "react"
 import { toast } from "react-toastify"
 
 import Error500 from "../../../errors/Error500";
-import ApiServices from "../../../../api/ApiServices";
 import HttpServices from "../../../../services/HttpServices";
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect";
+import { SUPPORT_FEATURES_CLIENT_API_ROUTE, SUPPORT_FEATURES_CLIENT_ACCESS_API_ROUTE, SUPPORT_FEATURES_COMPANY_PROFILE_API_ROUTE } from "../../../../api/ApiRoutes";
 
 const ClientFeatures = () => {
     let clientSupportFeaturesPromise = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + `portal/a/site-master/features/support/clients`
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet(SUPPORT_FEATURES_CLIENT_API_ROUTE)
 
         if (response.status !== 200) {
             throw new Error("Something went wrong when fetching agent support features...");
@@ -27,9 +25,8 @@ const ClientFeatures = () => {
             let input = {   
                 client_access: toggleStatus
             }
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + `portal/a/site-master/features/support/clients/client-access`
-            const response: any = await HttpServices.httpPost(apiCall, input)
+            
+            const response: any = await HttpServices.httpPost(SUPPORT_FEATURES_CLIENT_ACCESS_API_ROUTE, input)
                 
             if (response.data.success) {
                 if (toggleStatus === 'Y') {
@@ -67,9 +64,8 @@ const ClientFeatures = () => {
             let input = {   
                 create_company_profile: toggleStatus
             }
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + `portal/a/site-master/features/support/clients/company-profile`
-            const response: any = await HttpServices.httpPost(apiCall, input)
+            
+            const response: any = await HttpServices.httpPost(SUPPORT_FEATURES_COMPANY_PROFILE_API_ROUTE, input)
                 
             if (response.data.success) {
                 if (toggleStatus === 'Y') {

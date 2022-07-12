@@ -6,7 +6,6 @@ import { useCountries } from 'use-react-countries'
 
 import '../../../../assets/css/react_phone_number_input.css'
 import { COMPANY_GROUP_CHECK_API_ROUTE, COMPANY_GROUP_CREATE_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import { generalRoutes } from "../../../../routes/settings/generalRoutes"
@@ -327,9 +326,7 @@ const CreateCompanyGroup = () => {
                 name: input.name
             }
 
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + COMPANY_GROUP_CHECK_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiCall, requestData)
+            const response: any = await HttpServices.httpPost(COMPANY_GROUP_CHECK_API_ROUTE, requestData)
             company.checkCompany = false
 
             if (response.data.success) {
@@ -454,12 +451,7 @@ const CreateCompanyGroup = () => {
                 formData.append("poc_country[]", poc[key].country)
             })
 
-            console.log(formData);
-
-
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + COMPANY_GROUP_CREATE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
+            const response: any = await HttpServices.httpPost(COMPANY_GROUP_CREATE_API_ROUTE, formData)
 
             if (response.data.success) {
                 input.name = ''

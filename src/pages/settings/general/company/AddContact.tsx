@@ -1,14 +1,10 @@
-import { Dialog, Listbox, Transition } from "@headlessui/react"
+import { Dialog, Transition } from "@headlessui/react"
 import React, { Fragment, useState } from "react"
 import PhoneInput, { isValidPhoneNumber, parsePhoneNumber } from 'react-phone-number-input'
 import { COMPANY_GROUP_CONTACT_ADD_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 
 import ErrorBanner from "../../../../components/layouts/ErrorBanner"
-import Loading from "../../../../components/layouts/Loading"
-import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
 import HttpServices from "../../../../services/HttpServices"
-import Error500 from "../../../errors/Error500"
 
 const AddContact = ({ show, showOrHideModal, companyId, orgnztn_country, reloadContactsTable }: { show: any, showOrHideModal: any, companyId: any, orgnztn_country: any, reloadContactsTable: any }) => {
     const [state, setstate] = useState({
@@ -209,9 +205,7 @@ const AddContact = ({ show, showOrHideModal, companyId, orgnztn_country, reloadC
             formData.append("phone", input.phone)
             formData.append("country", input.country)
 
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + COMPANY_GROUP_CONTACT_ADD_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
+            const response: any = await HttpServices.httpPost(COMPANY_GROUP_CONTACT_ADD_API_ROUTE, formData)
 
             if (response.data.success) {
                 input.name = ''

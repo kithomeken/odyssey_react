@@ -1,4 +1,4 @@
-export const COOKIE_UUID = '.8mhx_uid'
-export const COOKIE_SANCTUM = '._KO3rZlz0Zn'
-export const COOKIE_AC_NAME = '._z0QplQGhGm'
-export const COOKIE_AC_EMAIL = '._08gNXSM5Nw'
+export const SANCTUM_COOKIE_NAME = '._KO3rZlz0Zn'
+export const UUID_COOKIE_NAME = '.8mhx_uid'
+export const ACCOUNT_NAME_COOKIE = '._z0QplQGhGm'
+export const ACCOUNT_EMAIL_COOKIE = '._08gNXSM5Nw'

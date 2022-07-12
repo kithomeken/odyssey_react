@@ -1,8 +1,7 @@
 import React from "react"
 import { useState } from "react";
-import state from "sweetalert/typings/modules/state";
+
 import { COMPANY_GROUP_PRODUCTS_SUBSCRIBED_API_ROUTE, COMPANY_GROUP_UNSUBSCRIBE_TO_PRODUCT_API_ROUTE } from "../../../../api/ApiRoutes";
-import ApiServices from "../../../../api/ApiServices";
 import Loading from "../../../../components/layouts/Loading"
 import DateFormating from "../../../../lib/hooks/DateFormating";
 import HttpServices from "../../../../services/HttpServices";
@@ -24,9 +23,7 @@ const ProductsTab = ({ data, status, companyId, updateTabDataState, updateTabSta
 
     const fetchProductsSubscribedToApiCall = async () => {
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + COMPANY_GROUP_PRODUCTS_SUBSCRIBED_API_ROUTE + '/' + companyId
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(COMPANY_GROUP_PRODUCTS_SUBSCRIBED_API_ROUTE + '/' + companyId)
 
             setstate({
                 ...state, show: false
@@ -56,13 +53,7 @@ const ProductsTab = ({ data, status, companyId, updateTabDataState, updateTabSta
             let formData = new FormData()
             formData.append("product_uuid", product_uuid)
             formData.append("company_uuid", companyId)
-
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + COMPANY_GROUP_UNSUBSCRIBE_TO_PRODUCT_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
-
-            console.log(response);
-            
+            const response: any = await HttpServices.httpPost(COMPANY_GROUP_UNSUBSCRIBE_TO_PRODUCT_API_ROUTE, formData)            
             
             if (response.data.success) {
                 fetchProductsSubscribedToApiCall()

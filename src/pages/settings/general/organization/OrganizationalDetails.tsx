@@ -6,7 +6,7 @@ import PhoneInput from 'react-phone-number-input'
 import swal from 'sweetalert';
 
 import { ORGANIZATION_FETCH_DETAILS_API_ROUTE, ORGANIZATION_LOGO_REMOVAL_API_ROUTE } from "../../../../api/ApiRoutes";
-import ApiServices, { IMAGES_DOMAIN } from "../../../../api/ApiServices"
+import { IMAGES_DOMAIN } from "../../../../api/ApiServices"
 import Loading from "../../../../components/layouts/Loading";
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
@@ -61,9 +61,7 @@ const OrganizationalDetails = () => {
 
     async function fetchOrganizationDetailsApiCall() {
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + ORGANIZATION_FETCH_DETAILS_API_ROUTE
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(ORGANIZATION_FETCH_DETAILS_API_ROUTE)
 
             let { data } = state
             let status = state.status
@@ -134,9 +132,7 @@ const OrganizationalDetails = () => {
 
         try {
             let formData = new FormData()
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + ORGANIZATION_LOGO_REMOVAL_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
+            const response: any = await HttpServices.httpPost(ORGANIZATION_LOGO_REMOVAL_API_ROUTE, formData)
 
             if (response.data.success) {
                 updateOrganizationLogoState(null)

@@ -2,9 +2,7 @@ import { Transition, Dialog, Listbox } from "@headlessui/react"
 import { Fragment, useState } from "react"
 import { useDispatch } from "react-redux"
 
-import ApiServices from "../../../../api/ApiServices"
 import ErrorBanner from "../../../../components/layouts/ErrorBanner"
-import SuccessBanner from "../../../../components/layouts/SuccessBanner"
 import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
 import HttpServices from "../../../../services/HttpServices"
@@ -35,9 +33,7 @@ const CreateTicketStatus = ({ show, showOrHideModal, reloadTicketStatusFunc }: {
 
     const dispatch = useDispatch()
     const scrumCategoriesListApiCall = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + TICKET_STATUS_SCRM_CAT_API_ROUTE
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet(TICKET_STATUS_SCRM_CAT_API_ROUTE)
 
         if (response.status !== 200) {
             throw new Error("Something went wrong while fecthing data.");
@@ -137,9 +133,7 @@ const CreateTicketStatus = ({ show, showOrHideModal, reloadTicketStatusFunc }: {
 
         try {
             status.checkStatus = true
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + TICKET_STATUS_CHECK_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiCall, input)
+            const response: any = await HttpServices.httpPost(TICKET_STATUS_CHECK_API_ROUTE, input)
             status.checkStatus = false
 
             if (response.data.success) {
@@ -192,9 +186,7 @@ const CreateTicketStatus = ({ show, showOrHideModal, reloadTicketStatusFunc }: {
         let { input }: any = state
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + TICKET_STATUS_CREATE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, input)
+            const response: any = await HttpServices.httpPost(TICKET_STATUS_CREATE_API_ROUTE, input)
 
             if (response.data.success) {
                 input.name = ''

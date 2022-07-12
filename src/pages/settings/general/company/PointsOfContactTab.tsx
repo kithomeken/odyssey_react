@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import PhoneInput from 'react-phone-number-input'
 import { COMPANY_GROUP_CONTACT_LIST_API_ROUTE, COMPANY_GROUP_CONTACT_REMOVE_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 
 import Loading from "../../../../components/layouts/Loading"
 import HttpServices from "../../../../services/HttpServices"
@@ -25,9 +24,7 @@ const PointsOfContactTab = ({ data, status, companyId, orgnztn_country, updateTa
 
     const reloadContactsPersonsDetailsApiCall = async () => {
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + COMPANY_GROUP_CONTACT_LIST_API_ROUTE + '/' + companyId
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(COMPANY_GROUP_CONTACT_LIST_API_ROUTE + '/' + companyId)
 
             setstate({
                 ...state, show: false
@@ -50,10 +47,7 @@ const PointsOfContactTab = ({ data, status, companyId, orgnztn_country, updateTa
             let formData = new FormData()
             formData.append("contact_uuid", contact_uuid)
             formData.append("company_uuid", companyId)
-
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + COMPANY_GROUP_CONTACT_REMOVE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)            
+            const response: any = await HttpServices.httpPost(COMPANY_GROUP_CONTACT_REMOVE_API_ROUTE, formData)            
             
             if (response.data.success) {
                 reloadContactsPersonsDetailsApiCall()

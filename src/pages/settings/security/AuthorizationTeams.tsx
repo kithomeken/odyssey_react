@@ -2,7 +2,7 @@ import { format } from "date-fns"
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { Link } from "react-router-dom"
-import ApiServices from "../../../api/ApiServices"
+
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
 import HeaderParagraphLarge from "../../../components/settings/HeaderParagraphLarge"
@@ -35,9 +35,7 @@ const AuthorizationTeams = () => {
     ]
 
     const authTeamsUsePromiseResponse = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + `portal/a/site-master/security/auth-teams`
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet('portal/a/site-master/security/auth-teams')
 
         if (response.status !== 200) {
             setstate({

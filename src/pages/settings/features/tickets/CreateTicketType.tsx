@@ -1,9 +1,7 @@
-import { Transition } from "@headlessui/react"
-import React, { Fragment, useState } from "react"
+import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useNavigate } from "react-router-dom"
 import { TICKET_TYPES_CHECK_API_ROUTE, TICKET_TYPES_CREATE_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import ErrorBanner from "../../../../components/layouts/ErrorBanner"
 import SuccessBanner from "../../../../components/layouts/SuccessBanner"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
@@ -102,9 +100,7 @@ const CreateTicketType = () => {
 
         try {
             ticket.checkTicket = true
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + TICKET_TYPES_CHECK_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiCall, input)
+            const response: any = await HttpServices.httpPost(TICKET_TYPES_CHECK_API_ROUTE, input)
             ticket.checkTicket = false
 
             if (response.data.success) {
@@ -183,9 +179,7 @@ const CreateTicketType = () => {
         let { banner }: any = state
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + TICKET_TYPES_CREATE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, input)
+            const response: any = await HttpServices.httpPost(TICKET_TYPES_CREATE_API_ROUTE, input)
 
             if (response.data.success) {
                 if (state.input.another === 'Y') {

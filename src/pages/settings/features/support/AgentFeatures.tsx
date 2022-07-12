@@ -2,9 +2,9 @@ import React from "react"
 import { toast } from "react-toastify"
 
 import Error500 from "../../../errors/Error500";
-import ApiServices from "../../../../api/ApiServices";
 import HttpServices from "../../../../services/HttpServices";
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect";
+import { SUPPORT_FEATURES_AGENT_API_ROUTE, SUPPORT_FEATURES_FIELD_AGENT_API_ROUTE } from "../../../../api/ApiRoutes";
 
 const AgentFeatures = () => {
     const onToggleAgentTechnicianFeature = async (e: any) => {
@@ -15,9 +15,8 @@ const AgentFeatures = () => {
             let input = {   
                 field_agent: toggleStatus
             }
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + `portal/a/site-master/features/support/agents/field-agent`
-            const response: any = await HttpServices.httpPost(apiCall, input)
+            
+            const response: any = await HttpServices.httpPost(SUPPORT_FEATURES_FIELD_AGENT_API_ROUTE, input)
                 
             if (response.data.success) {
                 if (toggleStatus === 'Y') {
@@ -48,9 +47,7 @@ const AgentFeatures = () => {
     }
     
     let agentSupportState = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + `portal/a/site-master/features/support/agents`
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet(SUPPORT_FEATURES_AGENT_API_ROUTE)
 
         if (response.status !== 200) {
             throw new Error("Something went wrong when fetching agent support features...");

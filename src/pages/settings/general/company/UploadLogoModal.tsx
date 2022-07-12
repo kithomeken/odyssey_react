@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react"
 import React, { Fragment, useState } from "react"
+
 import { COMPANY_GROUP_LOGO_APPEND_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import HttpServices from "../../../../services/HttpServices"
 
 const UploadLogoModal = ({ show, showOrHideModal, companyId, updateCompanyLogoState }: { show: any, showOrHideModal: any, companyId: any, updateCompanyLogoState: any }) => {
@@ -119,10 +119,7 @@ const UploadLogoModal = ({ show, showOrHideModal, companyId, updateCompanyLogoSt
             let formData = new FormData()
             formData.append("company_logo", input.logo)
             formData.append("company_uuid", companyId)
-
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + COMPANY_GROUP_LOGO_APPEND_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
+            const response: any = await HttpServices.httpPost(COMPANY_GROUP_LOGO_APPEND_API_ROUTE, formData)
 
             if (response.data.success) {
                 input.logo = null

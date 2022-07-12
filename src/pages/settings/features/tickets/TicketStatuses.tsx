@@ -1,7 +1,6 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { TICKET_STATUS_LIST_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
@@ -104,9 +103,7 @@ const TicketStatuses = () => {
 
     async function fetchTicketStatusListApiCall() {
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + TICKET_STATUS_LIST_API_ROUTE
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(TICKET_STATUS_LIST_API_ROUTE)
 
             let { data } = state
             let { dataLength } = state
@@ -142,9 +139,7 @@ const TicketStatuses = () => {
 
     const refetchTicketStatusListAfterCreatingStatus = async () => {
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + TICKET_STATUS_LIST_API_ROUTE
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(TICKET_STATUS_LIST_API_ROUTE)
 
             let { data } = state
             let { dataLength } = state

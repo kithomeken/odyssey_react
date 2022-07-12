@@ -1,10 +1,10 @@
 import React, { Component } from "react"
 import { Helmet } from "react-helmet"
-import ConstantsRegistry from "../../global/ConstantsRegistry"
+import { APPLICATION_NAME } from "../../global/ConstantsRegistry"
 
 class PasswordRecovery extends Component {
     render() {
-        const projectApplicationName = ConstantsRegistry.projectApplicationName()
+        const projectApplicationName = APPLICATION_NAME
 
         return(
             <React.Fragment>

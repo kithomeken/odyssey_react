@@ -3,7 +3,6 @@ import React, { Fragment, useState } from "react"
 import { useDispatch } from "react-redux"
 
 import { COMPANY_GROUP_ALL_PRODUCTS_API_ROUTE, COMPANY_GROUP_SUBSCRIBE_TO_PRODUCT_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import Loading from "../../../../components/layouts/Loading"
 import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
@@ -25,9 +24,7 @@ const AddProduct = ({ show, showOrHideModal, companyId, reloadProductsTable }: {
 
     const dispatch = useDispatch()
     const allProductListApiCall = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + COMPANY_GROUP_ALL_PRODUCTS_API_ROUTE + '/' + companyId
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet(COMPANY_GROUP_ALL_PRODUCTS_API_ROUTE + '/' + companyId)
 
         if (response.status !== 200) {
             throw new Error("Something went wrong while fecthing data.");
@@ -82,9 +79,7 @@ const AddProduct = ({ show, showOrHideModal, companyId, reloadProductsTable }: {
             formData.append("product_uuid", input.uuid)
             formData.append("company_uuid", companyId)
 
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + COMPANY_GROUP_SUBSCRIBE_TO_PRODUCT_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
+            const response: any = await HttpServices.httpPost(COMPANY_GROUP_SUBSCRIBE_TO_PRODUCT_API_ROUTE, formData)
 
             if (response.data.success) {
                 input.name = ''

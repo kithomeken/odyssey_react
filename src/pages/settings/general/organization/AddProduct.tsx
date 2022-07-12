@@ -1,10 +1,8 @@
 import React, { Fragment, useState } from "react"
 import { useNavigate } from "react-router-dom";
 
-import ApiServices from "../../../../api/ApiServices"
 import HttpServices from "../../../../services/HttpServices"
 import { PRODUCT_ADD_API_ROUTE, PRODUCT_CHECK_API_ROUTE } from "../../../../api/ApiRoutes"
-import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 import { Transition, Dialog } from "@headlessui/react";
 import ErrorBanner from "../../../../components/layouts/ErrorBanner";
 import SuccessBanner from "../../../../components/layouts/SuccessBanner";
@@ -85,9 +83,7 @@ const AddProduct = ({ show, showOrHideModal, reloadReactTable }: { show: any, sh
         let { product }: any = state
 
         product.checkProduct = true
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + PRODUCT_CHECK_API_ROUTE
-        const response: any = await HttpServices.httpPost(apiCall, input)
+        const response: any = await HttpServices.httpPost(PRODUCT_CHECK_API_ROUTE, input)
         product.checkProduct = false
 
         if (response.data.success) {
@@ -156,9 +152,7 @@ const AddProduct = ({ show, showOrHideModal, reloadReactTable }: { show: any, sh
         let { input }: any = state
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + PRODUCT_ADD_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, input)
+            const response: any = await HttpServices.httpPost(PRODUCT_ADD_API_ROUTE, input)
             
             if (response.data.success) {
                 input.name = ''

@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet"
 import { Link } from "react-router-dom"
 
 import { PRODUCT_LIST_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import NoDataReactTable from "../../../../lib/hooks/NoDataReactTable"
@@ -51,9 +50,7 @@ const ProductManagement = () => {
 
     async function fetchProductListApiCall(hideModal = 'Y') {
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + PRODUCT_LIST_API_ROUTE
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(PRODUCT_LIST_API_ROUTE)
 
             let { data } = state
             let status = state.status

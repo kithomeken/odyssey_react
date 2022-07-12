@@ -1,11 +1,9 @@
 import React, { useState } from "react"
-import swal from "sweetalert"
 import { Helmet } from "react-helmet"
 
-import ApiServices from "../../../api/ApiServices"
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
-import ConstantsRegistry, { HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
+import { HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
 import { usePromiseEffect } from "../../../lib/hooks/usePromiseEffect"
 import { securityRoutes } from "../../../routes/settings/securityRoutes"
 import HttpServices from "../../../services/HttpServices"
@@ -46,7 +44,6 @@ const CreateAuthorizationTeam = () => {
     const showButton = false
     const pageTitle = "Create Authorization Group"
     const thisPageRoutes = securityRoutes[1].path
-    const applicationName = ConstantsRegistry.projectApplicationName()
 
     const breadCrumb = [
         { linkItem: true, title: "Security", url: thisPageRoutes },
@@ -134,9 +131,7 @@ const CreateAuthorizationTeam = () => {
     }
 
     const supportFeaturesPromise = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + `portal/a/site-master/features/support/all`
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet('portal/a/site-master/features/support/all')
 
         if (response.status !== 200) {
             throw new Error("Something went wrong when fetching support features...");
@@ -251,9 +246,7 @@ const CreateAuthorizationTeam = () => {
     const handlePostingFormData = async () => {
         try {
             let input = state.input
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + `portal/a/site-master/security/auth-team/create`
-            const response: any = await HttpServices.httpPost(apiCall, input)
+            const response: any = await HttpServices.httpPost('portal/a/site-master/security/auth-team/create', input)
 
             if (response.data.success) {
                 toast("Created authorization group...", {
