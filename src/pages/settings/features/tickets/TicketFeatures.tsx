@@ -3,11 +3,10 @@ import { Helmet } from "react-helmet"
 import { toast } from "react-toastify"
 
 import { TICKET_FEATURES_CONFIGURE_API_ROUTE, TICKET_FEATURES_LIST_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import HeaderParagraphLarge from "../../../../components/settings/HeaderParagraphLarge"
-import ConstantsRegistry, { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
+import { APPLICATION_NAME, HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import { featuresRoutes } from "../../../../routes/settings/featuresRoutes"
 import HttpServices from "../../../../services/HttpServices"
 import ComplementaryTicketFeatures from "./ComplementaryTicketFeatures"
@@ -36,7 +35,7 @@ const TicketFeatures = () => {
     const showButton = false
     const pageTitle = "Ticket Features"
     const thisPageRoutes = featuresRoutes[3].path
-    const applicationName = ConstantsRegistry.projectApplicationName()
+    const applicationName = APPLICATION_NAME
 
     const breadCrumb = [
         { linkItem: true, title: "Features", url: thisPageRoutes },
@@ -84,9 +83,7 @@ const TicketFeatures = () => {
         setStatusMainAsPending()
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + TICKET_FEATURES_LIST_API_ROUTE
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(TICKET_FEATURES_LIST_API_ROUTE)
 
             let { features }: any = state
             let statusMain = state.statusMain
@@ -131,9 +128,7 @@ const TicketFeatures = () => {
                 input_value: value,
             }
 
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + TICKET_FEATURES_CONFIGURE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiCall, input)
+            const response: any = await HttpServices.httpPost(TICKET_FEATURES_CONFIGURE_API_ROUTE, input)
 
             if (response.data.success) {
                 if (value === 'Y') {

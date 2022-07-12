@@ -1,13 +1,11 @@
 import React, { Fragment, useState } from "react"
 import { useCountries } from 'use-react-countries'
 import { Transition, Dialog, Listbox } from "@headlessui/react"
-import PhoneInput, { isValidPhoneNumber, parsePhoneNumber } from 'react-phone-number-input'
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 
 import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
 import Editor from "../../../../lib/tiptap/Editor"
 import { ORGANIZATION_DETAILS_UPDATE_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
-import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 import HttpServices from "../../../../services/HttpServices"
 
 const EditOrganizationDetails = ({ show, showOrHideModal, stateFromParent, reloadPageState }) => {
@@ -239,10 +237,7 @@ const EditOrganizationDetails = ({ show, showOrHideModal, stateFromParent, reloa
             formData.append("country", input.country)
             formData.append("address", input.address)
             formData.append("timezone", input.timezone)
-
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + ORGANIZATION_DETAILS_UPDATE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
+            const response: any = await HttpServices.httpPost(ORGANIZATION_DETAILS_UPDATE_API_ROUTE, formData)
 
             if (response.data.success) {
                 showOrHideModal('amendDetails')

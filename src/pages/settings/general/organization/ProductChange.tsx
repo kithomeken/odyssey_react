@@ -3,7 +3,6 @@ import React from 'react';
 import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { PRODUCT_B4_CHECK_API_ROUTE, PRODUCT_UPDATE_API_ROUTE } from '../../../../api/ApiRoutes';
-import ApiServices from '../../../../api/ApiServices';
 import HttpServices from '../../../../services/HttpServices';
 import { useEffect } from 'react';
 
@@ -104,9 +103,7 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
         }
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + PRODUCT_B4_CHECK_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiCall, requestData)
+            const response: any = await HttpServices.httpPost(PRODUCT_B4_CHECK_API_ROUTE, requestData)
             product.checkProduct = false
 
             if (response.data.success) {
@@ -208,9 +205,7 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
         }
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + PRODUCT_UPDATE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, requestData)
+            const response: any = await HttpServices.httpPost(PRODUCT_UPDATE_API_ROUTE, requestData)
 
             if (response.data.success) {
                 fetchFunc()

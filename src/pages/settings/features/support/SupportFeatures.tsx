@@ -4,7 +4,7 @@ import { Helmet } from "react-helmet"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import HeaderParagraphLarge from "../../../../components/settings/HeaderParagraphLarge"
-import ConstantsRegistry, { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
+import { APPLICATION_NAME, HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import { featuresRoutes } from "../../../../routes/settings/featuresRoutes"
 import AgentFeatures from "./AgentFeatures"
 import AnnouncementFeatures from "./AnnouncementFeatures"
@@ -21,7 +21,7 @@ const SupportFeatures = () => {
     const showButton = false
     const pageTitle = "Support Features"
     const thisPageRoutes = featuresRoutes[0].path
-    const applicationName = ConstantsRegistry.projectApplicationName()
+    const applicationName = APPLICATION_NAME
 
     const breadCrumb = [
         { linkItem: true, title: "Features", url: thisPageRoutes },

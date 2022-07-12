@@ -3,7 +3,6 @@ import { Helmet } from "react-helmet"
 import swal from 'sweetalert';
 
 import { TICKET_TYPES_LIST_API_ROUTE, TICKET_TYPES_REINSTATE_API_ROUTE, TICKET_TYPES_SUSPEND_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import HttpServices from "../../../../services/HttpServices"
@@ -52,9 +51,7 @@ const TicketTypes = () => {
         setStatusAsPending()
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + TICKET_TYPES_LIST_API_ROUTE
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(TICKET_TYPES_LIST_API_ROUTE)
             
             let { type } = state
             let status = state.status
@@ -160,9 +157,8 @@ const TicketTypes = () => {
             const input = {
                 uuid: uuid
             }
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + TICKET_TYPES_SUSPEND_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, input)
+
+            const response: any = await HttpServices.httpPost(TICKET_TYPES_SUSPEND_API_ROUTE, input)
 
             if (response.data.success) {
                 fetchTicketTypeListApiCall()
@@ -200,9 +196,8 @@ const TicketTypes = () => {
             const input = {
                 uuid: uuid
             }
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + TICKET_TYPES_REINSTATE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, input)
+
+            const response: any = await HttpServices.httpPost(TICKET_TYPES_REINSTATE_API_ROUTE, input)
 
             if (response.data.success) {
                 fetchTicketTypeListApiCall()

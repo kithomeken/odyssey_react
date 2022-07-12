@@ -1,10 +1,10 @@
 import React, {useState} from "react"
-import { Link, useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import { Helmet } from "react-helmet"
-import ConstantsRegistry from "../../global/ConstantsRegistry"
+import { APPLICATION_NAME } from "../../global/ConstantsRegistry"
 
 const ForgotPassword = () =>  {
-    const projectApplicationName = ConstantsRegistry.projectApplicationName()
+    const projectApplicationName = APPLICATION_NAME
     const location = useLocation()
     const [fromLocation, setFromLocation] = useState({
         from: ''

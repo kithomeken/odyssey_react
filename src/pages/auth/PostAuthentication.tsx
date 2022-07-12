@@ -3,21 +3,19 @@ import {useDispatch} from "react-redux";
 import {Helmet} from "react-helmet"
 
 import postSignInWait from '../../assets/images/post_sign_in_wait.png'
-import ApiServices from '../../api/ApiServices';
 import Crypto from '../../encryption/Crypto';
 import HttpServices from '../../services/HttpServices';
 import CookieServices from '../../services/CookieServices';
-import ConstantsRegistry, { COOKIE_OPTIONS } from '../../global/ConstantsRegistry';
+import { COOKIE_OPTIONS } from '../../global/ConstantsRegistry';
 
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { usePromiseEffect } from '../../lib/hooks/usePromiseEffect';
+import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_NAME_COOKIE } from '../../global/CookieNames';
 
 const PostAuthentication = () => {
     const dispatch = useDispatch()
     const postAuthenticationProcess = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + `auth/account/agent/info`
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet('auth/account/agent/info')
 
         if (response.status !== 200) {
             throw new Error("Something went wrong while signing user in.");
@@ -29,12 +27,9 @@ const PostAuthentication = () => {
 
         const encryptedAccountName = Crypto.encryptDataUsingAES256(accountName)
         const encryptedAccountEmail = Crypto.encryptDataUsingAES256(accountEmail)
-        
-        const accountNameCookie = ConstantsRegistry.accountNameCookie()
-        const accountEmailCookie = ConstantsRegistry.accountEmailCookie()
-        
-        CookieServices.set(accountNameCookie, encryptedAccountName, COOKIE_OPTIONS)
-        CookieServices.set(accountEmailCookie, encryptedAccountEmail, COOKIE_OPTIONS)
+                
+        CookieServices.set(ACCOUNT_NAME_COOKIE, encryptedAccountName, COOKIE_OPTIONS)
+        CookieServices.set(ACCOUNT_EMAIL_COOKIE, encryptedAccountEmail, COOKIE_OPTIONS)
 
         return {response}
     }, [dispatch])

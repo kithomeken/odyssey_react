@@ -1,11 +1,10 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
-import { getCountryByNameOrShortName } from 'node-countries'
 import swal from 'sweetalert';
+import { FULLY_QUALIFIED_DOMAIN_NAME } from "../../../../api/ApiRegistry";
 
 import { COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE, COMPANY_GROUP_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
-import ApiServices from "../../../../api/ApiServices"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
@@ -48,7 +47,6 @@ const CompanyView = () => {
     })
 
     const showButton = false
-    const FQDN = ApiServices.FQDN()
     const params = useParams();
     const pageTitle = "Company Details"
 
@@ -70,9 +68,7 @@ const CompanyView = () => {
     async function fetchCompanyDetailsApiCall() {
         try {
             const companyId = params.uuid
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + COMPANY_GROUP_VIEW_API_ROUTE + '/' + companyId
-            const response: any = await HttpServices.httpGet(apiCall)
+            const response: any = await HttpServices.httpGet(COMPANY_GROUP_VIEW_API_ROUTE + '/' + companyId)
 
             let { data } = state
             let status = state.status
@@ -200,9 +196,7 @@ const CompanyView = () => {
             let formData = new FormData()
             formData.append("company_uuid", params.uuid)
 
-            const apiDomain = ApiServices.apiDomain()
-            const apiToBeConsumed = apiDomain + COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiToBeConsumed, formData)
+            const response: any = await HttpServices.httpPost(COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE, formData)
 
             if (response.data.success) {
                 updateCompanyLogoState(null)
@@ -323,7 +317,8 @@ const CompanyView = () => {
                                                             state.data.logo !== null && state.data.logo !== undefined ? (
                                                                 <div className="w-full">
                                                                     <div className="bg-gray-100 rounded mr-4 h-44 mb-3 flex flex-col justify-center">
-                                                                        <img src={`${FQDN}/uploads/company-logos/${state.data.logo}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} />
+                                                                        // TODO: Set special image api link
+                                                                        <img src={`${FULLY_QUALIFIED_DOMAIN_NAME}/uploads/company-logos/${state.data.logo}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} />
                                                                     </div>
 
                                                                     <p className="text-red-500 text-xs mb-4">

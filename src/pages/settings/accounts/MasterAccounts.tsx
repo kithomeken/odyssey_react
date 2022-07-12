@@ -2,12 +2,11 @@ import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import swal from 'sweetalert';
 
-import { COOKIE_UUID } from "../../../global/CookieNames";
+import { UUID_COOKIE_NAME } from "../../../global/CookieNames";
 import { MASTER_ACCOUNTS_LIST_API_ROUTE } from "../../../api/ApiRoutes";
 import { APPLICATION_NAME, HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
 
 import Crypto from "../../../encryption/Crypto"
-import ApiServices from "../../../api/ApiServices";
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
 import HeaderParagraph from "../../../components/settings/HeaderParagraph"
@@ -84,10 +83,7 @@ const MasterAccounts = () => {
         setStatusAsPending()
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + MASTER_ACCOUNTS_LIST_API_ROUTE
-            const response: any = await HttpServices.httpGet(apiCall)
-
+            const response: any = await HttpServices.httpGet(MASTER_ACCOUNTS_LIST_API_ROUTE)
             let { data }: any = state
             let status = state.status
 
@@ -115,7 +111,7 @@ const MasterAccounts = () => {
     }, []);
 
     const onClickRevokePriviledges = (uuid: any) => {
-        const encryptedCookieValue = CookieServices.get(COOKIE_UUID)
+        const encryptedCookieValue = CookieServices.get(UUID_COOKIE_NAME)
         const uuidCookieValue = Crypto.decryptDataUsingAES256(encryptedCookieValue)      
 
         if (encryptedCookieValue === uuid) {

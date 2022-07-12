@@ -2,10 +2,10 @@ import React, { useState } from "react"
 import { toast } from "react-toastify"
 
 import Error500 from "../../../errors/Error500";
-import ApiServices from "../../../../api/ApiServices";
 import HttpServices from "../../../../services/HttpServices";
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect";
 import swal from "sweetalert";
+import { SUPPORT_FEATURES_ESC_MATRIX_ENABLE_API_ROUTE, SUPPORT_FEATURES_ESC_MATRIX_CLIENT_API_ROUTE, SUPPORT_FEATURES_ESC_MATRIX_API_ROUTE } from "../../../../api/ApiRoutes";
 
 const EscalationMatrix = () => {
     const [state, setstate] = useState({
@@ -32,9 +32,8 @@ const EscalationMatrix = () => {
             let input = {
                 escalation_access: toggleStatus
             }
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + `portal/a/site-master/features/support/escalation-matrix/enable`
-            const response: any = await HttpServices.httpPost(apiCall, input)
+
+            const response: any = await HttpServices.httpPost(SUPPORT_FEATURES_ESC_MATRIX_ENABLE_API_ROUTE, input)
                 
             if (response.data.success) {
                 if (toggleStatus === 'Y') {
@@ -89,9 +88,8 @@ const EscalationMatrix = () => {
             let input = {
                 client_escalations: toggleStatus
             }
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + `portal/a/site-master/features/support/escalation-matrix/client`
-            const response: any = await HttpServices.httpPost(apiCall, input)
+
+            const response: any = await HttpServices.httpPost(SUPPORT_FEATURES_ESC_MATRIX_CLIENT_API_ROUTE, input)
                 
             if (response.data.success) {
                 if (toggleStatus === 'Y') {
@@ -124,9 +122,7 @@ const EscalationMatrix = () => {
     }
 
     let escalationSupportFeaturesPromise = usePromiseEffect(async () => {
-        const apiDomain = ApiServices.apiDomain()
-        const apiCall = apiDomain + `portal/a/site-master/features/support/escalation-matrix`
-        const response: any = await HttpServices.httpGet(apiCall)
+        const response: any = await HttpServices.httpGet(SUPPORT_FEATURES_ESC_MATRIX_API_ROUTE)
 
         if (response.status !== 200) {
             throw new Error("Something went wrong when fetching agent support features...");

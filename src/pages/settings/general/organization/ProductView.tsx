@@ -1,11 +1,9 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
-import { useDispatch } from "react-redux"
 import { useParams } from "react-router-dom"
 import swal from 'sweetalert';
 
 import Error500 from "../../../errors/Error500"
-import ApiServices from "../../../../api/ApiServices"
 import Header from "../../../../components/settings/Header"
 import HttpServices from "../../../../services/HttpServices"
 import DateFormating from "../../../../lib/hooks/DateFormating"
@@ -52,11 +50,8 @@ const Productview = () => {
         setStatusAsPending()
 
         try {
-            const apiDomain = ApiServices.apiDomain()
             const productId = params.uuid
-            const apiCall = apiDomain + PRODUCT_VIEW_API_ROUTE + '/' + productId
-            const response: any = await HttpServices.httpGet(apiCall)
-
+            const response: any = await HttpServices.httpGet(PRODUCT_VIEW_API_ROUTE + '/' + productId)
             let { product } = state
             let status = state.status
 
@@ -117,9 +112,7 @@ const Productview = () => {
         let { banner }: any = state
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + PRODUCT_DECOMMISSION_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiCall, params)
+            const response: any = await HttpServices.httpPost(PRODUCT_DECOMMISSION_API_ROUTE, params)
 
             if (response.data.success) {
                 fetchProductDetailsApiCall()
@@ -156,9 +149,7 @@ const Productview = () => {
         let { banner }: any = state
 
         try {
-            const apiDomain = ApiServices.apiDomain()
-            const apiCall = apiDomain + PRODUCT_REINSTATE_API_ROUTE
-            const response: any = await HttpServices.httpPost(apiCall, params)
+            const response: any = await HttpServices.httpPost(PRODUCT_REINSTATE_API_ROUTE, params)
 
             if (response.data.success) {
                 // navigate(0)

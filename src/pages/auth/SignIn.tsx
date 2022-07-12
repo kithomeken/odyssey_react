@@ -4,12 +4,11 @@ import {Helmet} from "react-helmet"
 import {Navigate, useLocation} from "react-router";
 
 import {useAppSelector} from "../../store/hooks";
-import ConstantsRegistry from "../../global/ConstantsRegistry";
+import { APPLICATION_NAME } from "../../global/ConstantsRegistry";
 import {accountAuthentication} from "../../store/auth/authenticationActions";
-import Auth from "../../lib/router/Auth";
 
 const SignIn = () => {
-    const projectApplicationName = ConstantsRegistry.projectApplicationName()
+    const projectApplicationName = APPLICATION_NAME
     const authState = useAppSelector(state => state.authentication);
     const dispatch = useDispatch();
     const location = useLocation()
