@@ -47,6 +47,14 @@ export const TICKET_FEATURES_CONFIGURE_API_ROUTE = 'portal/a/site-master/feature
 export const SUPPORT_FEATURES_CONFIGURE_API_ROUTE = 'portal/a/site-master/features/support/configure'
 export const SUPPORT_FEATURES_AGENT_API_ROUTE = 'portal/a/site-master/features/support/agents'
 export const SUPPORT_FEATURES_CLIENT_API_ROUTE = 'portal/a/site-master/features/support/clients'
+export const SUPPORT_FEATURES_CLIENT_ACCESS_API_ROUTE = 'portal/a/site-master/features/support/clients/client-access'
+export const SUPPORT_FEATURES_COMPANY_PROFILE_API_ROUTE = 'portal/a/site-master/features/support/clients/company-profile'
+export const SUPPORT_FEATURES_FIELD_AGENT_API_ROUTE = 'portal/a/site-master/features/support/agents/field-agent'
+export const SUPPORT_FEATURES_ANNOUCEMENTS_API_ROUTE = 'portal/a/site-master/features/support/announcements'
+export const SUPPORT_FEATURES_ANNOUCEMENTS_ENABLE_API_ROUTE = 'portal/a/site-master/features/support/announcements/enable'
+export const SUPPORT_FEATURES_ESC_MATRIX_API_ROUTE = 'portal/a/site-master/features/support/escalation-matrix'
+export const SUPPORT_FEATURES_ESC_MATRIX_ENABLE_API_ROUTE = 'portal/a/site-master/features/support/escalation-matrix/enable'
+export const SUPPORT_FEATURES_ESC_MATRIX_CLIENT_API_ROUTE = 'portal/a/site-master/features/support/escalation-matrix/client'
 
 // Ticket Statuses
 export const TICKET_STATUS_SCRM_CAT_API_ROUTE = 'portal/a/site-master/tickets/status/scrum-categories'
