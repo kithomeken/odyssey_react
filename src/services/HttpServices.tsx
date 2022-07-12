@@ -2,14 +2,14 @@ import axios from "axios"
 
 import Crypto from "../encryption/Crypto"
 import CookieServices from "./CookieServices"
-import ConstantsRegistry from "../global/ConstantsRegistry"
+import { API_DOMAIN_PREFIX } from "../api/ApiRegistry"
+import { SANCTUM_COOKIE_NAME } from "../global/CookieNames"
 
 const xsrfToken = CookieServices.get("XSRF-TOKEN")
 
 class HttpServices {
     protected decryptSanctumTokenCookie() {
-        const cookieNameForSanctumToken = ConstantsRegistry.sanctumCookie()
-        const cipherText = CookieServices.get(cookieNameForSanctumToken)
+        const cipherText = CookieServices.get(SANCTUM_COOKIE_NAME)
 
         return (cipherText != null) 
             ? Crypto.decryptDataUsingAES256(cipherText) 
@@ -26,7 +26,8 @@ class HttpServices {
         }
 
         try {
-            return await axios.get(url, authorizationBearer)
+            const GET_API_URL = API_DOMAIN_PREFIX + url
+            return await axios.get(GET_API_URL, authorizationBearer)
         } catch (error) {
             console.log("Could not fetch data", error)
             return error
@@ -44,7 +45,8 @@ class HttpServices {
 
         try {
             const finalOptions = Object.assign(authorizationBearer, options)
-            return await axios.post(url, data, finalOptions);
+            const POST_API_URL = API_DOMAIN_PREFIX + url
+            return await axios.post(POST_API_URL, data, finalOptions);
         } catch (error: any) {
             console.error("Could not post data", error);
             return (error.response !== undefined) ? error.response : error;
@@ -62,7 +64,8 @@ class HttpServices {
 
         try {
             const finalOptions = Object.assign(authorizationBearer, options)
-            return await axios.post(url, data, finalOptions);
+            const POST_API_URL = API_DOMAIN_PREFIX + url
+            return await axios.post(POST_API_URL, data, finalOptions);
         } catch (error: any) {
             console.error("Could not post data", error);
             return (error.response !== undefined) ? error.response : error;
