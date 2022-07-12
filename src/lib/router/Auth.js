@@ -1,24 +1,21 @@
 import CookieServices from '../../services/CookieServices'
-import ConstantsRegistry from '../../global/ConstantsRegistry'
-
-const sanctumCookie = ConstantsRegistry.sanctumCookie()
-const uuidCookie = ConstantsRegistry.uuidCookie()
+import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_NAME_COOKIE, SANCTUM_COOKIE_NAME, UUID_COOKIE_NAME } from '../../global/CookieNames'
 
 class Auth {
     constructor() {
-        const sanctumToken = CookieServices.get(sanctumCookie)
+        const sanctumToken = CookieServices.get(SANCTUM_COOKIE_NAME)
         sanctumToken ? (this.authenticated = true) : (this.authenticated = false)
     }
 
     isAuthenticated() {
-        const sanctumToken = CookieServices.get(sanctumCookie)
+        const sanctumToken = CookieServices.get(SANCTUM_COOKIE_NAME)
         sanctumToken ? (this.authenticated = true) : (this.authenticated = false)
         return this.authenticated
     }
 
     signOut(cb) {
-        CookieServices.remove(sanctumCookie)
-        CookieServices.remove(uuidCookie)
+        CookieServices.remove(SANCTUM_COOKIE_NAME)
+        CookieServices.remove(UUID_COOKIE_NAME)
 
         this.authenticated = false
         cb()
@@ -26,17 +23,10 @@ class Auth {
 
     freshStart() {
         // Removes all cookies set
-        const sanctumToken = ConstantsRegistry.sanctumCookie()
-        CookieServices.remove(sanctumToken)
-        
-        const uuidCookie = ConstantsRegistry.uuidCookie()
-        CookieServices.remove(uuidCookie)
-        
-        const acEmailCookie = ConstantsRegistry.accountEmailCookie()
-        CookieServices.remove(acEmailCookie)
-        
-        const acNameCookie = ConstantsRegistry.accountNameCookie()
-        CookieServices.remove(acNameCookie)
+        CookieServices.remove(SANCTUM_COOKIE_NAME)
+        CookieServices.remove(UUID_COOKIE_NAME)
+        CookieServices.remove(ACCOUNT_EMAIL_COOKIE)
+        CookieServices.remove(ACCOUNT_NAME_COOKIE)
     }
 }
 
