@@ -1,11 +1,10 @@
 import axios from "axios"
-import { useLocation } from "react-router";
-import ApiServices from "../../api/ApiServices";
+import { SIGN_IN_API_SUFFIX } from "../../api/ApiRegistry";
 
 export const accountAuthentication = (email: string, password: string) => {
     return (dispatch: (arg0: { type: string; response: any; }) => void) => {      
         axios
-        .post(ApiServices.signInApi(), { email, password })
+        .post(SIGN_IN_API_SUFFIX, { email, password })
         .then((apiResponse) => {
             console.log(apiResponse.data)
 

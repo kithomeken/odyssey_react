@@ -1,18 +1,15 @@
 import { Navigate } from "react-router"
-import ConstantsRegistry from "../../global/ConstantsRegistry"
+
 import CookieServices from "../../services/CookieServices"
+import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_NAME_COOKIE, SANCTUM_COOKIE_NAME } from "../../global/CookieNames"
 
 const failedAuthenticationReducer = (action: any) => {
     switch (action.type) {
         case 'REVOKE_AUTH_ACCESS_':
             // Revoke authentication access
-            const cookieNameForAccountName = ConstantsRegistry.accountNameCookie()
-            const cookieNameForAccountEmail = ConstantsRegistry.accountEmailCookie()
-            const cookieNameForSanctumToken = ConstantsRegistry.sanctumCookie()
-
-            CookieServices.remove(cookieNameForAccountName)
-            CookieServices.remove(cookieNameForAccountEmail)
-            CookieServices.remove(cookieNameForSanctumToken)
+            CookieServices.remove(ACCOUNT_NAME_COOKIE)
+            CookieServices.remove(ACCOUNT_EMAIL_COOKIE)
+            CookieServices.remove(SANCTUM_COOKIE_NAME)
 
             return <Navigate replace to="/auth/sign-in" />
     }

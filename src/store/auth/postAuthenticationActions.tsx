@@ -1,8 +1,6 @@
 import axios from "axios";
 import { Navigate } from "react-router";
 
-import ApiServices from "../../api/ApiServices";
-
 export const postAuthentication = (token: any) => {
     return async (dispatch: (argo: {type: string, response: any}) => void) => {
         dispatch({
@@ -10,9 +8,6 @@ export const postAuthentication = (token: any) => {
             response: null,
         });
         
-        let apiDomain = ApiServices.apiDomain()
-        apiDomain = apiDomain + `auth/account/agent/info`
-
         const authorizationBearer = {
             headers: {
                 Authorization: "Bearer " + token,
@@ -20,7 +15,7 @@ export const postAuthentication = (token: any) => {
         }
 
         axios
-        .get(`${apiDomain}`, authorizationBearer)
+        .get(`auth/account/agent/info`, authorizationBearer)
         .then((resp) => {
             if (resp.status === 200) {
                 dispatch({

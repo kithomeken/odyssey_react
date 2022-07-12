@@ -1,6 +1,7 @@
 import CookieServices from "../../services/CookieServices";
 import Crypto from "../../encryption/Crypto";
-import ConstantsRegistry, { COOKIE_OPTIONS } from "../../global/ConstantsRegistry";
+import { COOKIE_OPTIONS } from "../../global/ConstantsRegistry";
+import { SANCTUM_COOKIE_NAME, UUID_COOKIE_NAME } from "../../global/CookieNames";
 
 const initialState = {
     loading: false,
@@ -14,13 +15,10 @@ const authenticationReducer = (state = initialState, action: any) => {
             // Create a new session in successful sign in
             const encryptedAccessToken = Crypto.encryptDataUsingAES256(action.response.data.token)
             const encryptedUuidToken = Crypto.encryptDataUsingAES256(action.response.data.uuid)
-
-            const sanctumCookie = ConstantsRegistry.sanctumCookie()
-            CookieServices.set(sanctumCookie, encryptedAccessToken, COOKIE_OPTIONS)
-
-            const uuidCookie = ConstantsRegistry.uuidCookie()
-            CookieServices.set(uuidCookie, encryptedUuidToken, COOKIE_OPTIONS)
             
+            CookieServices.set(SANCTUM_COOKIE_NAME, encryptedAccessToken, COOKIE_OPTIONS)
+            CookieServices.set(UUID_COOKIE_NAME, encryptedUuidToken, COOKIE_OPTIONS)
+
             return {
                 ...initialState,
                 error: '',

@@ -1,6 +1,7 @@
-import CookieServices from "../../services/CookieServices"
 import Crypto from "../../encryption/Crypto"
-import ConstantsRegistry, { COOKIE_OPTIONS } from "../../global/ConstantsRegistry"
+import CookieServices from "../../services/CookieServices"
+import { COOKIE_OPTIONS } from "../../global/ConstantsRegistry"
+import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_NAME_COOKIE } from "../../global/CookieNames"
 
 const initialState = {
     isLoading: true,
@@ -30,12 +31,9 @@ const postAuthenticationReducer = (state = initialState, action: any) => {
 
             const encryptedAgentCarter = Crypto.encryptDataUsingAES256(agentCarter)
             const encryptedAgentCarterEmail = Crypto.encryptDataUsingAES256(agentCarterEmail)
-            
-            const accountNameCookie = ConstantsRegistry.accountNameCookie()
-            const accountEmailCookie = ConstantsRegistry.accountEmailCookie()
-            
-            CookieServices.set(accountNameCookie, encryptedAgentCarter, COOKIE_OPTIONS)
-            CookieServices.set(accountEmailCookie, encryptedAgentCarterEmail, COOKIE_OPTIONS)
+
+            CookieServices.set(ACCOUNT_NAME_COOKIE, encryptedAgentCarter, COOKIE_OPTIONS)
+            CookieServices.set(ACCOUNT_EMAIL_COOKIE, encryptedAgentCarterEmail, COOKIE_OPTIONS)
 
             return {
                 ...initialState,
