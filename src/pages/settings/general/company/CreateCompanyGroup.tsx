@@ -1,11 +1,12 @@
-import React, { useState } from "react"
 import { Helmet } from "react-helmet"
+import React, { useState } from "react"
+import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import PhoneInput, { isValidPhoneNumber, parsePhoneNumber } from 'react-phone-number-input'
 import { useCountries } from 'use-react-countries'
+import PhoneInput, { isValidPhoneNumber, parsePhoneNumber } from 'react-phone-number-input'
 
 import '../../../../assets/css/react_phone_number_input.css'
-import { COMPANY_GROUP_CHECK_API_ROUTE, COMPANY_GROUP_CREATE_API_ROUTE } from "../../../../api/ApiRoutes"
+import { COMPANY_GROUP_CHECK_API_ROUTE, COMPANY_GROUP_CREATE_API_ROUTE, ORGANIZATION_FETCH_DETAILS_API_ROUTE } from "../../../../api/ApiRoutes"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import { generalRoutes } from "../../../../routes/settings/generalRoutes"
@@ -15,6 +16,10 @@ import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
 import ErrorBanner from "../../../../components/layouts/ErrorBanner"
 import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
 import { Listbox } from "@headlessui/react"
+import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
+import { getCountryByName } from "node-countries"
+import Loading from "../../../../components/layouts/Loading"
+import Error500 from "../../../errors/Error500"
 
 const CreateCompanyGroup = () => {
     const [state, setstate] = useState({
@@ -24,12 +29,17 @@ const CreateCompanyGroup = () => {
             checkCompany: false,
             companyExists: true,
         },
+        data: {
+            country: '',
+            country_code: 'TH',
+        },
         input: {
             name: '',
             description: '',
             domain: '',
             logo: null,
-            country: '',
+            file_name: null,
+            country: 'Kenya',
         },
         errors: {
             name: '',
@@ -63,11 +73,24 @@ const CreateCompanyGroup = () => {
         { linkItem: false, title: pageTitle },
     ]
 
-    /* 
-        TODO: Add useEffect to fetch the base organization's 
-            : country from organizational settings
-            : To be used as default in phone number input
-    */
+    const dispatch = useDispatch()
+    const fetchOrganizationDetailsApiCall = usePromiseEffect(async () => {
+        const response: any = await HttpServices.httpGet(ORGANIZATION_FETCH_DETAILS_API_ROUTE)
+
+        if (response.status !== 200) {
+            throw new Error("Something went wrong while fecthing data.");
+        }
+
+        let { data } = state
+        data.country = response.data.data.country
+        data.country_code = getCountryByName(data.country).alpha2
+
+        /* setstate({
+            ...state, data
+        })
+ */
+        return response.data.data
+    }, [dispatch,])
 
     const onChangeHandler = (e: any) => {
         const isPostingForm = state.isPostingForm
@@ -192,12 +215,18 @@ const CreateCompanyGroup = () => {
 
         if (fileType !== 'image/png' && fileType !== 'image/jpg' && fileType !== 'image/jpeg' && fileType !== 'image/svg+xml') {
             errors[e.target.name] = 'Allowed file types are png, jpg, jpeg and svg files'
+            input.logo = null
+            input.file_name = null
+
             setstate({
                 ...state
             })
             return
         } else if (fileSize > 1) {
             errors[e.target.name] = 'Maximum file upload size is 1MB'
+            input.logo = null
+            input.file_name = null
+
             setstate({
                 ...state
             })
@@ -205,6 +234,7 @@ const CreateCompanyGroup = () => {
         }
 
         input[e.target.name] = e.target.files[0]
+        input.file_name = e.target.files[0].name
         errors[e.target.name] = ''
 
         setstate({
@@ -496,335 +526,345 @@ const CreateCompanyGroup = () => {
             </div>
 
             <div className="w-full px-12 form-group">
-                <div className="w-8/12">
-                    {
-                        state.requestFailed ? (
-                            <div className="mb-3">
-                                <ErrorBanner message="Failed to add company group, please try again later..." />
-                            </div>
-                        ) : null
-                    }
-
-                    <form className="w-full form-group" onSubmit={onFormSubmitHandler}>
-                        <div className="w-full mb-2">
-                            <p className="text-sm text-emerald-500">
-                                Company Details
-                            </p>
-                        </div>
-
-                        <div className="w-full flex mb-3">
-                            {/* Left Half */}
-                            <div className="w-6/12 px-4 border-r">
-                                <div className="w-10/12 rounded-md shadow-none space-y-px mb-5">
-                                    <label htmlFor="name" className="block mb-1 text-sm text-gray-500">Name:</label>
-
-                                    <div className="w-full flex items-center align-middle">
-                                        <div className="w-full">
-                                            <input type="text" name="name" id="name" autoComplete="off" className="focus:ring-1 w-full focus:ring-green-500 text-gray-500 p-2 capitalize flex-1 block text-sm rounded-md sm:text-sm border border-gray-400" placeholder="Company Name" onChange={onChangeHandler} value={state.input.name} onBlur={onInputBlur} required />
-
-                                            {
-                                                state.errors.name.length > 0 &&
-                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
-                                                    {state.errors.name}
-                                                </span>
-                                            }
-                                        </div>
-
-                                        <div className="w-12 pl-2">
-                                            {
-                                                state.company.checkCompany ? (
-                                                    <span className="fad text-green-500 fa-spinner-third fa-lg block fa-spin"></span>
-                                                ) : (
-                                                    null
-                                                )
-                                            }
-                                        </div>
+                {
+                    fetchOrganizationDetailsApiCall.status === 'rejected' ? (
+                        <Error500 />
+                    ) : fetchOrganizationDetailsApiCall.status === 'fulfilled' ? (
+                        <div className="w-8/12">
+                            {
+                                state.requestFailed ? (
+                                    <div className="mb-3">
+                                        <ErrorBanner message="Failed to add company group, please try again later..." />
                                     </div>
+                                ) : null
+                            }
+
+                            <form className="w-full form-group" onSubmit={onFormSubmitHandler}>
+                                <div className="w-full mb-2">
+                                    <p className="text-sm text-emerald-500">
+                                        Company Details
+                                    </p>
                                 </div>
 
-                                <div className="w-12/12 rounded-md shadow-none space-y-px form-group flex items-center">
-                                    <div className="w-full">
-                                        <label htmlFor="description" className="block mb-1 text-sm text-gray-500">Description:</label>
+                                <div className="w-full flex mb-3">
+                                    {/* Left Half */}
+                                    <div className="w-6/12 px-4 border-r">
+                                        <div className="w-10/12 rounded-md shadow-none space-y-px mb-5">
+                                            <label htmlFor="name" className="block mb-1 text-sm text-gray-500">Name:</label>
 
-                                        <div className="w-full">
-                                            <textarea id="description" name="description" rows={3} className="shadow-sm focus:ring-1 focus:ring-green-500 focus:border-green-500 text-gray-500 mt-1 block w-full sm:text-sm border border-gray-400 rounded-md resize-none p-2" placeholder="Company Description" required onChange={onChangeHandler} onBlur={onInputBlur} value={state.input.description}></textarea>
+                                            <div className="w-full flex items-center align-middle">
+                                                <div className="w-full">
+                                                    <input type="text" name="name" id="name" autoComplete="off" className="focus:ring-1 w-full focus:ring-green-500 text-gray-500 p-2 capitalize flex-1 block text-sm rounded-md sm:text-sm border border-gray-300" placeholder="Company Name" onChange={onChangeHandler} value={state.input.name} onBlur={onInputBlur} required />
 
-                                            {
-                                                state.errors.description.length > 0 &&
-                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
-                                                    {state.errors.description}
-                                                </span>
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="w-12/12 rounded-md shadow-none space-y-px form-group flex items-center">
-                                    <div className="w-full">
-                                        <ListBoxZero
-                                            onChangeListBoxHandler={onChangeListBoxHandler}
-                                            state={state.input.country}
-                                            label="Country:"
-                                            listButton={
-                                                <>
-                                                    {countries.map((selectedItem: any, index: any) => (
-                                                        <span key={index}>
-                                                            {
-                                                                state.input.country === selectedItem.country ? (
-                                                                    <span className="flex items-center">
-                                                                        <span className={`flex-shrink-0 h-5 w-4 rounded ${selectedItem.color_code}`}></span>
-                                                                        <span className="ml-2 text-sm text-gray-700 truncate">{selectedItem.name}</span>
-                                                                    </span>
-                                                                ) : null
-                                                            }
+                                                    {
+                                                        state.errors.name.length > 0 &&
+                                                        <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                            {state.errors.name}
                                                         </span>
-                                                    ))}
+                                                    }
+                                                </div>
 
-                                                    <span className="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                                        <i className="far fa-chevron-down text-emerald-500"></i>
-                                                    </span>
-                                                </>
-                                            }
-                                            listOptions={
-                                                <>
-                                                    {countries.map((listItem: any, index: any) => (
-                                                        <Listbox.Option
-                                                            key={index}
-                                                            className={({ active }) =>
-                                                                classNames(
-                                                                    active ? 'text-white bg-gray-100' : 'text-gray-900',
-                                                                    'cursor-default select-none relative py-2 pl-3 pr-9'
-                                                                )
-                                                            }
-                                                            value={listItem.country}
-                                                        >
-                                                            {({ selected }) => (
-                                                                <>
-                                                                    <span className="flex items-center">
-                                                                        <span className={`flex-shrink-0 h-5 w-4 rounded`}>{listItem.emoji}</span>
-                                                                        <span className="ml-2 text-sm text-gray-700 truncate">{listItem.name}</span>
-                                                                    </span>
-
-                                                                    {selected ? (
-                                                                        <span className="text-green-600 absolute inset-y-0 right-0 flex items-center pr-4">
-                                                                            <i className="fad fa-check h-5 w-5"></i>
-                                                                        </span>
-                                                                    ) : null}
-                                                                </>
-                                                            )}
-                                                        </Listbox.Option>
-                                                    ))}
-                                                </>
-                                            }
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Right Half */}
-                            <div className="w-6/12 px-4">
-                                <div className="w-11/12 rounded-md shadow-none space-y-px form-group text-gray-600">
-                                    <label htmlFor="company-name" className="block mb-1 text-sm">
-                                        Company Domain
-                                        <sup className="text-gray-500 ml-2">(Optional)</sup>
-                                    </label>
-
-                                    <div className="w-full form-group">
-                                        <div className="w-12/12">
-                                            <input type="url" name="domain" id="company-domain" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50" placeholder="https://company-domain.com" value={state.input.domain} />
-
-                                            {state.errors.domain.length > 0 &&
-                                                <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                                    {state.errors.domain}
-                                                </span>
-                                            }
+                                                <div className="w-12 pl-2">
+                                                    {
+                                                        state.company.checkCompany ? (
+                                                            <span className="fad text-green-500 fa-spinner-third fa-lg block fa-spin"></span>
+                                                        ) : (
+                                                            null
+                                                        )
+                                                    }
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
 
-                                <div className="w-11/12 form-group">
-                                    <label className="block text-sm text-gray-600">
-                                        Company Logo
-                                        <sup className="text-gray-500 ml-2">(Optional)</sup>
-                                    </label>
-                                    <div className="mt-1 flex justify-center px-6 pt-4 pb-4 border-2 border-gray-400 border-dashed rounded-md">
-                                        <div className="space-y-1 text-center flex align-middle">
-                                            <svg
-                                                className="mx-auto h-12 w-12 text-gray-400"
-                                                stroke="currentColor"
-                                                fill="none"
-                                                viewBox="0 0 48 48"
-                                                aria-hidden="true"
-                                            >
-                                                <path
-                                                    d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                                                    strokeWidth={2}
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
+                                        <div className="w-12/12 rounded-md shadow-none space-y-px form-group flex items-center">
+                                            <div className="w-full">
+                                                <label htmlFor="description" className="block mb-1 text-sm text-gray-500">Description:</label>
+
+                                                <div className="w-full">
+                                                    <textarea id="description" name="description" rows={3} className="shadow-sm focus:ring-1 focus:ring-green-500 focus:border-green-500 text-gray-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md resize-none p-2" placeholder="Company Description" required onChange={onChangeHandler} onBlur={onInputBlur} value={state.input.description}></textarea>
+
+                                                    {
+                                                        state.errors.description.length > 0 &&
+                                                        <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                            {state.errors.description}
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="w-12/12 rounded-md shadow-none space-y-px form-group flex items-center">
+                                            <div className="w-full">
+                                                <ListBoxZero
+                                                    onChangeListBoxHandler={onChangeListBoxHandler}
+                                                    state={state}
+                                                    label="Country:"
+                                                    listButton={
+                                                        <>
+                                                            {countries.map((country, index) => (
+                                                                <span key={index}>
+                                                                    {
+                                                                        state.input.country === country.name ? (
+                                                                            <span className="flex items-center">
+                                                                                <span className="flex-shrink-0 h-5 w-4 rounded">{country.emoji}</span>
+                                                                                <span className="ml-2 text-sm text-gray-700 truncate">{country.name}</span>
+                                                                            </span>
+                                                                        ) : null
+                                                                    }
+                                                                </span>
+                                                            ))}
+
+                                                            <span className="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                                                <i className="far fa-chevron-down text-emerald-500"></i>
+                                                            </span>
+                                                        </>
+                                                    }
+                                                    listOptions={
+                                                        <>
+                                                            {countries.map((country, index) => (
+                                                                <Listbox.Option
+                                                                    key={index}
+                                                                    className={({ active }) =>
+                                                                        classNames(
+                                                                            active ? 'text-white bg-gray-100' : 'text-gray-900',
+                                                                            'cursor-default select-none relative py-2 pl-3 pr-9'
+                                                                        )
+                                                                    }
+                                                                    value={country.name}
+                                                                >
+                                                                    {({ selected }) => (
+                                                                        <>
+                                                                            <span className="flex items-center">
+                                                                                <span className="flex-shrink-0 h-5 w-4 rounded">{country.emoji}</span>
+                                                                                <span className="ml-2 text-sm text-gray-700 truncate">{country.name}</span>
+                                                                            </span>
+
+                                                                            {selected ? (
+                                                                                <span className="text-green-600 absolute inset-y-0 right-0 flex items-center pr-4">
+                                                                                    <i className="fad fa-check h-5 w-5"></i>
+                                                                                </span>
+                                                                            ) : null}
+                                                                        </>
+                                                                    )}
+                                                                </Listbox.Option>
+                                                            ))}
+                                                        </>
+                                                    }
                                                 />
-                                            </svg>
-                                            <div className="text-sm w-full ml-3 text-gray-600">
-                                                <label
-                                                    htmlFor="file-upload"
-                                                    className="relative cursor-pointer bg-white rounded-md text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
-                                                >
-                                                    <span>Upload a file</span>
-                                                    <input id="file-upload" name="logo" type="file" onChange={onFileChangeHandler} className="sr-only" />
-                                                </label>
-                                                <p className="pl-1"></p>
-                                                <p className="text-xs text-gray-500">png, jpg, jpeg, gif up to 1MB</p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {state.errors.logo.length > 0 &&
-                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
-                                            {state.errors.logo}
-                                        </span>
-                                    }
-                                </div>
-                            </div>
-                        </div>
+                                    {/* Right Half */}
+                                    <div className="w-6/12 px-4">
+                                        <div className="w-11/12 rounded-md shadow-none space-y-px form-group text-gray-600">
+                                            <label htmlFor="company-name" className="block mb-1 text-sm">
+                                                Company Domain
+                                                <sup className="text-gray-500 ml-2">(Optional)</sup>
+                                            </label>
 
-                        <div className="w-full mb-4">
-                            <p className="text-sm text-emerald-500">
-                                Piont Of Contact
-                            </p>
+                                            <div className="w-full form-group">
+                                                <div className="w-12/12">
+                                                    <input type="url" name="domain" id="company-domain" autoComplete="off" onChange={onChangeHandler} className="focus:ring-1 w-full focus:ring-green-500 p-2 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50" placeholder="https://company-domain.com" value={state.input.domain} />
 
-                            <span className="text-slate-500 text-xs">
-                                Add a focal point of information to be contacted when there's a need be.
-                            </span>
-                        </div>
+                                                    {state.errors.domain.length > 0 &&
+                                                        <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                                            {state.errors.domain}
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
 
-                        <div className="w-full mb-3 pl-5">
-                            <div className="">
-                                <div className="w-full mb-4 text-sm text-slate-500 flex align-middle">
-                                    <div className="w-48 border-b pb-2 mr-3 pl-5 border-gray-200">
-                                        Name
-                                    </div>
-
-                                    <div className="w-48 border-b pb-2 mr-3 pl-5 border-gray-200">
-                                        Email
-                                    </div>
-
-                                    <div className="w-56 border-b pb-2 pl-5 border-gray-200">
-                                        Phone
-                                    </div>
-                                </div>
-
-                                <div className="w-full mb-3">
-                                    {
-                                        state.poc.map((contact: any, index: any) => {
-                                            return (
-                                                <div key={index}>
-                                                    <div className="w-full mb-3 flex align-middle">
-                                                        <div className="mr-3 w-48 mb-3">
-                                                            <input type="text" name="name" id="poc-1-name" autoComplete="off" className="focus:ring-1 capitalize w-full focus:ring-green-500 p-1-5 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50"
-                                                                onChange={(e) => onPointOfContactChangeHandler(e, index)}
-                                                                onBlur={(e) => onPointOfContactBlur(e, index)}
-                                                                placeholder="Contact Person"
-                                                                required={index === 0 ? true : false}
-                                                                value={contact.name}
-                                                            />
-
-                                                            {
-                                                                state.pocErrors[index].name.length > 0 &&
-                                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
-                                                                    {state.pocErrors[index].name}
-                                                                </span>
-                                                            }
-                                                        </div>
-
-                                                        <div className="mr-5 w-48 mb-3">
-                                                            <input type="text" name="email" id="poc-1-email" autoComplete="off" onChange={(e) => onPointOfContactChangeHandler(e, index)} className="focus:ring-1 w-full focus:ring-green-500 p-1-5 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-400 disabled:opacity-50" onBlur={(e) => onPointOfContactBlur(e, index)} placeholder="contact@email.com" value={contact.email} />
-
-                                                            {
-                                                                state.pocErrors[index].email.length > 0 &&
-                                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
-                                                                    {state.pocErrors[index].email}
-                                                                </span>
-                                                            }
-                                                        </div>
-
-                                                        <div className="mr-3 w-56 mb-3">
-                                                            <PhoneInput
-                                                                international
-                                                                defaultCountry="KE"
-                                                                placeholder="Enter phone number"
-                                                                value={state.poc[index].phone}
-                                                                onChange={(e) => onPhoneInputChange(e, index)}
-                                                                error={state.poc[index].phone ? (isValidPhoneNumber(state.poc[index].phone) ? undefined : 'Invalid phone number') : 'Phone number required'}
-                                                            />
-
-                                                            {
-                                                                state.pocErrors[index].phone.length > 0 &&
-                                                                <span className='invalid-feedback text-xs text-red-600 pl-0'>
-                                                                    {state.pocErrors[index].phone}
-                                                                </span>
-                                                            }
-                                                        </div>
-
-                                                        <div className="mb-3">
-                                                            {
-                                                                index !== 0 ? (
-                                                                    <p className="text-red-500 p-1-5 flex-1 text-sm cursor-pointer mb-0" onClick={() => removePointOfContactHandler(index)}>
-                                                                        Remove
-                                                                    </p>
-                                                                ) : (
-                                                                    null
-                                                                )
-                                                            }
-                                                        </div>
+                                        <div className="w-11/12 form-group">
+                                            <label className="block text-sm text-gray-600">
+                                                Company Logo
+                                                <sup className="text-gray-500 ml-2">(Optional)</sup>
+                                            </label>
+                                            <div className="mt-1 flex justify-center px-6 pt-4 pb-4 mb-3 border-2 border-gray-300 border-dashed rounded-md">
+                                                <div className="space-y-1 text-center flex align-middle">
+                                                    <svg
+                                                        className="mx-auto h-12 w-12 text-gray-400"
+                                                        stroke="currentColor"
+                                                        fill="none"
+                                                        viewBox="0 0 48 48"
+                                                        aria-hidden="true"
+                                                    >
+                                                        <path
+                                                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                                            strokeWidth={2}
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                        />
+                                                    </svg>
+                                                    <div className="text-sm w-full ml-3 text-gray-600">
+                                                        <label
+                                                            htmlFor="file-upload"
+                                                            className="relative cursor-pointer bg-white rounded-md text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500"
+                                                        >
+                                                            <span>Upload company logo</span>
+                                                            <input id="file-upload" name="logo" type="file" onChange={onFileChangeHandler} className="sr-only" />
+                                                        </label>
+                                                        <p className="pl-1"></p>
+                                                        <p className="text-xs text-gray-500">png, jpg, jpeg, gif up to 1MB</p>
                                                     </div>
                                                 </div>
+                                            </div>
+
+                                            {
+                                                state.input.logo !== null && state.input.logo !== undefined ? (
+                                                    <div className="w-full">
+                                                        <span className="text-gray-500 block mb-1 text-xs w-full">
+                                                            File Name:
+                                                        </span>
+
+                                                        <span className="text-slate-600 block text-xs w-full">
+                                                            <span className="fad fa-file mr-2"></span>
+                                                            {state.input.file_name}
+                                                        </span>
+                                                    </div>
+                                                ) : null
+                                            }
+
+                                            {state.errors.logo.length > 0 &&
+                                                <span className='invalid-feedback font-small text-red-600 pl-0'>
+                                                    {state.errors.logo}
+                                                </span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="w-full mb-4">
+                                    <p className="text-emerald-500">
+                                        Piont Of Contact
+                                    </p>
+
+                                    <span className="text-slate-500 text-sm">
+                                        Add a focal point of information to be contacted when there's a need be.
+                                    </span>
+                                </div>
+
+                                <div className="w-full mb-3 pl-5">
+                                    <div className="">
+                                        <div className="w-full mb-3">
+                                            {
+                                                state.poc.map((contact: any, index: any) => {
+                                                    return (
+                                                        <div key={index}>
+                                                            <div className="w-full mb-3 flex align-middle">
+                                                                <div className="mr-4 w-52 mb-3">
+                                                                    <input type="text" name="name" id="poc-1-name" autoComplete="off" className="focus:ring-1 capitalize w-full focus:ring-green-500 p-1-5 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50"
+                                                                        onChange={(e) => onPointOfContactChangeHandler(e, index)}
+                                                                        onBlur={(e) => onPointOfContactBlur(e, index)}
+                                                                        placeholder="Jane Doe"
+                                                                        required={index === 0 ? true : false}
+                                                                        value={contact.name}
+                                                                    />
+
+                                                                    {
+                                                                        state.pocErrors[index].name.length > 0 &&
+                                                                        <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                                            {state.pocErrors[index].name}
+                                                                        </span>
+                                                                    }
+                                                                </div>
+
+                                                                <div className="mr-5 w-52 mb-3">
+                                                                    <input type="text" name="email" id="poc-1-email" autoComplete="off" onChange={(e) => onPointOfContactChangeHandler(e, index)} className="focus:ring-1 w-full focus:ring-green-500 p-1-5 lowercase flex-1 block text-sm rounded-md sm:text-sm border border-gray-300 disabled:opacity-50" onBlur={(e) => onPointOfContactBlur(e, index)} placeholder="jane.doe@email.com" value={contact.email} />
+
+                                                                    {
+                                                                        state.pocErrors[index].email.length > 0 &&
+                                                                        <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                                            {state.pocErrors[index].email}
+                                                                        </span>
+                                                                    }
+                                                                </div>
+
+                                                                <div className="mr-3 w-56 mb-3">
+                                                                    <PhoneInput
+                                                                        international
+                                                                        defaultCountry='TH'
+                                                                        className="border border-gray-300 px-3 rounded"
+                                                                        placeholder="Enter phone number"
+                                                                        value={state.poc[index].phone}
+                                                                        onChange={(e) => onPhoneInputChange(e, index)}
+                                                                        error={state.poc[index].phone ? (isValidPhoneNumber(state.poc[index].phone) ? undefined : 'Invalid phone number') : 'Phone number required'}
+                                                                    />
+
+                                                                    {
+                                                                        state.pocErrors[index].phone.length > 0 &&
+                                                                        <span className='invalid-feedback text-xs text-red-600 pl-0'>
+                                                                            {state.pocErrors[index].phone}
+                                                                        </span>
+                                                                    }
+                                                                </div>
+
+                                                                <div className="mb-3">
+                                                                    {
+                                                                        index !== 0 ? (
+                                                                            <p className="text-red-500 p-1-5 flex-1 text-sm cursor-pointer mb-0" onClick={() => removePointOfContactHandler(index)}>
+                                                                                Remove
+                                                                            </p>
+                                                                        ) : (
+                                                                            null
+                                                                        )
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div className="w-6/12">
+                                        <div className="mb-3" id="poc_extra"></div>
+
+                                        {
+                                            state.poc.length < 3 ? (
+                                                <span className="text-blue-500 text-sm cursor-pointer" onClick={addPointOfContactHandler}>
+                                                    Add another point of contact
+                                                </span>
+                                            ) : (
+                                                null
                                             )
-                                        })
+                                        }
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-row pt-3 px-4">
+                                    {
+                                        state.isPostingForm ? (
+                                            <button type="button" className={`inline-flex items-center px-4 py-1 border border-green-300 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300`} disabled={true}>
+                                                <span>
+                                                    <span className="left-0 inset-y-0 flex items-center pl-3">
+                                                        <span className="pr-2">
+                                                            Creating Company
+                                                        </span>
+
+                                                        <span className="w-5 h-5">
+                                                            <i className="fad fa-spinner-third fa-lg fa-spin"></i>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </button>
+                                        ) : (
+                                            <button type="submit" disabled={state.company.companyExists} className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50`}>
+                                                <span className="text-sm">
+                                                    Create Company
+                                                </span>
+                                            </button>
+                                        )
                                     }
                                 </div>
-                            </div>
-
-                            <div className="w-6/12">
-                                <div className="mb-3" id="poc_extra"></div>
-
-                                {
-                                    state.poc.length < 3 ? (
-                                        <span className="text-blue-500 text-sm cursor-pointer" onClick={addPointOfContactHandler}>
-                                            Add another point of contact
-                                        </span>
-                                    ) : (
-                                        null
-                                    )
-                                }
-                            </div>
+                            </form>
                         </div>
-
-                        <div className="flex flex-row pt-3 px-4">
-                            {
-                                state.isPostingForm ? (
-                                    <button type="button" className={`inline-flex items-center px-4 py-1 border border-green-300 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300`} disabled={true}>
-                                        <span>
-                                            <span className="left-0 inset-y-0 flex items-center pl-3">
-                                                <span className="pr-2">
-                                                    Creating Company
-                                                </span>
-
-                                                <span className="w-5 h-5">
-                                                    <i className="fad fa-spinner-third fa-lg fa-spin"></i>
-                                                </span>
-                                            </span>
-                                        </span>
-                                    </button>
-                                ) : (
-                                    <button type="submit" disabled={state.company.companyExists} className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50`}>
-                                        <span className="text-sm">
-                                            Create Company
-                                        </span>
-                                    </button>
-                                )
-                            }
-                        </div>
-                    </form>
-                </div>
+                    ) : (
+                        <Loading />
+                    )
+                }
             </div>
         </React.Fragment>
     )
