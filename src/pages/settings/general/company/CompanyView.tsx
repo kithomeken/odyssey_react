@@ -2,8 +2,9 @@ import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
 import swal from 'sweetalert';
-import { FULLY_QUALIFIED_DOMAIN_NAME } from "../../../../api/ApiRegistry";
+import { useCountries } from 'use-react-countries'
 
+import { FULLY_QUALIFIED_DOMAIN_NAME } from "../../../../api/ApiRegistry";
 import { COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE, COMPANY_GROUP_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
@@ -49,6 +50,7 @@ const CompanyView = () => {
     const showButton = false
     const params = useParams();
     const pageTitle = "Company Details"
+    const { countries } = useCountries()
 
     const breadCrumb = [
         { linkItem: true, title: "General Settings", url: "" },
@@ -247,9 +249,22 @@ const CompanyView = () => {
                                                         {state.data.name}
                                                     </p>
 
-                                                    <p className="text-sm mb-5 text-gray-500">
+                                                    <p className="text-sm mb-3 text-gray-500">
                                                         {state.data.description}
                                                     </p>
+
+                                                    {countries.map((country: any, index: any) => (
+                                                        <span key={index}>
+                                                            {
+                                                                (state.data.country) === country.name ? (
+                                                                    <span className="flex items-center align-middle mb-3" key={index}>
+                                                                        <span className="flex-shrink-0 h-5 w-4 rounded">{country.emoji}</span>
+                                                                        <span className="ml-3 h-5 text-sm text-gray-700 truncate">{country.name}</span>
+                                                                    </span>
+                                                                ) : null
+                                                            }
+                                                        </span>
+                                                    ))}
 
                                                     {
                                                         state.data.domain === null ? (
@@ -267,17 +282,6 @@ const CompanyView = () => {
                                                             </div>
                                                         )
                                                     }
-
-                                                    <h2 className="flex items-center mb-3">
-                                                        <div className="w-10">
-                                                            {/* <Flag code={state.data.country}  size="L" hasDropShadow hasBorderRadius  gradient="real-linear"/> */}
-                                                        </div>
-
-                                                        <span className="ml-3">
-                                                            {state.data.country_name}
-                                                        </span>
-                                                    </h2>
-
 
                                                     {/* <div className="w-full form-group">
                                                         <p className="text-sm mb-1">
@@ -317,7 +321,9 @@ const CompanyView = () => {
                                                             state.data.logo !== null && state.data.logo !== undefined ? (
                                                                 <div className="w-full">
                                                                     <div className="bg-gray-100 rounded mr-4 h-44 mb-3 flex flex-col justify-center">
-                                                                        // TODO: Set special image api link
+                                                                        {
+                                                                            // TODO: Set special image api link
+                                                                        }
                                                                         <img src={`${FULLY_QUALIFIED_DOMAIN_NAME}/uploads/company-logos/${state.data.logo}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} />
                                                                     </div>
 
