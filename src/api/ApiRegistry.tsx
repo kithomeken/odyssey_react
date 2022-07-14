@@ -5,8 +5,8 @@ function ApiRegistry () {
 
     if (process.env.NODE_ENV === 'production') {
         FQDNdomain = "https://project-0.kennedykitho.me"
-        apiDomain = 'https://project-0.kennedykitho.me/api/'
-        imagesDomain = 'https://images.kennedykitho.me/'
+        apiDomain = 'https://api.odyssey.kennedykitho.me/api/'
+        imagesDomain = 'https://api.media.kennedykitho.me/'
     } else {
         FQDNdomain = 'http://localhost/project-0/public'
         apiDomain = 'http://localhost/project-0/public/api/'

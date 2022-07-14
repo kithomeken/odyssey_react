@@ -11,6 +11,7 @@ import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import DateFormating from "../../../../lib/hooks/DateFormating"
 import NoDataReactTable from "../../../../lib/hooks/NoDataReactTable"
 import ReactTable from "../../../../lib/hooks/ReactTable"
+import TableContentFormatting from "../../../../lib/hooks/TableContentFormating"
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
 import { generalRoutes } from "../../../../routes/settings/generalRoutes"
 import HttpServices from "../../../../services/HttpServices"
@@ -46,14 +47,26 @@ const CompanyGroups = () => {
     const columns = [
         {
             Header: 'Company Name',
-            accessor: (data: { name: any, description: any }) => (
+            accessor: (data: { name: any, description: any, uuid: any }) => (
+                <span>
+                    <Link to={`${data.uuid}`} className="m-auto block cursor-pointer text-emerald-600 hover:text-blue-900 text-sm">
+                        {data.name}
+                    </Link>
+
+                    <span className="block text-gray-500 mb-0 text-sm truncate">
+                        <TableContentFormatting
+                            content={data.description}
+                        />
+                    </span>
+                </span>
+            ),
+        },
+        {
+            Header: 'Country',
+            accessor: (data: { country: any }) => (
                 <span>
                     <span className="block text-black text-sm">
-                        {data.name}
-                    </span>
-
-                    <span className="block text-gray-500 mb-0 text-sm">
-                        {data.description}
+                        {data.country}
                     </span>
                 </span>
             ),
