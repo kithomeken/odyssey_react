@@ -154,41 +154,44 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
 
     const onFormSubmitHandler = (e: any) => {
         e.preventDefault()
-        let { product }: any = state
-        let { errors }: any = state
-        let { input }: any = state
+        let isPostingForm = state.isPostingForm
 
-        if (errors.name.length > 0 || errors.description.length > 0) {
-            // Do nothing
-        } else {
-            if (input.name !== productProps.name) {
-                // Post form data
-                let { isPostingForm } = state
-                let requestFailed = state.requestFailed
-                isPostingForm = true
-                requestFailed = false
+        if (!isPostingForm) {
+            let { errors }: any = state
+            let { input }: any = state
 
-                setstate({
-                    ...state, isPostingForm, requestFailed
-                })
+            if (errors.name.length > 0 || errors.description.length > 0) {
+                // Do nothing
+            } else {
+                if (input.name !== productProps.name) {
+                    // Post form data
+                    let { isPostingForm } = state
+                    let requestFailed = state.requestFailed
+                    isPostingForm = true
+                    requestFailed = false
 
-                // Since product name as been updated
-                // Check if it exists in database
-                // If does not exist proceed and update 
-                // the product details from checkProductNameBeforeUpdate
-                checkProductNameBeforeUpdate()
-            } else if (input.description !== productProps.description) {
-                // Post form data
-                let { isPostingForm } = state
-                let requestFailed = state.requestFailed
-                isPostingForm = true
-                requestFailed = false
+                    setstate({
+                        ...state, isPostingForm, requestFailed
+                    })
 
-                setstate({
-                    ...state, isPostingForm, requestFailed
-                })
+                    // Since product name as been updated
+                    // Check if it exists in database
+                    // If does not exist proceed and update 
+                    checkProductNameBeforeUpdate()
+                } else if (input.description !== productProps.description) {
+                    // Post form data
+                    let { isPostingForm } = state
+                    let requestFailed = state.requestFailed
+                    
+                    isPostingForm = true
+                    requestFailed = false
 
-                return postFormData()
+                    setstate({
+                        ...state, isPostingForm, requestFailed
+                    })
+
+                    return postFormData()
+                }
             }
         }
     }
@@ -335,12 +338,12 @@ function ProductEdit({ uuid, show, productProps, hidePanel, fetchFunc }: { uuid:
                                                                     </span>
                                                                 </button>
                                                             ) : (
-                                                                <button 
-                                                                type="submit"
-                                                                disabled={
-                                                                    (state.input.name !== productProps.name || state.input.description !== productProps.description) ? false : true
-                                                                }
-                                                                className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white mb-6 bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50`}>
+                                                                <button
+                                                                    type="submit"
+                                                                    disabled={
+                                                                        (state.input.name !== productProps.name || state.input.description !== productProps.description) ? false : true
+                                                                    }
+                                                                    className={`inline-flex items-center px-4 py-1 border border-green-500 rounded shadow-sm text-sm text-white mb-6 bg-green-500 hover:bg-green-700 hover:border-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50`}>
                                                                     <span className="text-sm">
                                                                         Update
                                                                     </span>

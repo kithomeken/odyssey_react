@@ -17,7 +17,7 @@ import EmptyResultsReturned from "../../../errors/EmptyResultsReturned";
 import Error500 from "../../../errors/Error500"
 import UploadOrganizationLogo from "./UploadOrganizationLogo";
 import EditOrganizationDetails from "./EditOrganizationDetails";
-import { IMG_API_DOMAIN_PREFIX } from "../../../../api/ApiRegistry"
+import { API_MEDIA_DOMAIN_PREFIX } from "../../../../api/ApiRegistry"
 
 const OrganizationalDetails = () => {
     const [state, setstate] = useState({
@@ -290,7 +290,7 @@ const OrganizationalDetails = () => {
                                                             <div className="w-full flex">
                                                                 <div className="w-full">
                                                                     <div className="bg-gray-100 rounded mr-4 h-44 mb-3 flex flex-col justify-center">
-                                                                        <img src={`${IMG_API_DOMAIN_PREFIX}/organization/${state.data.logo_thumbnail}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} />
+                                                                        <img src={`${API_MEDIA_DOMAIN_PREFIX}/organization/${state.data.logo_thumbnail}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} />
                                                                     </div>
 
                                                                     <p className="text-red-500 text-xs mb-4">

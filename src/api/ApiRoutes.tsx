@@ -31,6 +31,8 @@ export const COMPANY_GROUP_CONTACT_ADD_API_ROUTE = 'portal/a/site-master/general
 export const COMPANY_GROUP_CONTACT_REMOVE_API_ROUTE = 'portal/a/site-master/general/company-groups/point-of-contact/delete'
 export const COMPANY_GROUP_LOGO_APPEND_API_ROUTE = 'portal/a/site-master/general/company-groups/logo/append'
 export const COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE = 'portal/a/site-master/general/company-groups/logo/remove'
+export const COMPANY_GROUP_CHECK_B4_API_ROUTE = 'portal/a/site-master/general/company-groups/check-b4-update'
+export const COMPANY_GROUP_UPDATE_API_ROUTE = 'portal/a/site-master/general/company-groups/update'
 
 // Ticket Types
 export const TICKET_TYPES_LIST_API_ROUTE = 'portal/a/site-master/tickets/types/all'

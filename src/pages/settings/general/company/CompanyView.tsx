@@ -4,16 +4,18 @@ import { useParams } from "react-router-dom"
 import swal from 'sweetalert';
 import { useCountries } from 'use-react-countries'
 
-import { FULLY_QUALIFIED_DOMAIN_NAME } from "../../../../api/ApiRegistry";
+import { API_MEDIA_DOMAIN_PREFIX } from "../../../../api/ApiRegistry";
 import { COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE, COMPANY_GROUP_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import HeaderParagraph from "../../../../components/settings/HeaderParagraph"
 import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry"
 import DateFormating from "../../../../lib/hooks/DateFormating"
+import { generalRoutes } from "../../../../routes/settings/generalRoutes";
 import HttpServices from "../../../../services/HttpServices"
 import EmptyResultsReturned from "../../../errors/EmptyResultsReturned"
 import Error500 from "../../../errors/Error500"
+import EditCompanyGroup from "./EditCompanyGroup";
 import PointsOfContactTab from "./PointsOfContactTab"
 import ProductsTab from "./ProductsTab"
 import UploadCompanyLogo from "./UploadLogoModal"
@@ -39,7 +41,8 @@ const CompanyView = () => {
             products: 'pending',
         },
         show: {
-            uploadModal: false
+            uploadModal: false,
+            amendDetails: false,
         },
         activeTab: 'poc',
         status: 'pending',
@@ -51,17 +54,21 @@ const CompanyView = () => {
     const params = useParams();
     const pageTitle = "Company Details"
     const { countries } = useCountries()
+    const COMPANY_GROUPS: any = (generalRoutes.find((routeName) => routeName.name === 'CMPNY'))?.path
 
     const breadCrumb = [
         { linkItem: true, title: "General Settings", url: "" },
-        { linkItem: true, title: "Company Groups", url: "" },
+        { linkItem: true, title: "Company Groups", url: COMPANY_GROUPS },
         { linkItem: false, title: pageTitle },
     ]
 
     function fetchCompanyDetailsWithSetState() {
+        let { show } = state
+        show.amendDetails = false
+        
         setstate({
-            ...state,
-            status: 'pending'
+            ...state, show,
+            status: 'pending',
         })
 
         fetchCompanyDetailsApiCall()
@@ -79,6 +86,9 @@ const CompanyView = () => {
             status = 'fulfilled'
             // data.country_name = getCountryByNameOrShortName(response.data.data.country).name
             // data.country_code = getCountryByNameOrShortName(response.data.data.country).countryCallingCodes[0]
+
+            console.log(data);
+            
 
             setstate({
                 ...state, data, status
@@ -164,6 +174,15 @@ const CompanyView = () => {
         })
     }
 
+    const showOrHideAmendDetailsModal = () => {
+        let { show } = state
+        show.amendDetails = !state.show.amendDetails
+
+        setstate({
+            ...state, show
+        })
+    }
+
     const updateCompanyLogoState = (logo: any, _fromModal?: any) => {
         let { data } = state
         data.logo = logo
@@ -217,7 +236,13 @@ const CompanyView = () => {
     return (
         <React.Fragment>
             <Helmet>
-                <title>{pageTitle}</title>
+                {
+                    state.status === 'fulfilled' ? (
+                        <title>{state.data.name} - {pageTitle}</title>
+                    ) : (
+                        <title>{pageTitle}</title>
+                    )
+                }
             </Helmet>
 
             <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
@@ -242,13 +267,25 @@ const CompanyView = () => {
                                         <EmptyResultsReturned />
                                     ) : (
                                         <div>
-                                            <div className="w-10/12 pt-2 flex">
-                                                {/* Company details half */}
-                                                <div className="w-5/12 px-4 border-r">
-                                                    <p className="text-2xl mb-1">
+                                            <div className="w-10/12 flex align-middle px-4">
+                                                <div className="w-8/12 flex align-middle">
+                                                    <p className="text-3xl mb-0">
                                                         {state.data.name}
                                                     </p>
 
+                                                    <div className="w-10 ml-4 flex align-middle justify-center">
+                                                        <button type="button" className={`inline-flex items-center p-1 px-2 ml-3 border-0 rounded text-sm text-blue-500 bg-white hover:bg-gray-50 hover:underline hover:border-0 focus:outline-none`} onClick={showOrHideAmendDetailsModal}>
+                                                            <span className="text-sm">
+                                                                Edit
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="w-10/12 pt-2 flex">
+                                                {/* Company details half */}
+                                                <div className="w-5/12 px-4 border-r">
                                                     <p className="text-sm mb-3 text-gray-500">
                                                         {state.data.description}
                                                     </p>
@@ -257,7 +294,7 @@ const CompanyView = () => {
                                                         <span key={index}>
                                                             {
                                                                 (state.data.country) === country.name ? (
-                                                                    <span className="flex items-center align-middle mb-3" key={index}>
+                                                                    <span className="flex items-center align-middle mb-4" key={index}>
                                                                         <span className="flex-shrink-0 h-5 w-4 rounded">{country.emoji}</span>
                                                                         <span className="ml-3 h-5 text-sm text-gray-700 truncate">{country.name}</span>
                                                                     </span>
@@ -267,15 +304,15 @@ const CompanyView = () => {
                                                     ))}
 
                                                     {
-                                                        state.data.domain === null ? (
-                                                            <p className="text-blue-500 text-sm mb-3">
+                                                        state.data.domain === null || state.data.domain === undefined ? (
+                                                            <p className="text-blue-500 text-sm mb-4"  onClick={showOrHideAmendDetailsModal}>
                                                                 <span className="cursor-pointer">
                                                                     <span className="fas fa-plus mr-2"></span>
                                                                     Add company domain
                                                                 </span>
                                                             </p>
                                                         ) : (
-                                                            <div className="w-full mb-3">
+                                                            <div className="w-full mb-4">
                                                                 <a target="blank" href={state.data.domain} className="text-sm form-group mb-3 hover:underline text-blue-500">
                                                                     {state.data.domain}
                                                                 </a>
@@ -283,35 +320,23 @@ const CompanyView = () => {
                                                         )
                                                     }
 
-                                                    {/* <div className="w-full form-group">
-                                                        <p className="text-sm mb-1">
-                                                            Tickets raised tagged with company id
-                                                        </p>
-
-                                                        <p className="text-2xl mb-1">
-                                                            0
-                                                        </p>
-
-                                                        <p className="text-xs text-gray-500">
-                                                            Company group currently has no tickets raised under it's wings
-                                                        </p>
-                                                    </div> */}
-
                                                     <div className="form-group rounded border border-orange-400 bg-amber-100 py-3 px-4">
                                                         <div className="flex items-center align-middle text-orange-500">
-                                                            <span className="text-xs pl-3">
-                                                                No tickets have been raised by/for this company group
+                                                            <i className="fad fa-exclamation-triangle fa-lg text-orange-400"></i>
+                                                            <span className="text-sm pl-3">
+                                                                Company currently has no raised tickets under it's wings...
                                                             </span>
                                                         </div>
                                                     </div>
 
-                                                    <p className="text-xs text-gray-500 flex items-center align-middle">
-                                                        <i className="fal fa-clock"></i>
-                                                        <span className="ml-1">
+                                                    <div className="flex items-center align-middle text-xs mb-3 text-gray-500">
+                                                        <span className="fal fa-clock"></span>
+
+                                                        <span className="ml-2">
                                                             <span className="mr-1">Created on: </span>
                                                             <DateFormating dateString={state.data.created_at} />
                                                         </span>
-                                                    </p>
+                                                    </div>
                                                 </div>
 
                                                 {/* Company logo half */}
@@ -324,7 +349,7 @@ const CompanyView = () => {
                                                                         {
                                                                             // TODO: Set special image api link
                                                                         }
-                                                                        <img src={`${FULLY_QUALIFIED_DOMAIN_NAME}/uploads/company-logos/${state.data.logo}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} />
+                                                                        <img src={`${API_MEDIA_DOMAIN_PREFIX}/company/${state.data.logo}`} className="form-group h-36 m-auto rounded text-sm" alt={`${state.data.name} Company Logo`} />
                                                                     </div>
 
                                                                     <p className="text-red-500 text-xs mb-4">
@@ -411,6 +436,14 @@ const CompanyView = () => {
                                                 show={state.show.uploadModal}
                                                 showOrHideModal={showOrHideUploadLogoModal}
                                                 updateCompanyLogoState={updateCompanyLogoState}
+                                            />
+
+                                            <EditCompanyGroup
+                                                companyId={params.uuid}
+                                                stateFromParent={state.data}
+                                                show={state.show.amendDetails}
+                                                showOrHideModal={showOrHideAmendDetailsModal}
+                                                reloadFetchData={fetchCompanyDetailsWithSetState}
                                             />
                                         </div>
                                     )
