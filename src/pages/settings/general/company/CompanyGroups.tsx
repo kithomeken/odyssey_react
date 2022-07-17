@@ -73,22 +73,14 @@ const CompanyGroups = () => {
         },
         {
             Header: 'Status',
-            accessor: (data: { suspended: any }) => (
-                data.suspended === 'Y' ? (
-                    <span className="flex items-center">
-                        <span className="h-3 w-3 align-middle bg-red-500 rounded-full mr-3"></span>
-
-                        <span className="text-gray-500 text-sm align-middle">
-                            Suspended
-                        </span>
+            accessor: (data: { deleted_at: any }) => (
+                data.deleted_at === null ? (
+                    <span className="bg-green-100 text-green-600 mb-0 text-xs py-1 px-2 rounded">
+                        Active
                     </span>
                 ) : (
-                    <span className="flex items-center">
-                        <span className="h-3 w-3 align-middle bg-green-500 rounded-full mr-3"></span>
-
-                        <span className="text-gray-500 text-sm align-middle">
-                            Active
-                        </span>
+                    <span className="text-red-600 bg-red-100 mb-0 text-xs py-1 px-2 rounded">
+                        Suspended
                     </span>
                 )
             )
