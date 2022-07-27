@@ -54,9 +54,7 @@ export const InformationAlert: FC<Props> = ({title, details, showModal, closeMod
                                         }
 
                                         <div className="">
-                                            <p className="text-sm text-gray-500">
-                                                {details}
-                                            </p>
+                                            {details}
                                         </div>
                                     </div>
                                 </div>
