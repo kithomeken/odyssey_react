@@ -1,9 +1,7 @@
 import AuthorizationTeams from "../../pages/settings/security/AuthorizationTeams";
-import CreateAuthorizationTeam from "../../pages/settings/security/CreateAuthorizationTeam";
 import EditAuthorizations from "../../pages/settings/security/EditAuthorizations";
 
 export const securityRoutes = [
-    { path: "/a/default/settings/security/authorization-groups", element: <AuthorizationTeams />, activeMenu: 'authorization' },
-    { path: "/a/default/settings/security/authorization-groups/create", element: <CreateAuthorizationTeam />, activeMenu: 'authorization' },
-    { path: "/a/default/settings/security/authorization-groups/:uuid", element: <EditAuthorizations />, activeMenu: 'authorization' },
+    { path: "/a/default/settings/security/auth-teams", element: <AuthorizationTeams />, activeMenu: 'authorization', name: 'AUTH' },
+    { path: "/a/default/settings/security/auth-teams/:uuid", element: <EditAuthorizations />, activeMenu: 'authorization', name: 'AUTH_VW' },
 ]
