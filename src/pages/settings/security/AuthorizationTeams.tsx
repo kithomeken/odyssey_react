@@ -11,9 +11,11 @@ import { usePromiseEffect } from "../../../lib/hooks/usePromiseEffect"
 import { securityRoutes } from "../../../routes/settings/securityRoutes"
 import HttpServices from "../../../services/HttpServices"
 import Error500 from "../../errors/Error500"
+import { CreateAuthGroup } from "./CreateAuthGroup"
 
 const AuthorizationTeams = () => {
     const [state, setstate] = useState({
+        show: false,
         isLoading: true,
         requestFailed: false,
     })
@@ -23,11 +25,11 @@ const AuthorizationTeams = () => {
     const thisPageRoutes = securityRoutes[0].path
 
     // Header button
-    const showButton = true
-    const buttonTitle = "Create Auth Team"
     const buttonIcon = true
+    const showButton = true
+    const actionButton = true
+    const buttonTitle = "Create Auth Team"
     const iconType = "fas fa-plus-circle"
-    const buttonLink = securityRoutes[1].path
 
     const breadCrumb = [
         { linkItem: true, title: "Security", url: thisPageRoutes },
@@ -48,9 +50,11 @@ const AuthorizationTeams = () => {
         return response.data
     }, [])
 
-    const responseValues: any = authTeamsUsePromiseResponse.value
-    console.log(responseValues);
-
+    const showOrHideModal = () => {
+        setstate({
+            ...state, show: !state.show
+        })
+    }
 
     return (
         <React.Fragment>
@@ -63,10 +67,11 @@ const AuthorizationTeams = () => {
 
                 <Header title={pageTitle}
                     showButton={showButton}
+                    actionButton={actionButton}
+                    actionEvent={showOrHideModal}
                     buttonTitle={buttonTitle}
                     buttonIcon={buttonIcon}
                     iconType={iconType}
-                    buttonLink={buttonLink}
                 />
 
                 <HeaderParagraphLarge title="Organize your support agents into specialized teams and make it easier to issue out access rights. Create a team and specify the actions that your agents can perform. To start you off, we've automatically created a few teams with the default badge tag. Go ahead and create a new team for your agents." />
@@ -88,7 +93,7 @@ const AuthorizationTeams = () => {
                                         <div className="w-full mb-3 py-3 px-4 rounded-md border hover:shadow" key={index}>
                                             <div className="flex mb-2 items-center">
                                                 <div className="basis-3/4">
-                                                    <Link to={`/a/default/settings/security/authorization-groups/${authTeam.uuid}`} className="text-green-500 block hover:underline">
+                                                    <Link to={`/a/default/settings/security/auth-teams/${authTeam.uuid}`} className="text-green-500 block hover:underline">
                                                         {authTeam.name}
                                                     </Link>
 
@@ -165,6 +170,12 @@ const AuthorizationTeams = () => {
                     )
                 }
             </div>
+
+            <CreateAuthGroup
+                show={state.show}
+                showOrHideModal={showOrHideModal}
+            />
+
         </React.Fragment>
     )
 }

@@ -34,6 +34,14 @@ export const COMPANY_GROUP_LOGO_REMOVAL_API_ROUTE = 'portal/a/site-master/genera
 export const COMPANY_GROUP_CHECK_B4_API_ROUTE = 'portal/a/site-master/general/company-groups/check-b4-update'
 export const COMPANY_GROUP_UPDATE_API_ROUTE = 'portal/a/site-master/general/company-groups/update'
 
+// Authorization Team
+export const AUTH_TEAM_CHECK_NAME_UPDATE_API_ROUTE = 'portal/a/site-master/security/auth-teams/check'
+export const AUTH_TEAM_CREATE_UPDATE_API_ROUTE = 'portal/a/site-master/security/auth-teams/create'
+export const AUTH_TEAM_DETAILS_API_ROUTE = 'portal/a/site-master/security/auth-teams' // uuid
+export const AUTH_TEAM_CONFIGURE_ADMIN_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/administrative/configure'
+export const AUTH_TEAM_TICKET_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/tickets' // uuid
+export const AUTH_TEAM_CONFIGURE_TICKETS_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/tickets/configure'
+
 // Ticket Types
 export const TICKET_TYPES_LIST_API_ROUTE = 'portal/a/site-master/tickets/types/all'
 export const TICKET_TYPES_CHECK_API_ROUTE = 'portal/a/site-master/tickets/types/check'
@@ -46,6 +54,7 @@ export const TICKET_FEATURES_LIST_API_ROUTE = 'portal/a/site-master/features/tic
 export const TICKET_FEATURES_CONFIGURE_API_ROUTE = 'portal/a/site-master/features/tickets/configure'
 
 // Support Features
+export const SUPPORT_FEATURES_LIST_API_ROUTE = 'portal/a/site-master/features/support/all'
 export const SUPPORT_FEATURES_CONFIGURE_API_ROUTE = 'portal/a/site-master/features/support/configure'
 export const SUPPORT_FEATURES_AGENT_API_ROUTE = 'portal/a/site-master/features/support/agents'
 export const SUPPORT_FEATURES_CLIENT_API_ROUTE = 'portal/a/site-master/features/support/clients'
