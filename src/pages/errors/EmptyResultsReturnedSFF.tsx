@@ -1,5 +1,5 @@
 import React from "react"
-import emptySearchBox from "../../assets/images/empty_box.png"
+import emptySearchBox from "../../assets/images/sad_dog_161669_74.png"
 
 const EmptyResultsReturnedSFF = () => {
     /* SFF - Small Form Factor */
