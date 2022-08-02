@@ -24,10 +24,10 @@ export const AdministativeRights: FC<Props> = ({ stateFromParent, support, onChe
                     support.allow_client_access === 'Y' ? (
                         <div className="ml-6">
                             <div className="w-9/12 mb-4">
-                                <div className="flex items-center">
+                                <div className="flex">
                                     <input
                                         id="onboard_client"
-                                        onClick={onCheckboxHandler}
+                                        onChange={onCheckboxHandler}
                                         disabled={disableCheckbox}
                                         checked={stateFromParent.adminRights.onboard_client === 'Y' ? true : false}
                                         name="onboard_client"
@@ -35,8 +35,12 @@ export const AdministativeRights: FC<Props> = ({ stateFromParent, support, onChe
                                         className="h-4 w-4 mt-1 cursor-pointer text-green-600 disabled:cursor-not-allowed focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                     />
 
-                                    <label htmlFor="onboard_client" className="ml-4 block text-sm text-gray-500">
+                                    <label htmlFor="onboard_client" className="ml-4 block text-sm text-gray-800">
                                         Onboard new clients to the system
+
+                                        <span className="block text-xs text-gray-500">
+                                            Can onboard new client users into the system
+                                        </span>
                                     </label>
                                 </div>
                             </div>
@@ -46,19 +50,23 @@ export const AdministativeRights: FC<Props> = ({ stateFromParent, support, onChe
 
                 <div className="ml-6">
                     <div className="w-12/12 mb-4">
-                        <div className="flex items-center">
+                        <div className="flex">
                             <input
                                 id="onboard_agents"
                                 name="onboard_agents"
                                 type="checkbox"
                                 disabled={disableCheckbox}
-                                onClick={onCheckboxHandler}
+                                onChange={onCheckboxHandler}
                                 checked={stateFromParent.adminRights.onboard_agents === 'Y' ? true : false}
                                 className="h-4 w-4 mt-1 cursor-pointer text-green-600 disabled:cursor-not-allowed focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                             />
 
-                            <label htmlFor="onboard_agents" className="ml-4 block text-sm text-gray-500">
+                            <label htmlFor="onboard_agents" className="ml-4 block text-sm text-gray-800">
                                 Invite new user agents into the system
+
+                                <span className="block text-xs text-gray-500">
+                                    Can send invitations to new members of the team to access the system
+                                </span>
                             </label>
                         </div>
                     </div>
@@ -66,19 +74,23 @@ export const AdministativeRights: FC<Props> = ({ stateFromParent, support, onChe
 
                 <div className="ml-6">
                     <div className="w-12/12 mb-4">
-                        <div className="flex items-center">
+                        <div className="flex">
                             <input
                                 id="change_auth_team"
                                 name="change_auth_team"
                                 disabled={disableCheckbox}
-                                onClick={onCheckboxHandler}
+                                onChange={onCheckboxHandler}
                                 type="checkbox"
                                 checked={stateFromParent.adminRights.change_auth_team === 'Y' ? true : false}
                                 className="h-4 w-4 mt-1 cursor-pointer text-green-600 disabled:cursor-not-allowed focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                             />
 
-                            <label htmlFor="change_auth_team" className="ml-4 block text-sm text-gray-500">
+                            <label htmlFor="change_auth_team" className="ml-4 block text-sm text-gray-800">
                                 Change a user's Authorization Team
+
+                                <span className="block text-xs text-gray-500">
+                                    Can change a user's Authorization Team, except Master and Client Authorization Teams
+                                </span>
                             </label>
                         </div>
                     </div>
@@ -88,19 +100,23 @@ export const AdministativeRights: FC<Props> = ({ stateFromParent, support, onChe
                     support.allow_announcements === 'Y' ? (
                         <div className="ml-6">
                             <div className="w-9/12 mb-4">
-                                <div className="flex items-center">
+                                <div className="flex">
                                     <input
                                         id="send_announcements"
                                         name="send_announcements"
                                         type="checkbox"
-                                        onClick={onCheckboxHandler}
+                                        onChange={onCheckboxHandler}
                                         disabled={disableCheckbox}
                                         checked={stateFromParent.adminRights.send_announcements === 'Y' ? true : false}
                                         className="h-4 w-4 mt-1 cursor-pointer text-green-600 disabled:cursor-not-allowed focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
                                     />
 
-                                    <label htmlFor="send_announcements" className="ml-4 block text-sm text-gray-500">
+                                    <label htmlFor="send_announcements" className="ml-4 block text-sm text-gray-800">
                                         Send announcements to users in the system
+
+                                        <span className="block text-xs text-gray-500">sss
+                                            Can send announcement notifications to all users or a subset users in the system
+                                        </span>
                                     </label>
                                 </div>
                             </div>
