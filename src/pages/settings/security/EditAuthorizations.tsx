@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
 import { toast } from "react-toastify"
 
-import { AUTH_TEAM_CONFIGURE_ADMIN_RIGHTS_API_ROUTE, AUTH_TEAM_DETAILS_API_ROUTE } from "../../../api/ApiRoutes"
+import { AUTH_TEAM_CONFIGURE_ADMIN_RIGHTS_API_ROUTE, AUTH_TEAM_CONFIGURE_TICKETS_RIGHTS_API_ROUTE, AUTH_TEAM_DETAILS_API_ROUTE } from "../../../api/ApiRoutes"
 import Loading from "../../../components/layouts/Loading"
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
@@ -12,7 +12,6 @@ import { HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
 import DateFormating from "../../../lib/hooks/DateFormating"
 import HttpServices from "../../../services/HttpServices"
 import EmptyResultsReturned from "../../errors/EmptyResultsReturned"
-import Error500 from "../../errors/Error500"
 import { AdministativeRights } from "./AdministrativeRights"
 import { EscalationRights } from "./EscalationRights"
 import { TicketsRights } from "./TicketRights"
@@ -29,11 +28,17 @@ const EditAuthorizations = () => {
             created_at: '',
             adminRights: '',
         },
+        rights: {
+            admin: '',
+            tickets: null,
+        },
         features: {
             support: '',
+            tickets: '',
         },
         tabStatus: {
-            admin: 'pending'
+            admin: 'pending',
+            tickets: 'pending',
         },
         show: {
             amendDetails: false
@@ -46,6 +51,8 @@ const EditAuthorizations = () => {
     const params = useParams();
     const showButton = false
     const pageTitle = "Auth Team Details"
+    let validate = require('uuid-validate');
+    // let isValidUuid = validate(params.uuid)    
 
     const breadCrumb = [
         { linkItem: true, title: "Security", url: "" },
@@ -64,6 +71,7 @@ const EditAuthorizations = () => {
 
     async function fetchAuthorizationDetailsWithoutStatus() {
         try {
+            // if (isValidUuid) {
             const authTeamApiPoint = AUTH_TEAM_DETAILS_API_ROUTE + '/' + params.uuid
             const response: any = await HttpServices.httpGet(authTeamApiPoint)
 
@@ -78,8 +86,14 @@ const EditAuthorizations = () => {
             setstate({
                 ...state, data, status, features
             })
+            // } else {
+            //     let status = state.status
+            //     status = 'rejected'
 
-            console.log(data);
+            //     setstate({
+            //         ...state, status
+            //     })
+            // }
         } catch (e) {
             let status = state.status
             status = 'rejected'
@@ -105,31 +119,6 @@ const EditAuthorizations = () => {
             ...state,
             activeTab: tabName
         })
-    }
-
-    const loadRespectiveTab = (tabName = 'admin') => {
-        switch (tabName) {
-            case 'admin':
-                return <AdministativeRights
-                    disableCheckbox={disableAdministrativeRights()}
-                    onCheckboxHandler={onAdminRightsChangeHandler}
-                    support={state.features.support}
-                    stateFromParent={state.data}
-                />
-
-            case 'tickets':
-                return <TicketsRights
-
-                />
-
-            case 'escalations':
-                return <EscalationRights
-
-                />
-
-            default:
-                return null
-        }
     }
 
     function disableAdministrativeRights() {
@@ -196,6 +185,155 @@ const EditAuthorizations = () => {
         }
     }
 
+    function disableTicketRights(item: any) {
+        const ticketAccess = state.data.ticket_access
+        const specialRights = [
+            'edit_properties',
+            'any_comment',
+            'merge_tickets',
+            'archive_tickets',
+            'suspend_tickets',
+            'parent_child_ticketing',
+        ]
+
+        if (ticketAccess === 'GLB') {
+            return false
+        } else {
+            return specialRights.includes(item)
+        }
+    }
+
+    const onTicketRightsChangeHandler = (e: any, right: any) => {
+        const denyActionRequest = disableTicketRights(right)
+
+        if (!denyActionRequest) {
+            let { rights }: any = state
+            let checked = e.target.checked;
+
+            let toggleStatus = checked ? 'Y' : 'N'
+            rights.tickets[e.target.name] = toggleStatus
+
+            setstate({
+                ...state, rights
+            })
+
+            configureTicketRightsApiEndPoint(e.target.name, toggleStatus)
+        }
+    }
+
+    const configureTicketRightsApiEndPoint = async (inputKey: any, inputValue: any) => {
+        try {
+            let input = {
+                uuid: params.uuid,
+                input_key: inputKey,
+                input_value: inputValue,
+            }
+
+            const response: any = await HttpServices.httpPost(AUTH_TEAM_CONFIGURE_TICKETS_RIGHTS_API_ROUTE, input)
+
+            if (response.data.success) {
+                // Do nothing on success
+            } else {
+                // Rever the checkbox value
+                let { rights } = state
+                rights.tickets[inputKey] = inputValue === 'Y' ? 'N' : 'Y'
+
+                setstate({
+                    ...state, rights
+                })
+
+                toast.error('Something went wrong with your request. Try again later', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
+        } catch (error) {
+            // Rever the checkbox value
+            let { rights } = state
+            rights.tickets[inputKey] = inputValue === 'Y' ? 'N' : 'Y'
+
+            setstate({
+                ...state, rights
+            })
+
+            toast.error('Something went wrong with your request. Try again later', {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+        }
+    }
+
+    const updateRightsTabState = (tabName: any, dataFromTab: any) => {
+        let { rights } = state
+        rights[tabName] = dataFromTab
+
+        setstate({
+            ...state, rights
+        })
+    }
+
+    const updateTabStatus = (tabName: any, status: any) => {
+        let { tabStatus } = state
+        tabStatus[tabName] = status
+
+        setstate({
+            ...state, tabStatus
+        })
+    }
+
+    const updateFeaturesState = (feature: any, dataFromTab) => {
+        let {features} = state
+        features[feature] = dataFromTab
+
+        setstate({
+            ...state, features
+        })
+    }
+
+    const loadRespectiveTab = (tabName = 'admin') => {
+        switch (tabName) {
+            case 'admin':
+                return <AdministativeRights
+                    disableCheckbox={disableAdministrativeRights()}
+                    onCheckboxHandler={onAdminRightsChangeHandler}
+                    support={state.features.support}
+                    stateFromParent={state.data}
+                />
+
+            case 'tickets':
+                return <TicketsRights
+                    authTeamId={params.uuid}
+                    data={state.rights.tickets}
+                    status={state.tabStatus.tickets}
+                    updateTabStatus={updateTabStatus}
+                    disableCheckbox={disableTicketRights}
+                    rightsFromParent={state.rights.tickets}
+                    updateFeaturesState={updateFeaturesState}
+                    featuresFromParent={state.features.tickets}
+                    updateRightsTabState={updateRightsTabState}
+                    onCheckboxHandler={onTicketRightsChangeHandler}
+                />
+
+            case 'escalations':
+                return <EscalationRights
+
+                />
+
+            default:
+                return null
+        }
+    }
+
     return (
         <React.Fragment>
             <Helmet>
@@ -216,7 +354,7 @@ const EditAuthorizations = () => {
                 <div className="w-12/12 mb-5">
                     {
                         state.status === 'rejected' ? (
-                            <Error500 />
+                            <EmptyResultsReturned />
                         ) : state.status === 'fulfilled' ? (
                             <>
                                 {
@@ -231,12 +369,6 @@ const EditAuthorizations = () => {
                                                             {/* Excepteur sint occaecat */}
                                                             {state.data.name}
                                                         </p>
-
-                                                        <div className="">
-                                                            <button type="button" className="text-sm rounded-md float-right border border-red-600 shadow-sm px-3 py-1 text-red-600 bg-white hover:text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                                                Suspend
-                                                            </button>
-                                                        </div>
                                                     </div>
 
                                                     <p className="text-sm mb-3 text-slate-600">
@@ -247,16 +379,18 @@ const EditAuthorizations = () => {
                                                     <div className="w-full py-4 flex align-middle mb-5">
                                                         <div className="flex-grow flex flex-row align-middle">
                                                             {
-                                                                state.data.default === 'Y' ? (
-                                                                    <p className="mr-2 mb-0">
-                                                                        <span className="text-slate-200 bg-slate-600 mb-0 text-xs py-1 px-3 rounded">
-                                                                            System
+                                                                state.data.default !== 'Y' ? (
+                                                                    <p className="mr-4 mb-0">
+                                                                        <span className="text-slate-600 mb-0 text-xs py-1 rounded flex flex-row align-middle">
+                                                                            <i className="far fa-server mr-2 fa-lg"></i>
+
+                                                                            <span>System</span>
                                                                         </span>
                                                                     </p>
                                                                 ) : null
                                                             }
 
-                                                            <p className="mr-2 mb-0">
+                                                            <p className="mr-4 mb-0">
                                                                 {
                                                                     state.data.access_type === 'ALL' ? (
                                                                         <span className="text-purple-800 mb-0 text-xs py-1 flex flex-row align-middle">
@@ -265,7 +399,7 @@ const EditAuthorizations = () => {
                                                                             <span>All Time Access</span>
                                                                         </span>
                                                                     ) : (
-                                                                        <span className="text-orange-600 mb-0 text-xs py-1 px-3 rounded flex flex-row align-middle">
+                                                                        <span className="text-amber-500 mb-0 text-xs py-1 rounded flex flex-row align-middle">
                                                                             <i className="far fa-lock mr-2 fa-lg"></i>
 
                                                                             <span>Limited Time Access</span>
@@ -274,17 +408,17 @@ const EditAuthorizations = () => {
                                                                 }
                                                             </p>
 
-                                                            <p className="mr-2 mb-0">
+                                                            <p className="mr-4 mb-0">
                                                                 {
-                                                                    state.data.ticket_access === 'GB' ? (
-                                                                        <span className="text-sky-800 mb-0 text-xs py-1 px-3 rounded">
+                                                                    state.data.ticket_access === 'GLB' ? (
+                                                                        <span className="text-sky-800 mb-0 text-xs py-1 rounded">
                                                                             <i className="far fa-universal-access mr-2 fa-lg"></i>
 
                                                                             <span>Global Ticket Access</span>
                                                                         </span>
                                                                     ) : (
-                                                                        <span className="text-rose-800 mb-0 text-xs py-1 px-3 rounded flex flex-row align-middle">
-                                                                            <i className="far fa-pennant mr-2 fa-lg"></i>
+                                                                        <span className="text-rose-500 mb-0 text-xs py-1 rounded flex flex-row align-middle">
+                                                                            <i className="far fa-flag mr-2 fa-lg"></i>
 
                                                                             <span>Restricted Ticket Access</span>
                                                                         </span>
@@ -294,7 +428,7 @@ const EditAuthorizations = () => {
                                                         </div>
 
                                                         <p className="text-xs mb-2 text-slate-500">
-                                                            <i className="fal fa-clock text-gray-700"></i>
+                                                            <i className="fal fa-business-time fa-lg"></i>
                                                             <span className="ml-2">
                                                                 <DateFormating dateString={state.data.created_at} />
                                                             </span>
