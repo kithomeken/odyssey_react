@@ -38,7 +38,9 @@ export const COMPANY_GROUP_UPDATE_API_ROUTE = 'portal/a/site-master/general/comp
 export const AUTH_TEAM_CHECK_NAME_UPDATE_API_ROUTE = 'portal/a/site-master/security/auth-teams/check'
 export const AUTH_TEAM_CREATE_UPDATE_API_ROUTE = 'portal/a/site-master/security/auth-teams/create'
 export const AUTH_TEAM_DETAILS_API_ROUTE = 'portal/a/site-master/security/auth-teams' // uuid
-export const AUTH_TEAM_CONFIGURE_ADMIN_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/configure/rights/administrative'
+export const AUTH_TEAM_CONFIGURE_ADMIN_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/administrative/configure'
+export const AUTH_TEAM_TICKET_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/tickets' // uuid
+export const AUTH_TEAM_CONFIGURE_TICKETS_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/tickets/configure'
 
 // Ticket Types
 export const TICKET_TYPES_LIST_API_ROUTE = 'portal/a/site-master/tickets/types/all'
