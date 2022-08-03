@@ -23,7 +23,7 @@ export const TicketsRights: FC<Props> = ({ data, status, authTeamId, updateTabSt
         requestSucceeded: false,
     })
 
-    const fetchProductsSubscribedToApiCall = async () => {
+    const fetchTicketRightsApiCall = async () => {
         try {
             const response: any = await HttpServices.httpGet(AUTH_TEAM_TICKET_RIGHTS_API_ROUTE + '/' + authTeamId)
 
@@ -39,7 +39,7 @@ export const TicketsRights: FC<Props> = ({ data, status, authTeamId, updateTabSt
 
     React.useEffect(() => {
         if (data === null || data === undefined) {
-            fetchProductsSubscribedToApiCall();
+            fetchTicketRightsApiCall();
         }
     }, []);
 
