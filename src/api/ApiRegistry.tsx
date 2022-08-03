@@ -11,6 +11,10 @@ function ApiRegistry () {
         FQDNdomain = 'http://localhost/project-0/public'
         apiDomain = 'http://localhost/project-0/public/api/'
         mediaDomain = 'http://localhost/project-0/public/media'
+
+        // FQDNdomain = "https://project-0.kennedykitho.me"
+        // apiDomain = 'https://api.odyssey.kennedykitho.me/api/'
+        // mediaDomain = 'https://media.kennedykitho.me'
     }
 
     return {
