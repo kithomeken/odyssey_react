@@ -13,7 +13,6 @@ import DateFormating from "../../../lib/hooks/DateFormating"
 import HttpServices from "../../../services/HttpServices"
 import EmptyResultsReturned from "../../errors/EmptyResultsReturned"
 import { AdministativeRights } from "./AdministrativeRights"
-import { EscalationRights } from "./EscalationRights"
 import { TicketsRights } from "./TicketRights"
 
 const EditAuthorizations = () => {
@@ -31,6 +30,7 @@ const EditAuthorizations = () => {
         rights: {
             admin: '',
             tickets: null,
+            escalations: null,
         },
         features: {
             support: '',
@@ -51,8 +51,6 @@ const EditAuthorizations = () => {
     const params = useParams();
     const showButton = false
     const pageTitle = "Auth Team Details"
-    let validate = require('uuid-validate');
-    // let isValidUuid = validate(params.uuid)    
 
     const breadCrumb = [
         { linkItem: true, title: "Security", url: "" },
@@ -71,7 +69,6 @@ const EditAuthorizations = () => {
 
     async function fetchAuthorizationDetailsWithoutStatus() {
         try {
-            // if (isValidUuid) {
             const authTeamApiPoint = AUTH_TEAM_DETAILS_API_ROUTE + '/' + params.uuid
             const response: any = await HttpServices.httpGet(authTeamApiPoint)
 
@@ -86,14 +83,6 @@ const EditAuthorizations = () => {
             setstate({
                 ...state, data, status, features
             })
-            // } else {
-            //     let status = state.status
-            //     status = 'rejected'
-
-            //     setstate({
-            //         ...state, status
-            //     })
-            // }
         } catch (e) {
             let status = state.status
             status = 'rejected'
@@ -324,11 +313,6 @@ const EditAuthorizations = () => {
                     onCheckboxHandler={onTicketRightsChangeHandler}
                 />
 
-            case 'escalations':
-                return <EscalationRights
-
-                />
-
             default:
                 return null
         }
@@ -456,18 +440,7 @@ const EditAuthorizations = () => {
                                                     </button>
                                                 </div>
 
-                                                <div className="w-auto cursor-pointer" onClick={() => activateTab('escalations')}>
-                                                    <button className={classNames(
-                                                        state.activeTab === 'escalations' ? 'text-emerald-700 border-b-2 bg-emerald-50 border-emerald-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
-                                                        "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
-                                                    )}>
-                                                        <span className="lolrtn robot">Escalation Rights</span>
-                                                    </button>
-                                                </div>
-
-                                                <div className="flex-grow border-b-2">
-
-                                                </div>
+                                                <div className="flex-grow border-b-2"></div>
                                             </div>
 
                                             <div className="w-10/12 pb-6 px-3">
