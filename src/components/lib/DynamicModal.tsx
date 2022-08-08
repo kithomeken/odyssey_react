@@ -21,6 +21,8 @@ interface Props {
 }
 
 export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, description, onFormSubmitHandler, isPostingForm, formComponents, actionButton, preLoadsData, preLoadStatus }) => {
+    const modalSize = 'sm:max-w-' + size
+
     const checkIfFormIsPostingData = () => {
         if (!isPostingForm) {
             showOrHideModal()
@@ -39,6 +41,10 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
             draggable: true,
             progress: undefined,
         });
+    }
+
+    function classNames(...classes: any) {
+        return classes.filter(Boolean).join(' ')
     }
 
     const renderModalComponents = () => {
@@ -131,7 +137,12 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                         leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                         leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     >
-                        <div className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-${size} sm:w-full`}>
+                        <div 
+                        className={
+                            classNames(
+                                modalSize, 'inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full'
+                            )
+                        }>
                             {
                                 preLoadsData ? (
                                     // For items that pre load data
