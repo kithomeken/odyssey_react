@@ -22,7 +22,8 @@ export const AdministativeRights: FC<Props> = ({ stateFromParent, support, onChe
 
                 {
                     support.allow_client_access === 'Y' ? (
-                        <div className="ml-6">
+                        <>
+                            <div className="ml-6">
                             <div className="w-9/12 mb-4">
                                 <div className="flex">
                                     <input
@@ -45,6 +46,55 @@ export const AdministativeRights: FC<Props> = ({ stateFromParent, support, onChe
                                 </div>
                             </div>
                         </div>
+
+                        <div className="ml-6">
+                            <div className="w-9/12 mb-4">
+                                <div className="flex">
+                                    <input
+                                        id="onboard_client"
+                                        onChange={onCheckboxHandler}
+                                        disabled={disableCheckbox}
+                                        checked={stateFromParent.adminRights.onboard_client === 'Y' ? true : false}
+                                        name="onboard_client"
+                                        type="checkbox"
+                                        className="h-4 w-4 mt-1 cursor-pointer text-green-600 disabled:cursor-not-allowed focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
+                                    />
+
+                                    <label htmlFor="onboard_client" className="ml-4 block text-sm text-gray-800">
+                                        Edit client accounts
+
+                                        <span className="block text-xs text-gray-500">
+                                            Can make changes to the client field details
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="ml-6">
+                            <div className="w-9/12 mb-4">
+                                <div className="flex">
+                                    <input
+                                        id="onboard_client"
+                                        onChange={onCheckboxHandler}
+                                        disabled={disableCheckbox}
+                                        checked={stateFromParent.adminRights.onboard_client === 'Y' ? true : false}
+                                        name="onboard_client"
+                                        type="checkbox"
+                                        className="h-4 w-4 mt-1 cursor-pointer text-green-600 disabled:cursor-not-allowed focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
+                                    />
+
+                                    <label htmlFor="onboard_client" className="ml-4 block text-sm text-gray-800">
+                                        Blacklist clients
+
+                                        <span className="block text-xs text-gray-500">
+                                            Can change the status of a client account to blacklisted
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        </>
                     ) : null
                 }
 
@@ -71,6 +121,30 @@ export const AdministativeRights: FC<Props> = ({ stateFromParent, support, onChe
                         </div>
                     </div>
                 </div>
+
+                <div className="ml-6">
+                            <div className="w-9/12 mb-4">
+                                <div className="flex">
+                                    <input
+                                        id="onboard_client"
+                                        onChange={onCheckboxHandler}
+                                        disabled={disableCheckbox}
+                                        checked={stateFromParent.adminRights.onboard_client === 'Y' ? true : false}
+                                        name="onboard_client"
+                                        type="checkbox"
+                                        className="h-4 w-4 mt-1 cursor-pointer text-green-600 disabled:cursor-not-allowed focus:ring-green-500 focus:bg-green-500 active: border-gray-300 rounded"
+                                    />
+
+                                    <label htmlFor="onboard_client" className="ml-4 block text-sm text-gray-800">
+                                        Edit agent accounts
+
+                                        <span className="block text-xs text-gray-500">
+                                            Allows users to edit existing agent accounts. This <b>DOES NOT</b> mean they can change the passwords
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
                 <div className="ml-6">
                     <div className="w-12/12 mb-4">
