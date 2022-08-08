@@ -6,8 +6,8 @@ import { toast } from "react-toastify"
 import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
 import HttpServices from "../../../../services/HttpServices"
 import ErrorBanner from "../../../../components/layouts/ErrorBanner"
-import { ModalComponentSM } from "../../../../components/lib/ModalComponentSM"
 import { COMPANY_GROUP_CHECK_B4_API_ROUTE, COMPANY_GROUP_UPDATE_API_ROUTE } from "../../../../api/ApiRoutes"
+import { DynamicModal } from "../../../../components/lib/DynamicModal"
 
 const EditCompanyGroup = ({ show, showOrHideModal, stateFromParent, companyId, reloadFetchData }) => {
     const [state, setstate] = useState({
@@ -261,7 +261,8 @@ const EditCompanyGroup = ({ show, showOrHideModal, stateFromParent, companyId, r
 
     return (
         <React.Fragment>
-            <ModalComponentSM
+            <DynamicModal
+                size="sm"
                 show={show}
                 actionButton={{
                     before: "Update Details",
