@@ -21,8 +21,6 @@ interface Props {
 }
 
 export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, description, onFormSubmitHandler, isPostingForm, formComponents, actionButton, preLoadsData, preLoadStatus }) => {
-    const modalSize = 'sm:max-w-' + size
-
     const checkIfFormIsPostingData = () => {
         if (!isPostingForm) {
             showOrHideModal()
@@ -140,7 +138,16 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                         <div 
                         className={
                             classNames(
-                                modalSize, 'inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full'
+                                size === 'sm' ? 'sm:max-w-sm' : null,
+                                size === 'md' ? 'sm:max-w-md' : null,
+                                size === 'lg' ? 'sm:max-w-lg' : null,
+                                size === 'xl' ? 'sm:max-w-xl' : null,
+                                size === '2xl' ? 'sm:max-w-2xl' : null,
+                                size === '3xl' ? 'sm:max-w-3xl' : null,
+                                size === '4xl' ? 'sm:max-w-4xl' : null,
+                                size === '5xl' ? 'sm:max-w-5xl' : null,
+                                size === '6xl' ? 'sm:max-w-6xl' : null,
+                                'inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full'
                             )
                         }>
                             {
