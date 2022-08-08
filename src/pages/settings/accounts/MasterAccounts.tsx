@@ -30,7 +30,7 @@ const MasterAccounts = () => {
     const pageTitle = "Master Accounts"
 
     const breadCrumb = [
-        { linkItem: true, title: "User Settings", url: "" },
+        { linkItem: true, title: "Account Settings", url: "" },
         { linkItem: false, title: pageTitle },
     ]
 

@@ -21,6 +21,8 @@ class Navigation extends Component<Props> {
     render() {
         let activeMenu = this.state.activeMenu
         const MSTR_ACCOUNT_RT: any = (accountRoutes.find((routeName) => routeName.name === 'MSTR'))?.path
+        const AGNT_ACCOUNT_RT: any = (accountRoutes.find((routeName) => routeName.name === 'AGNT'))?.path
+        
         const TCKT_STATUS_RT: any = (featuresRoutes.find((routeName) => routeName.name === 'STT'))?.path
 
         // General Settings Routes
@@ -47,8 +49,21 @@ class Navigation extends Component<Props> {
                     <nav className="flex-grow block px-5 pt-0 pb-4 h-screen overflow-y-auto">
                         <div className="w-full">
                             <span className="lan-1 mb-0 mt-3 lolrtn text-gray-500 text-xs block tracking-widest">
-                                User Settings
+                                Account Settings
                             </span>
+
+                            <Link to={AGNT_ACCOUNT_RT} className={this.classNames(
+                                activeMenu === 'agents' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
+                                'mt-2 p-2 pl-4 flex aside-link-title rounded-lg mx-0 border-none hover:border-none items-center'
+                            )}>
+                                <div className="flex-shrink-0 w-5 mb-0 justify-items-center">
+                                    <i className="fal fa-user-circle"></i>
+                                </div>
+
+                                <p className="ml-4 text-sm">
+                                    Agent Accounts
+                                </p>
+                            </Link>
 
                             <Link to={MSTR_ACCOUNT_RT} className={this.classNames(
                                 activeMenu === 'organization' ? 'text-green-700 bg-green-200' : 'text-gray-900 hover:bg-gray-200',
