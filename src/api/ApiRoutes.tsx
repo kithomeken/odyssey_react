@@ -1,5 +1,8 @@
+// Agent Accounts
+export const AGENT_INVITATION_API_ROUTE = 'portal/a/site-master/accounts/users/agents/invitations'
+
 // Master Accounts
-export const MASTER_ACCOUNTS_LIST_API_ROUTE = 'portal/a/site-master/accounts/master/all'
+export const MASTER_ACCOUNTS_LIST_API_ROUTE = 'portal/a/site-master/accounts/users/master/all'
 
 // Organizational Details
 export const ORGANIZATION_FETCH_DETAILS_API_ROUTE = 'portal/a/site-master/general/organizational-details'
