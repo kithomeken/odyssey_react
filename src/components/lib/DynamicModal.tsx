@@ -1,26 +1,34 @@
 import { Transition, Dialog } from "@headlessui/react"
-import React, { FC, Fragment } from "react"
+import React, { FC, Fragment, useState } from "react"
 import { toast } from "react-toastify"
+import Error500 from "../../pages/errors/Error500"
 import Loading from "../layouts/Loading"
 
 interface Props {
     size: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl',
     title: any,
     show: boolean,
+    errorTitle?: any,
     description?: any,
+    errorMessage?: any,
     preLoadStatus?: any,
     formComponents: any,
     showOrHideModal: any,
     preLoadsData?: boolean,
     isPostingForm: boolean,
     onFormSubmitHandler: any,
+    dispErrorMessage?: boolean,
     actionButton: {
         before: any,
         after: any
     }
 }
 
-export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, description, onFormSubmitHandler, isPostingForm, formComponents, actionButton, preLoadsData, preLoadStatus }) => {
+export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, description, onFormSubmitHandler, isPostingForm, formComponents, actionButton, preLoadsData, preLoadStatus, dispErrorMessage, errorTitle, errorMessage }) => {
+    const [state, setstate] = useState({
+        size: size
+    })
+
     const checkIfFormIsPostingData = () => {
         if (!isPostingForm) {
             showOrHideModal()
@@ -51,7 +59,7 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                 <div className="bg-white pt-5 pb-4 sm:py-6 sm:pb-4">
                     <div className="w-full">
                         <div className="sm:col-span-8 lg:col-span-7 mb-3 px-4 sm:px-6">
-                            <h2 className="text-xl text-emerald-500 sm:pr-12">
+                            <h2 className="text-xl text-emerald-600 sm:pr-12">
                                 {title}
                             </h2>
                         </div>
@@ -95,7 +103,7 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                                         </span>
                                     </button>
                                 ) : (
-                                    <button type="submit" className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                    <button type="submit" className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm">
                                         {actionButton.before}
                                     </button>
                                 )
@@ -135,26 +143,60 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                         leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                         leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                     >
-                        <div 
-                        className={
-                            classNames(
-                                size === 'sm' ? 'sm:max-w-sm' : null,
-                                size === 'md' ? 'sm:max-w-md' : null,
-                                size === 'lg' ? 'sm:max-w-lg' : null,
-                                size === 'xl' ? 'sm:max-w-xl' : null,
-                                size === '2xl' ? 'sm:max-w-2xl' : null,
-                                size === '3xl' ? 'sm:max-w-3xl' : null,
-                                size === '4xl' ? 'sm:max-w-4xl' : null,
-                                size === '5xl' ? 'sm:max-w-5xl' : null,
-                                size === '6xl' ? 'sm:max-w-6xl' : null,
-                                'inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full'
-                            )
-                        }>
+                        <div
+                            className={
+                                classNames(
+                                    size === 'sm' ? 'sm:max-w-sm' : null,
+                                    size === 'md' ? 'sm:max-w-md' : null,
+                                    size === 'lg' ? 'sm:max-w-lg' : null,
+                                    size === 'xl' ? 'sm:max-w-xl' : null,
+                                    size === '2xl' ? 'sm:max-w-2xl' : null,
+                                    size === '3xl' ? 'sm:max-w-3xl' : null,
+                                    size === '4xl' ? 'sm:max-w-4xl' : null,
+                                    size === '5xl' ? 'sm:max-w-5xl' : null,
+                                    size === '6xl' ? 'sm:max-w-6xl' : null,
+                                    'inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full'
+                                )
+                            }>
                             {
                                 preLoadsData ? (
                                     // For items that pre load data
                                     preLoadStatus === 'rejected' ? (
-                                        null
+                                        <div className="">
+                                            {
+                                                dispErrorMessage ? (
+                                                    <>
+                                                        <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                            <div className="sm:flex sm:items-start">
+                                                                <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                                    <span className="fal fa-exclamation-circle fa-2x text-red-600"></span>
+                                                                </div>
+                                                                <div className="mt-3 text-center text-slate-600 sm:mt-0 sm:ml-4 sm:text-left">
+                                                                    <span className="text-red-500 mb-4">
+                                                                        {errorTitle}
+                                                                    </span>
+
+                                                                    <div className="text-sm">
+                                                                        {errorMessage}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                            <button 
+                                                            type="button" 
+                                                            onClick={checkIfFormIsPostingData}
+                                                            className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-red-600 font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                                Close
+                                                            </button>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <Error500 />
+                                                )
+                                            }
+
+                                        </div>
                                     ) : preLoadStatus === 'fulfilled' ? (
                                         renderModalComponents()
                                     ) : (
