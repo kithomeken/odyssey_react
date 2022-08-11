@@ -113,8 +113,8 @@ export const AgentAccounts = () => {
                 Header: 'Status',
                 accessor: (data: { is_active: any, email_verified_at: any }) => (
                     data.email_verified_at === null || data.email_verified_at === undefined ? (
-                        <span className="bg-amber-100 text-amber-600 mb-0 text-xs py-1 px-2 rounded">
-                            Pending Verification
+                        <span className="bg-fuchsia-100 text-fuchsia-700 mb-0 text-xs py-1 px-2 rounded">
+                            Invited
                         </span>
                     ) : (
                         data.is_active === 'Y' ? (
