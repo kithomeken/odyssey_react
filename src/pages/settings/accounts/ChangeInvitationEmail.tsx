@@ -212,7 +212,7 @@ export const ChangeInvitationEmail: FC<Props> = ({ show, email, showOrHide, uuid
                 onFormSubmitHandler={onFormSubmitHandler}
                 errorTitle="Action Denied"
                 errorMessage="A change in the invitation email was already performed"
-                description="Capture the correct e-mail address for the agent account and issue out a new invitation. By doing this, the previous sent out invitation will be discarded."
+                description="Capture the correct e-mail address for the agent account and send out a new invitation. By doing this, the previous sent out invitation will be discarded."
                 actionButton={{
                     before: "Change",
                     after: "Changing"
