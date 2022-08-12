@@ -130,124 +130,199 @@ export const AgentDetails = () => {
                             state.status === 'rejected' ? (
                                 <Error500 />
                             ) : state.status === 'fulfilled' ? (
-                                <div>
-                                    <div className="w-8/12 pt-2 pb-4 h-screen">
-                                        <div className="w-full flex flex-row align-middle mb-3">
+                                <div className="flex flex-row">
+                                    <div className="w-3/12 rounded pr-4 pt-2 pb-4">
+                                        <div className="w-full flex flex-row">
+                                            <div className="h-16 w-16 flex flex-row align-middle bg-emerald-600 mb-4 rounded-full">
+                                                <p className="m-auto text-2xl text-white">
+                                                    {getFirstLetterFromName()}
+                                                </p>
+                                            </div>
+
+                                            <div className="flex-auto h-10">
+                                                <DropDown
+                                                    menuItems={
+                                                        <>
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <button
+                                                                        onClick={showOrHideChangeInvitationEmailModal}
+                                                                        className={classNames(
+                                                                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                                            'block px-4 py-2 text-sm text-left w-full'
+                                                                        )}
+                                                                    >
+                                                                        Change Invitation Email
+                                                                    </button>
+                                                                )}
+                                                            </Menu.Item>
+
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <button
+                                                                        className={classNames(
+                                                                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                                            'block px-4 py-2 text-sm text-left w-full'
+                                                                        )}
+                                                                    >
+                                                                        Suggest Account Changes
+                                                                    </button>
+                                                                )}
+                                                            </Menu.Item>
+
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <button
+                                                                        className={classNames(
+                                                                            active ? 'bg-red-100 text-red-900' : 'text-red-700',
+                                                                            'block px-4 py-2 text-sm text-left w-full'
+                                                                        )}
+                                                                    >
+                                                                        Decommission Account
+                                                                    </button>
+                                                                )}
+                                                            </Menu.Item>
+                                                        </>
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+
+
+                                        <div className="mb-4">
+                                            <p className="text-sm text-slate-500 mb-0">
+                                                Account Name
+                                            </p>
+
                                             {
                                                 state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === undefined ? (
-                                                    <div className="w-full">
-                                                        <div className="w-full flex flex-row align-middle mb-3">
-                                                            <div className="flex flex-row align-middle flex-auto">
-                                                                <div className="w-10 h-10 flex align-middle bg-emerald-600 mr-3 rounded-full">
-                                                                    <p className="m-auto text-2xl text-white">
-                                                                        {getFirstLetterFromName()}
-                                                                    </p>
-                                                                </div>
-
-                                                                <div>
-                                                                    <p className="text-2xl text-slate-600">
-                                                                        {state.data.agent.email}
-                                                                    </p>
-
-                                                                    <span className="block text-slate-500 text-sm">
-                                                                        User invited on <DateFormating dateString={state.data.agent.created_at} />
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="relative inline-block text-left w-4/12">
-                                                                <div className="flex flex-row-reverse align-middle">
-                                                                    <button type="button" className="w-full inline-flex justify-center text-sm rounded border border-gray-400 shadow-sm px-2 py-1-5 bg-0-600 text-gray-500 sm:w-auto sm:text-sm">
-                                                                        <span>
-                                                                            <span className="left-0 inset-y-0 flex items-center">
-                                                                                <span className="w-5 h-5">
-                                                                                    <i className="fad fa-paper-plane"></i>
-                                                                                </span>
-
-                                                                                <span className="ml-1">
-                                                                                    Resend Invitation
-                                                                                </span>
-                                                                            </span>
-                                                                        </span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-
-                                                        <div className="mb-5 rounded py-3 px-4 bg-sky-50">
-                                                            <div className="flex items-center align-middle text-sky-600 p-1">
-                                                                <i className="fad fa-exclamation-circle fa-lg"></i>
-                                                                <span className="text-sm pl-3 text-sky-600">
-                                                                    This agent account has not been verified.
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <hr />
+                                                    <div className="flex items-center align-middle text-amber-700 px-0 py-3">
+                                                        <i className="fad fa-exclamation-circle fa-lg"></i>
+                                                        <span className="text-xs pl-3 text-amber-700">
+                                                            Account has not been verified.
+                                                        </span>
                                                     </div>
                                                 ) : (
-                                                    <div className="w-full">
-                                                        <div className="w-full flex flex-row align-middle mb-3">
-                                                            <div className="flex flex-row align-middle flex-auto">
-                                                                <div className="w-10 h-10 flex align-middle bg-emerald-600 mr-3 rounded-full">
-                                                                    <p className="m-auto text-2xl text-white">
-                                                                        {getFirstLetterFromName()}
-                                                                    </p>
-                                                                </div>
+                                                    <p className="text-sm text-slate-700 mb-0 flex fle-row align-middle">
+                                                        {state.data.agent.first_name} {state.data.agent.last_name}
 
-                                                                <div>
-                                                                    <p className="text-2xl text-slate-600">
-                                                                        {state.data.agent.first_name} {state.data.agent.last_name}
-                                                                    </p>
 
-                                                                    <span className="block text-slate-500 text-sm">
-                                                                        {state.data.agent.email}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="relative inline-block text-left w-4/12">
-                                                                <div className="flex flex-row-reverse align-middle">
-                                                                    <button type="button" className="w-full inline-flex justify-center text-sm rounded border border-gray-400 shadow-sm px-2 py-1-5 bg-0-600 text-gray-500 sm:w-auto sm:text-sm">
-                                                                        <span>
-                                                                            <span className="left-0 inset-y-0 flex items-center">
-                                                                                <span className="w-5 h-5">
-                                                                                    <i className="fad fa-pen"></i>
-                                                                                </span>
-
-                                                                                <span className="ml-1">
-                                                                                    Edit Account
-                                                                                </span>
-                                                                            </span>
-                                                                        </span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <hr />
-                                                    </div>
+                                                    </p>
                                                 )
                                             }
                                         </div>
 
+                                        <div className="mb-4">
+                                            <p className="text-sm text-slate-500 mb-0">
+                                                E-mail Address
+                                            </p>
+
+                                            <p className="text-sm text-slate-700">
+                                                {state.data.agent.email}
+                                            </p>
+                                        </div>
+
+                                        <hr />
+
+                                        <span className="block text-slate-500 text-xs my-4">
+                                            {
+                                                state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === undefined ? (
+                                                    <>
+                                                        User invited on
+                                                        <span className="text-slate-700 ml-1">
+                                                            <DateFormating dateString={state.data.agent.created_at} />
+                                                        </span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        Last active on
+                                                        <span className="text-slate-700 ml-1">
+                                                            <DateFormating dateString={state.data.agent.created_at} />
+                                                        </span>
+                                                    </>
+                                                )
+                                            }
+                                        </span>
+
+                                        {
+                                            state.data.agent.account_type === 'M' ? (
+                                                <span className="bg-fuchsia-700 text-white mb-0 text-xs py-1 px-2 rounded">
+                                                    Master Account
+                                                </span>
+                                            ) : null
+                                        }
+                                    </div>
+
+
+
+                                    <div className="w-8/12 pl-4 pt-2 pb-4 h-screen">
+                                        {/* <div className="w-full h-10">
+                                            <DropDown
+                                                iconProperty="fad fa-paper-plane"
+                                                buttonTitle="Resend Invitation"
+                                                onMainActionButton={undefined}
+                                                menuItems={
+                                                    <>
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <button
+                                                                    onClick={showOrHideChangeInvitationEmailModal}
+                                                                    className={classNames(
+                                                                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                                        'block px-4 py-2 text-sm text-left w-full'
+                                                                    )}
+                                                                >
+                                                                    Change Invitation Email
+                                                                </button>
+                                                            )}
+                                                        </Menu.Item>
+
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <button
+                                                                    className={classNames(
+                                                                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                                        'block px-4 py-2 text-sm text-left w-full'
+                                                                    )}
+                                                                >
+                                                                    Suggest Account Changes
+                                                                </button>
+                                                            )}
+                                                        </Menu.Item>
+
+                                                        <Menu.Item>
+                                                            {({ active }) => (
+                                                                <button
+                                                                    className={classNames(
+                                                                        active ? 'bg-red-100 text-red-900' : 'text-red-700',
+                                                                        'block px-4 py-2 text-sm text-left w-full'
+                                                                    )}
+                                                                >
+                                                                    Decommission Account
+                                                                </button>
+                                                            )}
+                                                        </Menu.Item>
+                                                    </>
+                                                }
+                                            />
+                                        </div> */}
+
                                         <div className="w-full mb-5 mt-3">
-                                            <div className="flex flex-row align-middle">
+                                            <div className="flex flex-row align-middle mb-3">
                                                 <div className="flex-auto">
-                                                    <p className="text-xl text-slate-600">
+                                                    <p className="text-xl text-emerald-600">
                                                         Authorization Team
                                                     </p>
                                                 </div>
 
-                                                <button type="button" className="items-center flex-none px-3 py-1 border-2 bg-emerald-500 border-emerald-500 rounded shadow-sm text-sm text-white hover:border-emerald-600 hover:bg-emerald-600 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-emerald-400">
+                                                <button type="button" className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm">
                                                     <span>
                                                         <span className="left-0 inset-y-0 flex items-center">
                                                             <span className="w-5 h-5">
                                                                 <i className="fas fa-exchange"></i>
                                                             </span>
 
-                                                            <span className="ml-1">
+                                                            <span className="ml-2">
                                                                 Change Team
                                                             </span>
                                                         </span>
@@ -256,13 +331,13 @@ export const AgentDetails = () => {
                                             </div>
 
                                             <p className="text-sm text-slate-600">
-                                                Team that manages the user's privileges, permissions, restrictions and ticket access.
+                                                Team that manages the user's permissions, restrictions and ticket access.
                                             </p>
 
-                                            <div className="w-full py-5">
+                                            <div className="w-full pt-5">
                                                 <div className="flex flex-row border-b pb-2 align-middle">
                                                     <div className="flex-auto">
-                                                        <span className="py-3 text-left text-xs text-emerald-600 uppercase font-normal tracking-wider">
+                                                        <span className="py-3 text-left text-xs text-slate-600 uppercase font-normal tracking-wider">
                                                             Team
                                                         </span>
                                                     </div>
@@ -274,23 +349,21 @@ export const AgentDetails = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex flex-row border-y divide-gray-200 align-middle">
+                                                <div className="flex flex-row border-t border-b-2 divide-gray-200 align-middle">
                                                     <div className="flex-auto">
                                                         <td className="py-2 whitespace-wrap">
-                                                            <span className="block text-emerald-600 mb-1">
+                                                            <span className="block text-blue-600 mb-1 text-sm">
                                                                 {state.data.auth_team.name}
                                                             </span>
 
-                                                            <span className="block text-slate-500 mb-1 text-sm">
-                                                                <TableContentFormatting
-                                                                    content={state.data.auth_team.description}
-                                                                />
+                                                            <span className="block text-slate-500 mb-1 text-xs">
+                                                                {state.data.auth_team.description}
                                                             </span>
                                                         </td>
                                                     </div>
 
                                                     <div className="w-32 flex align-middle flex-row">
-                                                        <button className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-900 text-sm">
+                                                        <button className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm">
                                                             Details
                                                         </button>
                                                     </div>
@@ -301,21 +374,21 @@ export const AgentDetails = () => {
                                         </div>
 
                                         <div className="w-full mb-5 mt-3">
-                                            <div className="flex flex-row align-middle">
+                                            <div className="flex flex-row align-middle mb-3">
                                                 <div className="flex-auto">
-                                                    <p className="text-xl text-slate-600">
+                                                    <p className="text-xl text-emerald-600">
                                                         Projects
                                                     </p>
                                                 </div>
 
-                                                <button type="button" className="items-center flex-none px-3 py-1 border-2 bg-emerald-500 border-emerald-500 rounded shadow-sm text-sm text-white hover:border-emerald-600 hover:bg-emerald-600 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-emerald-400">
+                                                <button type="button" className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm">
                                                     <span>
-                                                        <span className="left-0 inset-y-0 flex items-center">
+                                                        <span className="left-0 inset-y-0 flex flex-row align-middle">
                                                             <span className="w-5 h-5">
                                                                 <i className="fas fa-plus"></i>
                                                             </span>
 
-                                                            <span className="ml-1">
+                                                            <span className="ml-2">
                                                                 Add To Project
                                                             </span>
                                                         </span>
