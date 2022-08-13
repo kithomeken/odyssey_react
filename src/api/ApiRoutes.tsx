@@ -4,6 +4,7 @@ export const AGENT_LIST_API_ROUTE = 'portal/a/site-master/accounts/users/agents/
 export const AGENT_DETAILS_API_ROUTE = 'portal/a/site-master/accounts/users/agents'
 export const AGENT_CHANGE_EMAIL_CHECK_API_ROUTE = 'portal/a/site-master/accounts/users/agents/invitations/change-email/check'
 export const AGENT_CHANGE_EMAIL_INV_API_ROUTE = 'portal/a/site-master/accounts/users/agents/invitations/change-email'
+export const AGENT_RESEND_EMAIL_INV_API_ROUTE = 'portal/a/site-master/accounts/users/agents/invitations/resend'
 
 // Master Accounts
 export const MASTER_ACCOUNTS_LIST_API_ROUTE = 'portal/a/site-master/accounts/users/master/all'
