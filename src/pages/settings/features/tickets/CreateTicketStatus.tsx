@@ -3,7 +3,7 @@ import { Fragment, useState } from "react"
 import { useDispatch } from "react-redux"
 
 import ErrorBanner from "../../../../components/layouts/ErrorBanner"
-import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
+import {ListBoxZero} from "../../../../lib/hooks/ListBoxZero"
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
 import HttpServices from "../../../../services/HttpServices"
 import Error500 from "../../../errors/Error500"

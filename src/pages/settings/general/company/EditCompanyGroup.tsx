@@ -3,7 +3,7 @@ import React, { useState } from "react"
 import { useCountries } from 'use-react-countries'
 import { toast } from "react-toastify"
 
-import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
+import {ListBoxZero} from "../../../../lib/hooks/ListBoxZero"
 import HttpServices from "../../../../services/HttpServices"
 import ErrorBanner from "../../../../components/layouts/ErrorBanner"
 import { COMPANY_GROUP_CHECK_B4_API_ROUTE, COMPANY_GROUP_UPDATE_API_ROUTE } from "../../../../api/ApiRoutes"

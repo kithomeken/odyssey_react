@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 
 import { InformationAlert } from "../../../components/lib/InformationAlert"
 import { SideBarPanel } from "../../../components/lib/SideBarPanel"
-import ListBoxZero from "../../../lib/hooks/ListBoxZero"
+import {ListBoxZero} from "../../../lib/hooks/ListBoxZero"
 import { usePromiseEffect } from "../../../lib/hooks/usePromiseEffect"
 import HttpServices from "../../../services/HttpServices"
 import { AUTH_TEAM_CHECK_NAME_UPDATE_API_ROUTE, AUTH_TEAM_CREATE_UPDATE_API_ROUTE, SUPPORT_FEATURES_LIST_API_ROUTE } from "../../../api/ApiRoutes"

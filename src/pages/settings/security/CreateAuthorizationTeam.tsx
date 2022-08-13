@@ -12,7 +12,7 @@ import { InformationAlert } from "../../../components/lib/InformationAlert"
 import { toast } from "react-toastify"
 import HeaderParagraphLarge from "../../../components/settings/HeaderParagraphLarge"
 import { Listbox } from "@headlessui/react"
-import ListBoxZero from "../../../lib/hooks/ListBoxZero"
+import {ListBoxZero} from "../../../lib/hooks/ListBoxZero"
 
 const CreateAuthorizationTeam = () => {
     const [state, setstate] = useState({

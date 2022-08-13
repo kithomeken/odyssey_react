@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux"
 
 import { COMPANY_GROUP_ALL_PRODUCTS_API_ROUTE, COMPANY_GROUP_SUBSCRIBE_TO_PRODUCT_API_ROUTE } from "../../../../api/ApiRoutes"
 import Loading from "../../../../components/layouts/Loading"
-import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
+import {ListBoxZero} from "../../../../lib/hooks/ListBoxZero"
 import { usePromiseEffect } from "../../../../lib/hooks/usePromiseEffect"
 import HttpServices from "../../../../services/HttpServices"
 import Error500 from "../../../errors/Error500"
