@@ -3,19 +3,18 @@ import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
 
-import { AGENT_DETAILS_API_ROUTE } from "../../../api/ApiRoutes"
+import { AGENT_DETAILS_API_ROUTE, AGENT_RESEND_EMAIL_INV_API_ROUTE } from "../../../api/ApiRoutes"
 import Loading from "../../../components/layouts/Loading"
 import { DropDown } from "../../../components/lib/DropDown"
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
-import HeaderParagraph from "../../../components/settings/HeaderParagraph"
-import { HEADER_SECTION_BG, APPLICATION_NAME } from "../../../global/ConstantsRegistry"
+import { HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
 import DateFormating from "../../../lib/hooks/DateFormating"
 import HttpServices from "../../../services/HttpServices"
 import Error500 from "../../errors/Error500"
 import { ChangeInvitationEmail } from "./ChangeInvitationEmail"
 import emptySearchBox from '../../../assets/images/empty_results_returned.png'
-import TableContentFormatting from "../../../lib/hooks/TableContentFormating"
+import { toast } from "react-toastify"
 
 export const AgentDetails = () => {
     const [state, setstate] = useState({
@@ -23,10 +22,10 @@ export const AgentDetails = () => {
         show: false,
         status: 'pending',
         requestFailed: '',
+        resendingInvitation: false,
         allowInvitationChange: null,
         modals: {
             showChangeEmail: false,
-
         }
     })
 
@@ -79,12 +78,6 @@ export const AgentDetails = () => {
         return classes.filter(Boolean).join(' ')
     }
 
-    const onClickDropDownHandler = () => {
-        setstate({
-            ...state, show: !state.show
-        })
-    }
-
     const showOrHideChangeInvitationEmailModal = () => {
         let { modals } = state
         modals.showChangeEmail = !state.modals.showChangeEmail
@@ -103,10 +96,70 @@ export const AgentDetails = () => {
         })
     }
 
-    const updateAllowChangeInvitation = (isAllowed: any) => {
-        setstate({
-            ...state, allowInvitationChange: isAllowed
-        })
+    const resendEmailInvitationApiCall = async () => {
+        let { data } = state
+
+        if (data.agent.is_active === 'Y') {
+            setstate({
+                ...state, resendingInvitation: true
+            })
+
+            /* 
+            * TODO: Add functionality for checking on the number of 
+            * invitations sent in a 12 hour period.
+            * Should also check if the job failed and report to master
+            */
+
+            try {
+                let formData = new FormData
+                formData.append('uuid', params.uuid)
+
+                const response: any = await HttpServices.httpPost(AGENT_RESEND_EMAIL_INV_API_ROUTE, formData)
+                const dataResponse = response.data
+
+                if (response.data.success) {
+                    let toastText = 'Email invitation sent to agent'
+
+                    toast.success(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                } else {
+                    let toastText = dataResponse.message
+
+                    toast.error(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+            } catch (error) {
+                let toastText = 'Something went wrong. Could not complete action'
+
+                toast.error(toastText, {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
+
+            setstate({
+                ...state, resendingInvitation: false
+            })
+        }
     }
 
     return (
@@ -143,6 +196,43 @@ export const AgentDetails = () => {
                                                 <DropDown
                                                     menuItems={
                                                         <>
+                                                            <Menu.Item>
+                                                                {({ active }) => (
+                                                                    <>
+                                                                        {
+                                                                            state.resendingInvitation ? (
+                                                                                <button
+                                                                                    className={classNames(
+                                                                                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                                                        'block px-4 py-2 text-sm text-left w-full'
+                                                                                    )}
+                                                                                >
+                                                                                    <span className="left-0 inset-y-0 flex items-center">
+                                                                                        <span className="pr-2">
+                                                                                            Resending...
+                                                                                        </span>
+
+                                                                                        <span className="w-5 h-5 text-emerald-600">
+                                                                                            <i className="fad fa-spinner-third fa-lg fa-spin"></i>
+                                                                                        </span>
+                                                                                    </span>
+                                                                                </button>
+                                                                            ) : (
+                                                                                <button
+                                                                                    onClick={resendEmailInvitationApiCall}
+                                                                                    className={classNames(
+                                                                                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                                                        'block px-4 py-2 text-sm text-left w-full'
+                                                                                    )}
+                                                                                >
+                                                                                    Resend Invitation
+                                                                                </button>
+                                                                            )
+                                                                        }
+                                                                    </>
+                                                                )}
+                                                            </Menu.Item>
+
                                                             <Menu.Item>
                                                                 {({ active }) => (
                                                                     <button
@@ -205,8 +295,6 @@ export const AgentDetails = () => {
                                                 ) : (
                                                     <p className="text-sm text-slate-700 mb-0 flex fle-row align-middle">
                                                         {state.data.agent.first_name} {state.data.agent.last_name}
-
-
                                                     </p>
                                                 )
                                             }
