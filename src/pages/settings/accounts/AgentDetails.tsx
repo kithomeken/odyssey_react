@@ -2,6 +2,7 @@ import { Menu } from "@headlessui/react"
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
+import { toast } from "react-toastify"
 
 import { AGENT_DETAILS_API_ROUTE, AGENT_RESEND_EMAIL_INV_API_ROUTE } from "../../../api/ApiRoutes"
 import Loading from "../../../components/layouts/Loading"
@@ -14,7 +15,8 @@ import HttpServices from "../../../services/HttpServices"
 import Error500 from "../../errors/Error500"
 import { ChangeInvitationEmail } from "./ChangeInvitationEmail"
 import emptySearchBox from '../../../assets/images/empty_results_returned.png'
-import { toast } from "react-toastify"
+import { ChangeAuthTeam } from "./ChangeAuthTeam"
+import { ActionAlert } from "../../../components/lib/ActionAlert"
 
 export const AgentDetails = () => {
     const [state, setstate] = useState({
@@ -26,6 +28,7 @@ export const AgentDetails = () => {
         allowInvitationChange: null,
         modals: {
             showChangeEmail: false,
+            showChangeAuthTeam: false,
         }
     })
 
@@ -104,12 +107,6 @@ export const AgentDetails = () => {
                 ...state, resendingInvitation: true
             })
 
-            /* 
-            * TODO: Add functionality for checking on the number of 
-            * invitations sent in a 12 hour period.
-            * Should also check if the job failed and report to master
-            */
-
             try {
                 let formData = new FormData
                 formData.append('uuid', params.uuid)
@@ -160,6 +157,24 @@ export const AgentDetails = () => {
                 ...state, resendingInvitation: false
             })
         }
+    }
+
+    const showOrHideChangeAuthTeamModal = () => {
+        let { modals } = state
+        modals.showChangeAuthTeam = !state.modals.showChangeAuthTeam
+
+        setstate({
+            ...state, modals
+        })
+    }
+
+    const updateAuthorizationTeamState = (authTeam: any) => {
+        let { data }: any = state
+        data.auth_team = authTeam
+
+        setstate({
+            ...state, data
+        })
     }
 
     return (
@@ -403,7 +418,7 @@ export const AgentDetails = () => {
                                                     </p>
                                                 </div>
 
-                                                <button type="button" className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm">
+                                                <button type="button" onClick={showOrHideChangeAuthTeamModal} className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm">
                                                     <span>
                                                         <span className="left-0 inset-y-0 flex items-center">
                                                             <span className="w-5 h-5">
@@ -439,15 +454,15 @@ export const AgentDetails = () => {
 
                                                 <div className="flex flex-row border-t border-b-2 divide-gray-200 align-middle">
                                                     <div className="flex-auto">
-                                                        <td className="py-2 whitespace-wrap">
+                                                        <div className="py-2 whitespace-wrap">
                                                             <span className="block text-blue-600 mb-1 text-sm">
                                                                 {state.data.auth_team.name}
                                                             </span>
 
                                                             <span className="block text-slate-500 mb-1 text-xs">
-                                                                {state.data.auth_team.description}
+                                                                {state.data.auth_team.description.substring(0, 100)}'...'
                                                             </span>
-                                                        </td>
+                                                        </div>
                                                     </div>
 
                                                     <div className="w-32 flex align-middle flex-row">
@@ -508,6 +523,25 @@ export const AgentDetails = () => {
                                         updateAgentEmail={updateAgentEmail}
                                         show={state.modals.showChangeEmail}
                                         showOrHide={showOrHideChangeInvitationEmailModal}
+                                    />
+
+                                    <ChangeAuthTeam
+                                        uuid={params.uuid}
+                                        team_name={state.data.auth_team.name}
+                                        team_uuid={state.data.auth_team.uuid}
+                                        show={state.modals.showChangeAuthTeam}
+                                        showOrHide={showOrHideChangeAuthTeamModal}
+                                        updateAuthorizationTeamState={updateAuthorizationTeamState}
+                                        account_name={
+                                            state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === null ?
+                                                state.data.agent.email
+                                                :
+                                                state.data.agent.account_name
+                                        }
+                                    />
+
+                                    <ActionAlert
+
                                     />
                                 </div>
                             ) : (
