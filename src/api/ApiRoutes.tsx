@@ -4,6 +4,10 @@ export const AGENT_LIST_API_ROUTE = 'portal/a/site-master/accounts/users/agents/
 export const AGENT_DETAILS_API_ROUTE = 'portal/a/site-master/accounts/users/agents'
 export const AGENT_CHANGE_EMAIL_CHECK_API_ROUTE = 'portal/a/site-master/accounts/users/agents/invitations/change-email/check'
 export const AGENT_CHANGE_EMAIL_INV_API_ROUTE = 'portal/a/site-master/accounts/users/agents/invitations/change-email'
+export const AGENT_RESEND_EMAIL_INV_API_ROUTE = 'portal/a/site-master/accounts/users/agents/invitations/resend'
+export const AGENT_AUTH_TEAM_LIST_API_ROUTE = 'portal/a/site-master/accounts/users/agents/authorization-teams/list'
+export const AGENT_CHANGE_AUTH_TEAM_API_ROUTE = 'portal/a/site-master/accounts/users/agents/authorization-teams/change'
+export const AGENT_SUSPEND_ACCOUNT_API_ROUTE = 'portal/a/site-master/accounts/users/agents/suspend'
 
 // Master Accounts
 export const MASTER_ACCOUNTS_LIST_API_ROUTE = 'portal/a/site-master/accounts/users/master/all'
@@ -42,6 +46,7 @@ export const COMPANY_GROUP_CHECK_B4_API_ROUTE = 'portal/a/site-master/general/co
 export const COMPANY_GROUP_UPDATE_API_ROUTE = 'portal/a/site-master/general/company-groups/update'
 
 // Authorization Team
+export const AUTH_TEAM_LIST_API_ROUTE = 'portal/a/site-master/security/auth-teams'
 export const AUTH_TEAM_CHECK_NAME_UPDATE_API_ROUTE = 'portal/a/site-master/security/auth-teams/check'
 export const AUTH_TEAM_CREATE_UPDATE_API_ROUTE = 'portal/a/site-master/security/auth-teams/create'
 export const AUTH_TEAM_DETAILS_API_ROUTE = 'portal/a/site-master/security/auth-teams' // uuid

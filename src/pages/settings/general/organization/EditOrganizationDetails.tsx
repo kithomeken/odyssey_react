@@ -3,7 +3,7 @@ import { useCountries } from 'use-react-countries'
 import { Transition, Dialog, Listbox } from "@headlessui/react"
 import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
 
-import ListBoxZero from "../../../../lib/hooks/ListBoxZero"
+import {ListBoxZero} from "../../../../lib/hooks/ListBoxZero"
 import Editor from "../../../../lib/tiptap/Editor"
 import { ORGANIZATION_DETAILS_UPDATE_API_ROUTE } from "../../../../api/ApiRoutes"
 import HttpServices from "../../../../services/HttpServices"

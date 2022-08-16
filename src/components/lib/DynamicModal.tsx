@@ -67,7 +67,7 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                         <div className="w-full max-h-96 overflow-scroll px-4 sm:px-6">
                             {
                                 description && (
-                                    <p className="text-sm mb-3 text-gray-500">
+                                    <p className="text-sm mb-3 text-slate-600">
                                         {description}
                                     </p>
                                 )
@@ -92,9 +92,13 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                                     <button type="button" className="w-full inline-flex cursor-not-allowed justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white sm:ml-3 sm:w-auto sm:text-sm disabled:bg-emerald-600" disabled={true}>
                                         <span>
                                             <span className="left-0 inset-y-0 flex items-center">
-                                                <span className="pr-2">
-                                                    {actionButton.after}
-                                                </span>
+                                                {
+                                                    actionButton.after && (
+                                                        <span className="pr-2">
+                                                            {actionButton.after}
+                                                        </span>
+                                                    )
+                                                }
 
                                                 <span className="w-5 h-5">
                                                     <i className="fad fa-spinner-third fa-lg fa-spin"></i>

@@ -54,7 +54,7 @@ export const AgentAccounts = () => {
             })
         } catch (e) {
             console.warn(e);
-            let status = state.status            
+            let status = state.status
             status = 'rejected'
 
             setstate({
@@ -91,7 +91,7 @@ export const AgentAccounts = () => {
             },
             {
                 Header: 'Email',
-                accessor: (data: { email: any}) => (
+                accessor: (data: { email: any }) => (
                     <span>
                         <span className="block text-gray-500 mb-0 text-sm">
                             {data.email}
@@ -112,18 +112,18 @@ export const AgentAccounts = () => {
             {
                 Header: 'Status',
                 accessor: (data: { is_active: any, email_verified_at: any }) => (
-                    data.email_verified_at === null || data.email_verified_at === undefined ? (
-                        <span className="bg-fuchsia-100 text-fuchsia-700 mb-0 text-xs py-1 px-2 rounded">
-                            Invited
+                    data.is_active !== 'Y' ? (
+                        <span className="text-red-600 bg-red-100 mb-0 text-xs py-1 px-2 rounded">
+                            Suspended
                         </span>
                     ) : (
-                        data.is_active === 'Y' ? (
-                            <span className="bg-green-100 text-green-600 mb-0 text-xs py-1 px-2 rounded">
-                                Active
+                        data.email_verified_at === null || data.email_verified_at === undefined ? (
+                            <span className="bg-fuchsia-100 text-fuchsia-700 mb-0 text-xs py-1 px-2 rounded">
+                                Invited
                             </span>
                         ) : (
-                            <span className="text-red-600 bg-red-100 mb-0 text-xs py-1 px-2 rounded">
-                                Suspended
+                            <span className="bg-emerald-100 text-emerald-600 mb-0 text-xs py-1 px-2 rounded">
+                                Active
                             </span>
                         )
                     )
@@ -180,7 +180,7 @@ export const AgentAccounts = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col align-middle mt-6 h-16">
-                                <span className="fad text-green-500 fa-spinner-third fa-2x m-auto block fa-spin"></span>
+                                <span className="fad text-emerald-500 fa-spinner-third fa-2x m-auto block fa-spin"></span>
                             </div>
                         )
                     }

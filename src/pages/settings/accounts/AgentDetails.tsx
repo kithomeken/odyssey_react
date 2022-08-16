@@ -2,20 +2,22 @@ import { Menu } from "@headlessui/react"
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
+import { toast } from "react-toastify"
 
-import { AGENT_DETAILS_API_ROUTE } from "../../../api/ApiRoutes"
+import { AGENT_DETAILS_API_ROUTE, AGENT_RESEND_EMAIL_INV_API_ROUTE, AGENT_SUSPEND_ACCOUNT_API_ROUTE } from "../../../api/ApiRoutes"
 import Loading from "../../../components/layouts/Loading"
 import { DropDown } from "../../../components/lib/DropDown"
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
-import HeaderParagraph from "../../../components/settings/HeaderParagraph"
-import { HEADER_SECTION_BG, APPLICATION_NAME } from "../../../global/ConstantsRegistry"
+import { HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
 import DateFormating from "../../../lib/hooks/DateFormating"
 import HttpServices from "../../../services/HttpServices"
 import Error500 from "../../errors/Error500"
 import { ChangeInvitationEmail } from "./ChangeInvitationEmail"
 import emptySearchBox from '../../../assets/images/empty_results_returned.png'
-import TableContentFormatting from "../../../lib/hooks/TableContentFormating"
+import { ChangeAuthTeam } from "./ChangeAuthTeam"
+import { ActionModal } from "../../../components/lib/ActionModal"
+import { accountRoutes } from "../../../routes/settings/accountRoutes"
 
 export const AgentDetails = () => {
     const [state, setstate] = useState({
@@ -23,21 +25,27 @@ export const AgentDetails = () => {
         show: false,
         status: 'pending',
         requestFailed: '',
+        resendingInvitation: false,
         allowInvitationChange: null,
         modals: {
             showChangeEmail: false,
-
+            showChangeAuthTeam: false,
+            showSuspendAccount: false,
+        },
+        postingForm: {
+            suspendingAcc: false
         }
     })
 
     // Header button
+    const showButton = false
     const params = useParams();
     const pageTitle = "Agent Details"
-    const showButton = false
+    const AGNT_ACCOUNT_RT: any = (accountRoutes.find((routeName) => routeName.name === 'AGNT'))?.path
 
     const breadCrumb = [
-        { linkItem: true, title: "Account Settings", url: "" },
-        { linkItem: true, title: "Agent Accounts", url: "" },
+        { linkItem: true, title: "Account Settings", url: AGNT_ACCOUNT_RT },
+        { linkItem: true, title: "Agent Accounts", url: AGNT_ACCOUNT_RT },
         { linkItem: false, title: pageTitle },
     ]
 
@@ -79,12 +87,6 @@ export const AgentDetails = () => {
         return classes.filter(Boolean).join(' ')
     }
 
-    const onClickDropDownHandler = () => {
-        setstate({
-            ...state, show: !state.show
-        })
-    }
-
     const showOrHideChangeInvitationEmailModal = () => {
         let { modals } = state
         modals.showChangeEmail = !state.modals.showChangeEmail
@@ -103,10 +105,286 @@ export const AgentDetails = () => {
         })
     }
 
-    const updateAllowChangeInvitation = (isAllowed: any) => {
+    const resendEmailInvitationApiCall = async () => {
+        let { data } = state
+
+        if (data.agent.is_active === 'Y') {
+            setstate({
+                ...state, resendingInvitation: true
+            })
+
+            try {
+                let formData = new FormData
+                formData.append('uuid', params.uuid)
+
+                const response: any = await HttpServices.httpPost(AGENT_RESEND_EMAIL_INV_API_ROUTE, formData)
+                const dataResponse = response.data
+
+                if (response.data.success) {
+                    let toastText = 'Email invitation sent to agent'
+
+                    toast.success(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                } else {
+                    let toastText = dataResponse.message
+
+                    toast.error(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+            } catch (error) {
+                let toastText = 'Something went wrong. Could not complete action'
+
+                toast.error(toastText, {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
+
+            setstate({
+                ...state, resendingInvitation: false
+            })
+        }
+    }
+
+    const showOrHideChangeAuthTeamModal = () => {
+        let { modals } = state
+
+        if (state.data.agent.is_active === 'Y') {
+            modals.showChangeAuthTeam = !state.modals.showChangeAuthTeam
+
+            setstate({
+                ...state, modals
+            })
+        }
+    }
+
+    const updateAuthorizationTeamState = (authTeam: any) => {
+        let { data }: any = state
+        data.auth_team = authTeam
+
         setstate({
-            ...state, allowInvitationChange: isAllowed
+            ...state, data
         })
+    }
+
+    const showOrHideSuspendAccountModal = () => {
+        let { modals } = state
+        modals.showSuspendAccount = !state.modals.showSuspendAccount
+
+        setstate({
+            ...state, modals
+        })
+    }
+
+    const suspendAgentAccountApiCall = async () => {
+        let { data } = state
+        let { postingForm } = state
+
+        if (data.agent.is_active === 'Y' && !postingForm.suspendingAcc) {
+            try {
+                let formData = new FormData
+                formData.append('uuid', params.uuid)
+
+                postingForm.suspendingAcc = true
+                setstate({
+                    ...state, postingForm
+                })
+
+                const response: any = await HttpServices.httpPost(AGENT_SUSPEND_ACCOUNT_API_ROUTE, formData)
+                const dataResponse = response.data
+
+                if (response.data.success) {
+                    let { data } = state
+                    data.agent = response.data.data
+
+                    setstate({
+                        ...state, data
+                    })
+                } else {
+                    let toastText = dataResponse.message
+
+                    toast.error(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+
+                showOrHideSuspendAccountModal()
+            } catch (error) {
+                let toastText = 'Something went wrong. Could not complete action'
+
+                toast.error(toastText, {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
+
+            postingForm.suspendingAcc = false
+            setstate({
+                ...state, postingForm
+            })
+        }
+    }
+
+    function renderDropDownModal() {
+        let { data } = state
+
+        if (data.agent.email_verified_at === null || data.agent.email_verified_at === undefined) {
+            return (
+                <>
+                    <Menu.Item>
+                        {({ active }) => (
+                            <>
+                                {
+                                    state.resendingInvitation ? (
+                                        <button
+                                            className={classNames(
+                                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                'block px-4 py-2 text-sm text-left w-full'
+                                            )}
+                                        >
+                                            <span className="left-0 inset-y-0 flex items-center">
+                                                <span className="pr-2">
+                                                    Resending...
+                                                </span>
+
+                                                <span className="w-5 h-5 text-emerald-600">
+                                                    <i className="fad fa-spinner-third fa-lg fa-spin"></i>
+                                                </span>
+                                            </span>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={resendEmailInvitationApiCall}
+                                            className={classNames(
+                                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                'block px-4 py-2 text-sm text-left w-full'
+                                            )}
+                                        >
+                                            Resend Invitation
+                                        </button>
+                                    )
+                                }
+                            </>
+                        )}
+                    </Menu.Item>
+
+                    <Menu.Item>
+                        {({ active }) => (
+                            <button
+                                onClick={showOrHideChangeInvitationEmailModal}
+                                className={classNames(
+                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                    'block px-4 py-2 text-sm text-left w-full'
+                                )}
+                            >
+                                Change Invitation Email
+                            </button>
+                        )}
+                    </Menu.Item>
+                </>
+            )
+        } else {
+            return (
+                <>
+                    <Menu.Item>
+                        {({ active }) => (
+                            <button
+                                className={classNames(
+                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                    'block px-4 py-2 text-sm text-left w-full'
+                                )}
+                            >
+                                Suggest Account Changes
+                            </button>
+                        )}
+                    </Menu.Item>
+                </>
+            )
+        }
+    }
+
+    const restoreAccountAccessApiCall = async () => {
+        if (state.data.agent.is_active === 'Y') {
+            try {
+                let formData = new FormData
+                formData.append('uuid', params.uuid)
+
+                const response: any = await HttpServices.httpPost(AGENT_RESEND_EMAIL_INV_API_ROUTE, formData)
+                const dataResponse = response.data
+
+                if (response.data.success) {
+                    let toastText = 'Email invitation sent to agent'
+
+                    toast.success(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                } else {
+                    let toastText = dataResponse.message
+
+                    toast.error(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+            } catch (error) {
+                let toastText = 'Something went wrong. Could not complete action'
+
+                toast.error(toastText, {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
+
+            setstate({
+                ...state, resendingInvitation: false
+            })
+        }
     }
 
     return (
@@ -143,19 +421,11 @@ export const AgentDetails = () => {
                                                 <DropDown
                                                     menuItems={
                                                         <>
-                                                            <Menu.Item>
-                                                                {({ active }) => (
-                                                                    <button
-                                                                        onClick={showOrHideChangeInvitationEmailModal}
-                                                                        className={classNames(
-                                                                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                                                            'block px-4 py-2 text-sm text-left w-full'
-                                                                        )}
-                                                                    >
-                                                                        Change Invitation Email
-                                                                    </button>
-                                                                )}
-                                                            </Menu.Item>
+                                                            {
+                                                                state.data.agent.is_active === 'Y' ? (
+                                                                    renderDropDownModal()
+                                                                ) : null
+                                                            }
 
                                                             <Menu.Item>
                                                                 {({ active }) => (
@@ -165,23 +435,44 @@ export const AgentDetails = () => {
                                                                             'block px-4 py-2 text-sm text-left w-full'
                                                                         )}
                                                                     >
-                                                                        Suggest Account Changes
+                                                                        Account Audit Trail
                                                                     </button>
                                                                 )}
                                                             </Menu.Item>
 
-                                                            <Menu.Item>
-                                                                {({ active }) => (
-                                                                    <button
-                                                                        className={classNames(
-                                                                            active ? 'bg-red-100 text-red-900' : 'text-red-700',
-                                                                            'block px-4 py-2 text-sm text-left w-full'
+                                                            {
+                                                                state.data.agent.is_active === 'Y' ? (
+                                                                    <Menu.Item>
+                                                                        {({ active }) => (
+                                                                            <button
+                                                                                onClick={showOrHideSuspendAccountModal}
+                                                                                className={classNames(
+                                                                                    active ? 'bg-red-100 text-red-900' : 'text-red-700',
+                                                                                    'block px-4 py-2 text-sm text-left w-full'
+                                                                                )}
+                                                                            >
+                                                                                Suspend Account
+                                                                            </button>
                                                                         )}
-                                                                    >
-                                                                        Decommission Account
-                                                                    </button>
-                                                                )}
-                                                            </Menu.Item>
+                                                                    </Menu.Item>
+                                                                ) : (
+                                                                    <Menu.Item>
+                                                                        {({ active }) => (
+                                                                            <button
+                                                                                onClick={restoreAccountAccessApiCall}
+                                                                                className={classNames(
+                                                                                    active ? 'bg-amber-100 text-amber-800' : 'text-amber-700',
+                                                                                    'block px-4 py-2 text-sm text-left w-full'
+                                                                                )}
+                                                                            >
+                                                                                Restore Access
+                                                                            </button>
+                                                                        )}
+                                                                    </Menu.Item>
+                                                                )
+                                                            }
+
+
                                                         </>
                                                     }
                                                 />
@@ -205,8 +496,6 @@ export const AgentDetails = () => {
                                                 ) : (
                                                     <p className="text-sm text-slate-700 mb-0 flex fle-row align-middle">
                                                         {state.data.agent.first_name} {state.data.agent.last_name}
-
-
                                                     </p>
                                                 )
                                             }
@@ -253,59 +542,26 @@ export const AgentDetails = () => {
                                         }
                                     </div>
 
-
-
                                     <div className="w-8/12 pl-4 pt-2 pb-4 h-screen">
-                                        {/* <div className="w-full h-10">
-                                            <DropDown
-                                                iconProperty="fad fa-paper-plane"
-                                                buttonTitle="Resend Invitation"
-                                                onMainActionButton={undefined}
-                                                menuItems={
-                                                    <>
-                                                        <Menu.Item>
-                                                            {({ active }) => (
-                                                                <button
-                                                                    onClick={showOrHideChangeInvitationEmailModal}
-                                                                    className={classNames(
-                                                                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                                                        'block px-4 py-2 text-sm text-left w-full'
-                                                                    )}
-                                                                >
-                                                                    Change Invitation Email
-                                                                </button>
-                                                            )}
-                                                        </Menu.Item>
+                                        {
+                                            state.data.agent.is_active === 'N' ? (
+                                                <div className="form-group rounded border-0 border-amber-400 bg-amber-100 py-4 px-4">
+                                                    <div className="flex flex-row align-middle text-amber-500">
+                                                        <i className="fad fa-exclamation-triangle fa-lg mt-1 text-amber-700 flex-none"></i>
 
-                                                        <Menu.Item>
-                                                            {({ active }) => (
-                                                                <button
-                                                                    className={classNames(
-                                                                        active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                                                        'block px-4 py-2 text-sm text-left w-full'
-                                                                    )}
-                                                                >
-                                                                    Suggest Account Changes
-                                                                </button>
-                                                            )}
-                                                        </Menu.Item>
+                                                        <div className="flex-auto ml-1">
+                                                            <span className="text-sm pl-3 text-slate-700 block">
+                                                                This account has been suspended. User will not be able to collaborate with your team.
+                                                            </span>
 
-                                                        <Menu.Item>
-                                                            {({ active }) => (
-                                                                <button
-                                                                    className={classNames(
-                                                                        active ? 'bg-red-100 text-red-900' : 'text-red-700',
-                                                                        'block px-4 py-2 text-sm text-left w-full'
-                                                                    )}
-                                                                >
-                                                                    Decommission Account
-                                                                </button>
-                                                            )}
-                                                        </Menu.Item>
-                                                    </>
-                                                }
-                                            />
-                                        </div> */}
+                                                            <button className="text-sm pl-3 text-blue-600 block hover:underline" onClick={restoreAccountAccessApiCall}>
+                                                                Restore Access
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ) : null
+                                        }
 
                                         <div className="w-full mb-5 mt-3">
                                             <div className="flex flex-row align-middle mb-3">
@@ -315,7 +571,13 @@ export const AgentDetails = () => {
                                                     </p>
                                                 </div>
 
-                                                <button type="button" className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm">
+                                                <button 
+                                                type="button" 
+                                                disabled={
+                                                    state.data.agent.is_active !== 'Y' ? true : false
+                                                }
+                                                onClick={showOrHideChangeAuthTeamModal} 
+                                                className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
                                                     <span>
                                                         <span className="left-0 inset-y-0 flex items-center">
                                                             <span className="w-5 h-5">
@@ -351,15 +613,15 @@ export const AgentDetails = () => {
 
                                                 <div className="flex flex-row border-t border-b-2 divide-gray-200 align-middle">
                                                     <div className="flex-auto">
-                                                        <td className="py-2 whitespace-wrap">
+                                                        <div className="py-2 whitespace-wrap">
                                                             <span className="block text-blue-600 mb-1 text-sm">
                                                                 {state.data.auth_team.name}
                                                             </span>
 
                                                             <span className="block text-slate-500 mb-1 text-xs">
-                                                                {state.data.auth_team.description}
+                                                                {state.data.auth_team.description.substring(0, 100)}'...'
                                                             </span>
-                                                        </td>
+                                                        </div>
                                                     </div>
 
                                                     <div className="w-32 flex align-middle flex-row">
@@ -381,7 +643,12 @@ export const AgentDetails = () => {
                                                     </p>
                                                 </div>
 
-                                                <button type="button" className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm">
+                                                <button 
+                                                type="button" 
+                                                disabled={
+                                                    state.data.agent.is_active !== 'Y' ? true : false
+                                                }
+                                                className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
                                                     <span>
                                                         <span className="left-0 inset-y-0 flex flex-row align-middle">
                                                             <span className="w-5 h-5">
@@ -421,9 +688,40 @@ export const AgentDetails = () => {
                                         show={state.modals.showChangeEmail}
                                         showOrHide={showOrHideChangeInvitationEmailModal}
                                     />
+
+                                    <ChangeAuthTeam
+                                        uuid={params.uuid}
+                                        team_name={state.data.auth_team.name}
+                                        team_uuid={state.data.auth_team.uuid}
+                                        show={state.modals.showChangeAuthTeam}
+                                        showOrHide={showOrHideChangeAuthTeamModal}
+                                        updateAuthorizationTeamState={updateAuthorizationTeamState}
+                                        account_name={
+                                            state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === null ?
+                                                state.data.agent.email
+                                                :
+                                                state.data.agent.account_name
+                                        }
+                                    />
+
+                                    <ActionModal
+                                        iconClass="fad fa-trash-alt fa-lg"
+                                        title="Suspend Account"
+                                        show={state.modals.showSuspendAccount}
+                                        details="User will not be able to access tickets or collaborate with your team. The user's past contributions will however remain"
+                                        showOrHide={showOrHideSuspendAccountModal}
+                                        actionEvent={suspendAgentAccountApiCall}
+                                        isPostingForm={state.postingForm.suspendingAcc}
+                                        actionButton={{
+                                            before: "Suspend",
+                                            after: "Suspending"
+                                        }}
+                                    />
                                 </div>
                             ) : (
-                                <Loading />
+                                <div className="pt-10">
+                                    <Loading />
+                                </div>
                             )
                         }
                     </div>
