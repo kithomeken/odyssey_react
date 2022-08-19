@@ -5,6 +5,7 @@ import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-syn
 import rootReducer from './rootReducer';
 import authenticationReducer from './auth/authenticationReducers';
 import locationRecuder from './routing/locationReducer';
+import checkInvitationsReducer from './invitations/checkInvitationsReducer';
 
 const middlewares = [
     createStateSyncMiddleware(),
@@ -12,8 +13,9 @@ const middlewares = [
 
 export const store = configureStore({
     reducer: {
+        checkInvitations: checkInvitationsReducer,
         authentication: authenticationReducer,
-        locationRouting: locationRecuder
+        locationRouting: locationRecuder,
     },
     middleware: [...getDefaultMiddleware(), ...middlewares],
 });
