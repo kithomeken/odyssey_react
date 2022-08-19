@@ -56,7 +56,7 @@ const SignIn = () => {
                         <div className="rounded-md shadow-none space-y-px">
                             <div className="form-group">
                                 <label htmlFor="email-address" className="sr-only">Email address</label>
-                                <input id="email-address" name="email" type="email" autoComplete="off" required className="auth-email-input" placeholder="myemail@domain.com"
+                                <input id="email-address" name="email" type="email" autoComplete="off" required className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="myemail@domain.com"
                                 value={credentials.email}
                                 onChange={(e) => setCredentials({ ...credentials, email: e.target.value })}
                                 />
@@ -71,14 +71,14 @@ const SignIn = () => {
 
                             <div className="form-group">
                                 <label htmlFor="password" className="sr-only">Password</label>
-                                <input id="password" name="password" type="password" autoComplete="current-password" required className="auth-password-input" 
+                                <input id="password" name="password" type="password" autoComplete="current-password" required className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" 
                                 placeholder="********"
                                 value={credentials.password}
                                 onChange={(e) => setCredentials({ ...credentials, password: e.target.value })} />
                             </div>
 
                             <div className="mb-3 pt-3 px-10">
-                                <button className="auth-submit-button" type="submit">
+                                <button className="bg-green-500 relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white hover:bg-green-500 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-green-600" type="submit">
                                     <span>
                                         {
                                             authState.loading ? (
@@ -194,7 +194,7 @@ const SignIn = () => {
                             <div className="rounded-md shadow-none space-y-px">
                                 <div className="form-group">
                                     <label htmlFor="email-address" className="sr-only">Email address</label>
-                                    <input id="email-address" name="email" type="email" autoComplete="off" required className="auth-email-input" placeholder="myemail@domain.com"
+                                    <input id="email-address" name="email" type="email" autoComplete="off" required className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="myemail@domain.com"
                                         value={this.state.input.email}
                                         onChange={(event) => this.setState({
                                             input: {
@@ -211,7 +211,7 @@ const SignIn = () => {
 
                                 <div className="form-group">
                                     <label htmlFor="password" className="sr-only">Password</label>
-                                    <input id="password" name="password" type="password" autoComplete="current-password" required className="auth-password-input" placeholder="********"
+                                    <input id="password" name="password" type="password" autoComplete="current-password" required className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 focus:z-10 sm:text-sm" placeholder="********"
                                         value={this.state.input.password}
                                         onChange={(event) => this.setState({
                                             input: {
