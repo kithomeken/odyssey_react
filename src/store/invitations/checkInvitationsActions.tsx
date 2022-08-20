@@ -19,7 +19,7 @@ export const checkInvitationsActions = (encodedEndpointApi: any) => {
                 })
             }
         })
-        .catch((error) => {            
+        .catch((error) => {
             dispatch({
                 type: "INVITATION_EXCEPTION_ERROR",
                 response: "Error while checking invitation link status",
