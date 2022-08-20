@@ -8,7 +8,7 @@ const initialState = {
 
 export const acceptInvitationsReducer = (state = initialState, action: any) => {
     switch (action.type) {
-        case 'ACCEPTING_INVITE':
+        case 'ACCOUNT_VERIFICATION_PENDING_':
             return {
                 ...initialState,
                 response: null,
@@ -16,7 +16,7 @@ export const acceptInvitationsReducer = (state = initialState, action: any) => {
                 acceptedInvitation: false 
             }
         
-        case 'INVITATION_IS_VALID':
+        case 'ACCOUNT_VERIFICATION_COMPLETED_':
             return {
                 ...initialState,
                 response: action.response,
@@ -24,7 +24,7 @@ export const acceptInvitationsReducer = (state = initialState, action: any) => {
                 acceptedInvitation: true 
             }
         
-        case 'INVITATION_IS_NOT_VALID':
+        case 'ACCOUNT_VERIFICATION_FAILED_':
             return {
                 ...initialState,
                 response: action.response,
@@ -32,7 +32,7 @@ export const acceptInvitationsReducer = (state = initialState, action: any) => {
                 acceptedInvitation: false 
             }
     
-        case 'INVITATION_EXCEPTION_ERROR':
+        case 'ACCOUNT_VERIFICATION_EXCEPTION_':
             return {
                 ...initialState,
                 response: action.response,

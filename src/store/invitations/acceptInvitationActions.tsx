@@ -1,9 +1,9 @@
 import axios from "axios"
 
-export const acceptInvitationActions = (input: any, email: any, encodedEndpointApi: string) => {
+export const acceptInvitationActions = (input: any, encodedEndpointApi: string) => {
     return (dispatch: (arg0: {type: string, response: any}) => void) => {
         dispatch({
-            type: "ACCEPTING_INVITE",
+            type: "ACCOUNT_VERIFICATION_PENDING_",
             response: null
         })
 
@@ -17,26 +17,20 @@ export const acceptInvitationActions = (input: any, email: any, encodedEndpointA
         .post(decodedEndpointApi, formData)
         .then((response) => {
             if (response.data.success) {
-                const postVerificationResponse = {
-                    'email': email,
-                    'payload': response.data,
-                    'password': input.password,
-                }
-
                 dispatch({
-                    type: "INVITATION_ACCEPTED",
-                    response: postVerificationResponse
+                    type: "ACCOUNT_VERIFICATION_COMPLETED_",
+                    response: response.data
                 })
             } else {
                 dispatch({
-                    type: "INVITATION_ACCEPTANCE_FAILED",
+                    type: "ACCOUNT_VERIFICATION_FAILED_",
                     response: response.data
                 })
             }
         })
         .catch((error) => {
             dispatch({
-                type: "INVITATION_EXCEPTION_ERROR",
+                type: "ACCOUNT_VERIFICATION_EXCEPTION_",
                 response: "Error while posting the invitation acceptance",
             });
         })
