@@ -1,14 +1,16 @@
 import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
-import Loading from "../../components/layouts/Loading";
+import { Navigate, useLocation } from "react-router-dom";
 
+import Crypto from "../../encryption/Crypto";
+import { Status401 } from "../errors/Status401";
+import Loading from "../../components/layouts/Loading";
 import { APPLICATION_NAME } from "../../global/ConstantsRegistry"
+import { guestRoutes } from "../../routes/auth/guestRoutes";
 import { useAppSelector } from "../../store/hooks";
 import { acceptInvitationActions } from "../../store/invitations/acceptInvitationActions";
 import { checkInvitationsActions } from "../../store/invitations/checkInvitationsActions";
-import { Status401 } from "../errors/Status401";
 
 export const AgentInvitation = () => {
     const [state, setstate] = useState({
@@ -28,8 +30,10 @@ export const AgentInvitation = () => {
 
     const location = useLocation()
     const dispatch = useDispatch()
-    const checkInvitationState = useAppSelector(state => state.checkInvitations);
-    const acceptingInvState = useAppSelector(state => state.acceptedInvitation);
+    let invitation = {
+        check: useAppSelector(state => state.checkInvitations),
+        accept: useAppSelector(state => state.acceptedInvitation),
+    }
 
     let searchParams: any = {};
     let searchKey = location.search?.split("?")[1]?.split("&");
@@ -140,7 +144,7 @@ export const AgentInvitation = () => {
             let { errors } = state
             let targetName = e.target.name
             let targetValue = e.target.value
-            const pwdPolicy = checkInvitationState.response.payload.policies
+            const pwdPolicy = invitation.check.response.payload.policies
 
             switch (targetName) {
                 case 'password':
@@ -174,28 +178,44 @@ export const AgentInvitation = () => {
 
     const onAcceptingInvitationHandler = (e: any) => {
         e.preventDefault()
-        if (acceptingInvState) {
-            dispatch(acceptInvitationActions(state.input, checkInvitationState.response.payload.email, searchParams.endp))
+        if (!invitation.accept.isPostingInvite) {
+            dispatch(acceptInvitationActions(state.input, searchParams.endp))
         }
+    }    
+    
+    if (invitation.accept.authenticate) {
+        const emailAddr = invitation.check.response.payload.email
+        const encryptedEmailAddr = Crypto.encryptDataUsingAES256(emailAddr)
+
+        const postInvitationAuth = (guestRoutes.find((routeName) => routeName.name === 'POST_INVITATION_AUTH_'))?.path
+        const autoSignIn = postInvitationAuth + "?signature=" + searchParams.signature + "&auid=" + encryptedEmailAddr
+
+        const autoAuthState = {
+            email : emailAddr,
+            password: state.input.password,
+            signature: searchParams.signature,
+        }
+
+        return <Navigate replace state={autoAuthState} to={autoSignIn} />
     }
 
     return (
         <React.Fragment>
             <Helmet>
                 <title>
-                    {checkInvitationState.title}
+                    {invitation.check.title}
                 </title>
             </Helmet>
 
             <div className="wrapper all-white">
                 <section className="gx-container">
                     {
-                        checkInvitationState.loading ? (
+                        invitation.check.loading ? (
                             <div className="py-4">
                                 <Loading />
                             </div>
                         ) : (
-                            checkInvitationState.isInvitationValid ? (
+                            invitation.check.isInvitationValid ? (
                                 <>
                                     <header className="landing-header">
                                         <div className="landing-header__left mb-0">
@@ -227,7 +247,7 @@ export const AgentInvitation = () => {
                                                             onBlur={onInputBlur}
                                                             onChange={onInputChangeHandler}
                                                             value={state.input.first_name}
-                                                            disabled={acceptingInvState.isPostingInvite}
+                                                            disabled={invitation.accept.isPostingInvite}
                                                             className={
                                                                 classNames(
                                                                     state.errors.first_name.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
@@ -240,7 +260,7 @@ export const AgentInvitation = () => {
                                                             className={
                                                                 classNames(
                                                                     state.errors.first_name.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
-                                                                    acceptingInvState.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
+                                                                    invitation.accept.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
                                                                     "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                                 )
                                                             }>
@@ -259,7 +279,7 @@ export const AgentInvitation = () => {
                                                             onBlur={onInputBlur}
                                                             value={state.input.last_name}
                                                             onChange={onInputChangeHandler}
-                                                            disabled={acceptingInvState.isPostingInvite}
+                                                            disabled={invitation.accept.isPostingInvite}
                                                             className={
                                                                 classNames(
                                                                     state.errors.last_name.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
@@ -271,7 +291,7 @@ export const AgentInvitation = () => {
                                                             className={
                                                                 classNames(
                                                                     state.errors.last_name.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
-                                                                    acceptingInvState.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
+                                                                    invitation.accept.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
                                                                     "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                                 )
                                                             }>
@@ -308,7 +328,7 @@ export const AgentInvitation = () => {
                                                     onBlur={onPasswordInputBlur}
                                                     value={state.input.password}
                                                     onChange={onPasswordChangeHandler}
-                                                    disabled={acceptingInvState.isPostingInvite}
+                                                    disabled={invitation.accept.isPostingInvite}
                                                     className={
                                                         classNames(
                                                             state.errors.password.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
@@ -320,7 +340,7 @@ export const AgentInvitation = () => {
                                                     className={
                                                         classNames(
                                                             state.errors.password.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
-                                                            acceptingInvState.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
+                                                            invitation.accept.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
                                                             "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                         )
                                                     }>
@@ -346,7 +366,7 @@ export const AgentInvitation = () => {
                                                     onBlur={onPasswordInputBlur}
                                                     value={state.input.confirm_passwd}
                                                     onChange={onPasswordChangeHandler}
-                                                    disabled={acceptingInvState.isPostingInvite}
+                                                    disabled={invitation.accept.isPostingInvite}
                                                     className={
                                                         classNames(
                                                             state.errors.confirm_passwd.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
@@ -358,7 +378,7 @@ export const AgentInvitation = () => {
                                                     className={
                                                         classNames(
                                                             state.errors.confirm_passwd.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
-                                                            acceptingInvState.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
+                                                            invitation.accept.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
                                                             "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                         )
                                                     }>
@@ -376,7 +396,7 @@ export const AgentInvitation = () => {
 
                                         <div className="mb-3 pt-3 px-0 flex flex-row-reverse">
                                             {
-                                                acceptingInvState.isPostingInvite ? (
+                                                invitation.accept.isPostingInvite ? (
                                                     <button type="button" disabled className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-6 py-1-5 bg-green-600 hover:bg-green-600 text-white sm:ml-3 sm:w-auto sm:text-sm disabled:bg-green-600">
                                                         <span>
                                                             <span className="left-0 inset-y-0 flex items-center align-middle">
