@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
 
@@ -12,7 +12,6 @@ import Home from './pages/home/Home';
 import Error404 from './pages/errors/Error404';
 
 import FromIndexToHome from './lib/redirects/FromIndexToHome';
-import RequireAuthentication from './lib/router/RequireAuthentication';
 
 import { guestRoutes } from './routes/auth/guestRoutes';
 import { generalRoutes } from './routes/settings/generalRoutes';
@@ -22,20 +21,33 @@ import CheckAuthentication from './lib/router/CheckAuthentication';
 import PostAuthentication from './pages/auth/PostAuthentication';
 import { accountRoutes } from './routes/settings/accountRoutes';
 
+import MasterAuthenticatedRoutes from './lib/router/MasterAuthenticatedRoutes';
+import SpecialAuthenticatedRoutes from './lib/router/SpecialAuthenticatedRoutes';
+import StandardAuthenticatedRoutes from './lib/router/StandardAuthenticatedRoutes';
+
 const redirectedRoutes = [
     { path: "/home", element: <Home />, activeMenu: 'Y' },
     { path: "/", element: <FromIndexToHome />, activeMenu: 'Y' },
     { path: "/ac/post/auth/access/sntm/oen/seal/:uuid", element: <PostAuthentication />, activeMenu: 'N'},
 ]
 
-let protectedRoutes: Array<any> = []
+let standardRoutes: Array<any> = []
+let configurationRoutes: Array<any> = []
+let masterConfigurationRoutes: Array<any> = []
 
-protectedRoutes = redirectedRoutes.concat(
-    generalRoutes,
+standardRoutes = standardRoutes.concat(
+    redirectedRoutes,
+);
+
+masterConfigurationRoutes = masterConfigurationRoutes.concat(
     securityRoutes,
     featuresRoutes,
+)
+
+configurationRoutes = configurationRoutes.concat(
     accountRoutes,
-);
+    generalRoutes,
+)
 
 interface RouteContextType {
     currentpage: string,
@@ -65,6 +77,7 @@ function App() {
     return (
         <Router>
             <RouterProvider>
+                
                 <ToastContainer />
 
                 <Routes>
@@ -81,9 +94,9 @@ function App() {
                         }
                     </Route>
                     
-                    <Route element={<RequireAuthentication />} >
+                    <Route element={<StandardAuthenticatedRoutes />} >
                         {
-                            protectedRoutes.map((route, index) => {
+                            standardRoutes.map((route, index) => {
                                 return (
                                     <Route
                                         path={route.path}
@@ -94,8 +107,37 @@ function App() {
                             })
                         }
                     </Route>
+                    
+                    <Route element={<SpecialAuthenticatedRoutes />} >
+                        {
+                            configurationRoutes.map((route, index) => {
+                                return (
+                                    <Route
+                                        path={route.path}
+                                        element={route.element}
+                                        key={index}
+                                    />
+                                )
+                            })
+                        }
+                    </Route>
+                    
+                    <Route element={<MasterAuthenticatedRoutes />} >
+                        {
+                            masterConfigurationRoutes.map((route, index) => {
+                                return (
+                                    <Route
+                                        path={route.path}
+                                        element={route.element}
+                                        key={index}
+                                    />
+                                )
+                            })
+                        }
+                    </Route>
+                    
+                    <Route path="*" element={<Error404 />} />
 
-                    <Route path="*" element={<Error404 />} />                
                 </Routes>
             </RouterProvider>
         </Router>
