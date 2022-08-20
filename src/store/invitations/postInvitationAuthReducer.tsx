@@ -18,9 +18,11 @@ export const postInvitationAuthReducer = (state = initialState, action: any) => 
             }
 
         case 'AUTO_AUTH_COMPLETED_':
+            console.log('AUTO_AUTH_COMPLETED_', action.response);
+            
             // Create cookie sessions for account
-            const encryptedSanctumToken = Crypto.encryptDataUsingAES256(action.response.data.token)
-            const encryptedUuidToken = Crypto.encryptDataUsingAES256(action.response.data.uuid)
+            const encryptedSanctumToken = Crypto.encryptDataUsingAES256(action.response.token)
+            const encryptedUuidToken = Crypto.encryptDataUsingAES256(action.response.uuid)
             CookieServices.set(SANCTUM_COOKIE_NAME, encryptedSanctumToken, COOKIE_OPTIONS)
             CookieServices.set(UUID_COOKIE_NAME, encryptedUuidToken, COOKIE_OPTIONS)
 

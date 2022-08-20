@@ -52,7 +52,7 @@ export const postInvitationAuthActions = (locationState: any, urlParams: any) =>
                     }
                 })
                 .catch((error) => {
-                    console.log(error.response)
+                    console.log('Error occured while auto signing in')
 
                     dispatch({
                         type: "AUTO_AUTH_EXCEPTION_",
