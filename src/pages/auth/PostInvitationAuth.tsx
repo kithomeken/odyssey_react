@@ -3,16 +3,17 @@ import { Helmet } from "react-helmet"
 import { useDispatch } from "react-redux"
 import { Navigate, useLocation } from "react-router-dom"
 
-import Crypto from "../../encryption/Crypto"
 import postSignInWait from '../../assets/images/post_sign_in_wait.png'
 import { guestRoutes } from "../../routes/auth/guestRoutes"
 import { postInvitationAuthActions } from "../../store/invitations/postInvitationAuthActions"
 import { useAppSelector } from "../../store/hooks"
+import { postAuthActions } from "../../store/auth/postAuthActions"
 
 export const PostInvitationAuth = () => {
     const dispatch = useDispatch()
     const location = useLocation()
     const autoAuthState = useAppSelector(state => state.autoAuth)
+    const postAuthState = useAppSelector(state => state.postAuth)
 
     let searchParams: any = {};
     let searchKey = location.search?.split("?")[1]?.split("&");
@@ -37,6 +38,14 @@ export const PostInvitationAuth = () => {
 
     if (autoAuthState.redirectToAuth) {
         return redirectToSignIn()
+    }
+
+    if (autoAuthState.isAuthenticated) {
+        dispatch(postAuthActions())
+    }
+
+    if (postAuthState.redirect) {
+        return <Navigate replace to="/home" />
     }
 
     return (
