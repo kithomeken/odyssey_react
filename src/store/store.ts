@@ -7,6 +7,7 @@ import locationRecuder from './routing/locationReducer';
 import checkInvitationsReducer from './invitations/checkInvitationsReducer';
 import { acceptInvitationsReducer } from './invitations/acceptInvitationReducer';
 import { postInvitationAuthReducer } from './invitations/postInvitationAuthReducer';
+import { postAuthReducer } from './auth/postAuthReducer';
 
 const middlewares = [
     createStateSyncMiddleware(),
@@ -19,6 +20,7 @@ export const store = configureStore({
         authentication: authenticationReducer,
         locationRouting: locationRecuder,
         autoAuth: postInvitationAuthReducer,
+        postAuth: postAuthReducer,
     },
     middleware: [...getDefaultMiddleware(), ...middlewares],
 });
