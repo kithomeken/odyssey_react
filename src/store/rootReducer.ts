@@ -6,9 +6,11 @@ import authenticationReducer from './auth/authenticationReducers';
 import failedAuthenticationReducer from './auth/failedAuthenticationReducer';
 import { acceptInvitationsReducer } from './invitations/acceptInvitationReducer';
 import checkInvitationsReducer from './invitations/checkInvitationsReducer';
+import { postInvitationAuthReducer } from './invitations/postInvitationAuthReducer';
 
 const rootReducer = combineReducers({ 
     session: sessionReducer,
+    autoAuth: postInvitationAuthReducer,
     invitations: checkInvitationsReducer,
     authentication: authenticationReducer,
     acceptedInvitation: acceptInvitationsReducer,
