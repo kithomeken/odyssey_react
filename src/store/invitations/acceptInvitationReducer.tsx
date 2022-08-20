@@ -1,9 +1,7 @@
-import { postVerificationAuthAction } from "./postVerificationAuthAction"
-
 const initialState = {
     response: null,
-    isPostingInvite: true,
-    acceptedInvitation: false 
+    isPostingInvite: false,
+    authenticate: false 
 }
 
 export const acceptInvitationsReducer = (state = initialState, action: any) => {
@@ -12,8 +10,8 @@ export const acceptInvitationsReducer = (state = initialState, action: any) => {
             return {
                 ...initialState,
                 response: null,
+                authenticate: false,
                 isPostingInvite: true,
-                acceptedInvitation: false 
             }
         
         case 'ACCOUNT_VERIFICATION_COMPLETED_':
@@ -21,7 +19,7 @@ export const acceptInvitationsReducer = (state = initialState, action: any) => {
                 ...initialState,
                 response: action.response,
                 isPostingInvite: false,
-                acceptedInvitation: true 
+                authenticate: true,
             }
         
         case 'ACCOUNT_VERIFICATION_FAILED_':
@@ -29,7 +27,7 @@ export const acceptInvitationsReducer = (state = initialState, action: any) => {
                 ...initialState,
                 response: action.response,
                 isPostingInvite: false,
-                acceptedInvitation: false 
+                authenticate: false,
             }
     
         case 'ACCOUNT_VERIFICATION_EXCEPTION_':
@@ -37,7 +35,7 @@ export const acceptInvitationsReducer = (state = initialState, action: any) => {
                 ...initialState,
                 response: action.response,
                 isPostingInvite: false,
-                acceptedInvitation: false 
+                authenticate: false,
             }
 
         default:
