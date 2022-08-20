@@ -6,6 +6,7 @@ import Loading from "../../components/layouts/Loading";
 
 import { APPLICATION_NAME } from "../../global/ConstantsRegistry"
 import { useAppSelector } from "../../store/hooks";
+import { acceptInvitationActions } from "../../store/invitations/acceptInvitationActions";
 import { checkInvitationsActions } from "../../store/invitations/checkInvitationsActions";
 import { Status401 } from "../errors/Status401";
 
@@ -28,6 +29,7 @@ export const AgentInvitation = () => {
     const location = useLocation()
     const dispatch = useDispatch()
     const checkInvitationState = useAppSelector(state => state.checkInvitations);
+    const acceptingInvState = useAppSelector(state => state.acceptedInvitation);
 
     let searchParams: any = {};
     let searchKey = location.search?.split("?")[1]?.split("&");
@@ -94,19 +96,19 @@ export const AgentInvitation = () => {
                     } else if (targetValue.length > 12) {
                         errors[e.target.name] = targetTitle.replace('_', ' ') + ' cannot be more than 12 characters'
                     } else {
-                        if (targetValue.match(new RegExp('[`!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?~]')) ) {
+                        if (targetValue.match(new RegExp('[`!@#$%^&*()_+\-=\[\]{};:"\\|,.<>\/?~]'))) {
                             errors[e.target.name] = 'Please provide a vaaaaalid ' + targetName.replace('_', ' ')
                         } else {
                             // Remove allowed special characters then test for numbers
                             targetValue = targetValue.replace("'", '')
-                            targetValue = targetValue.replace(" ", '')                            
+                            targetValue = targetValue.replace(" ", '')
 
-                            if (targetValue.match(new RegExp('[A-Z]')) && targetValue.match(new RegExp('[a-z]'))) {
+                            if (!targetValue.match(new RegExp('[A-Z]')) || !targetValue.match(new RegExp('[a-z]'))) {
                                 errors[e.target.name] = 'Please provide a vaeeeeelid ' + targetName.replace('_', ' ')
                             }
                         }
                     }
-                break;
+                    break;
             }
 
             setstate({
@@ -152,7 +154,7 @@ export const AgentInvitation = () => {
 
                     }
                     break;
-                
+
                 case 'confirm_passwd':
                     if (targetValue.length < 1) {
                         errors[targetName] = 'Kindly confirm your password'
@@ -161,12 +163,19 @@ export const AgentInvitation = () => {
                             errors[targetName] = 'Passwords provided do not match'
                         }
                     }
-                break
+                    break
             }
 
             setstate({
                 ...state, errors
             })
+        }
+    }
+
+    const onAcceptingInvitationHandler = (e: any) => {
+        e.preventDefault()
+        if (acceptingInvState) {
+            dispatch(acceptInvitationActions(state.input, checkInvitationState.response.payload.email, searchParams.endp))
         }
     }
 
@@ -205,7 +214,7 @@ export const AgentInvitation = () => {
                                         </div>
                                     </div>
 
-                                    <form className="space-y-3 shadow-none px-0 mb-3 pt-4">
+                                    <form className="space-y-3 shadow-none px-0 mb-3 pt-4" onSubmit={onAcceptingInvitationHandler}>
                                         <div className="w-full border-b pb-5">
                                             <div className="flex flex-row align-middle">
                                                 <div className="w-6/12 mr-2">
@@ -218,10 +227,11 @@ export const AgentInvitation = () => {
                                                             onBlur={onInputBlur}
                                                             onChange={onInputChangeHandler}
                                                             value={state.input.first_name}
+                                                            disabled={acceptingInvState.isPostingInvite}
                                                             className={
                                                                 classNames(
                                                                     state.errors.first_name.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
-                                                                    "block px-2 py-2 w-full text-sm  bg-white bg-transparent rounded border-1 appearance-none focus:outline-none focus:ring-0  focus:bg-white peer"
+                                                                    "block px-2 py-2 w-full text-sm  bg-white bg-transparent rounded border-1 appearance-none focus:outline-none focus:ring-0  focus:bg-white peer disabled:opacity-50"
                                                                 )
                                                             }
                                                         />
@@ -229,7 +239,8 @@ export const AgentInvitation = () => {
                                                         <label htmlFor="first_name"
                                                             className={
                                                                 classNames(
-                                                                    state.errors.first_name.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'text-slate-700 peer-focus:text-green-600',
+                                                                    state.errors.first_name.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
+                                                                    acceptingInvState.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
                                                                     "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                                 )
                                                             }>
@@ -248,17 +259,19 @@ export const AgentInvitation = () => {
                                                             onBlur={onInputBlur}
                                                             value={state.input.last_name}
                                                             onChange={onInputChangeHandler}
+                                                            disabled={acceptingInvState.isPostingInvite}
                                                             className={
                                                                 classNames(
                                                                     state.errors.last_name.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
-                                                                    "block px-2 py-2 w-full text-sm  bg-white bg-transparent rounded border-1 appearance-none focus:outline-none focus:ring-0  focus:bg-white peer"
+                                                                    "block px-2 py-2 w-full text-sm  bg-white bg-transparent rounded border-1 appearance-none focus:outline-none focus:ring-0  focus:bg-white peer disabled:opacity-50"
                                                                 )
                                                             } />
 
                                                         <label htmlFor="last_name"
                                                             className={
                                                                 classNames(
-                                                                    state.errors.last_name.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'text-slate-700 peer-focus:text-green-600',
+                                                                    state.errors.last_name.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
+                                                                    acceptingInvState.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
                                                                     "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                                 )
                                                             }>
@@ -295,17 +308,19 @@ export const AgentInvitation = () => {
                                                     onBlur={onPasswordInputBlur}
                                                     value={state.input.password}
                                                     onChange={onPasswordChangeHandler}
+                                                    disabled={acceptingInvState.isPostingInvite}
                                                     className={
                                                         classNames(
                                                             state.errors.password.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
-                                                            "block px-2 py-2 w-full text-sm  bg-white bg-transparent rounded border-1 appearance-none focus:outline-none focus:ring-0  focus:bg-white peer"
+                                                            "block px-2 py-2 w-full text-sm  bg-white bg-transparent rounded border-1 appearance-none focus:outline-none focus:ring-0  focus:bg-white peer disabled:opacity-50"
                                                         )
                                                     } />
 
                                                 <label htmlFor="password"
                                                     className={
                                                         classNames(
-                                                            state.errors.password.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'text-slate-700 peer-focus:text-green-600',
+                                                            state.errors.password.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
+                                                            acceptingInvState.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
                                                             "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                         )
                                                     }>
@@ -331,17 +346,19 @@ export const AgentInvitation = () => {
                                                     onBlur={onPasswordInputBlur}
                                                     value={state.input.confirm_passwd}
                                                     onChange={onPasswordChangeHandler}
+                                                    disabled={acceptingInvState.isPostingInvite}
                                                     className={
                                                         classNames(
                                                             state.errors.confirm_passwd.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
-                                                            "block px-2 py-2 w-full text-sm  bg-white bg-transparent rounded border-1 appearance-none focus:outline-none focus:ring-0  focus:bg-white peer"
+                                                            "block px-2 py-2 w-full text-sm  bg-white bg-transparent rounded border-1 appearance-none focus:outline-none focus:ring-0  focus:bg-white peer disabled:opacity-50"
                                                         )
                                                     } />
 
                                                 <label htmlFor="confirm_passwd"
                                                     className={
                                                         classNames(
-                                                            state.errors.confirm_passwd.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'text-slate-700 peer-focus:text-green-600',
+                                                            state.errors.confirm_passwd.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
+                                                            acceptingInvState.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
                                                             "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                         )
                                                     }>
@@ -358,20 +375,38 @@ export const AgentInvitation = () => {
                                         </div>
 
                                         <div className="mb-3 pt-3 px-0 flex flex-row-reverse">
-                                            <button type="button" className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-6 py-1-5 bg-green-600 hover:bg-green-600 text-white sm:ml-3 sm:w-auto sm:text-sm disabled:bg-green-600">
-                                                <span>
-                                                    <span className="left-0 inset-y-0 flex items-center align-middle">
-                                                        <span className="pr-2">
-                                                            Complete
-                                                        </span>
+                                            {
+                                                acceptingInvState.isPostingInvite ? (
+                                                    <button type="button" disabled className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-6 py-1-5 bg-green-600 hover:bg-green-600 text-white sm:ml-3 sm:w-auto sm:text-sm disabled:bg-green-600">
+                                                        <span>
+                                                            <span className="left-0 inset-y-0 flex items-center align-middle">
+                                                                <span className="pr-2">
+                                                                    Completing
+                                                                </span>
 
-                                                        <span className="w-5 h-5">
-                                                            {/* <i className="fad fa-spinner-third fa-lg fa-spin"></i> */}
-                                                            <i className="fad fa-check-circle fa-lg"></i>
+                                                                <span className="w-5 h-5">
+                                                                    <i className="fad fa-spinner-third fa-lg fa-spin"></i>
+                                                                </span>
+                                                            </span>
                                                         </span>
-                                                    </span>
-                                                </span>
-                                            </button>
+                                                    </button>
+                                                ) : (
+                                                    <button type="submit" className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-6 py-1-5 bg-green-600 hover:bg-green-600 text-white sm:ml-3 sm:w-auto sm:text-sm">
+                                                        <span>
+                                                            <span className="left-0 inset-y-0 flex items-center align-middle">
+                                                                <span className="pr-2">
+                                                                    Complete
+                                                                </span>
+
+                                                                <span className="w-5 h-5">
+                                                                    {/* <i className="fad fa-spinner-third fa-lg fa-spin"></i> */}
+                                                                    <i className="fad fa-check-circle fa-lg"></i>
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                    </button>
+                                                )
+                                            }
                                         </div>
                                     </form>
                                 </>
