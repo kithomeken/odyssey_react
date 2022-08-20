@@ -3,7 +3,7 @@ import axios from "axios"
 export const checkInvitationsActions = (encodedEndpointApi: any) => {
     return (dispatch: (arg0: {type: string, response: any}) => void) => {
         const decodedEndpointApi = decodeURIComponent(encodedEndpointApi)
-        
+
         axios
         .get(decodedEndpointApi)
         .then((response) => {
