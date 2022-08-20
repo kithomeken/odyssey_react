@@ -28,4 +28,7 @@ function ApiRegistry () {
 export const FULLY_QUALIFIED_DOMAIN_NAME = ApiRegistry().FQDN_DOMAIN
 export const API_DOMAIN_PREFIX = ApiRegistry().API_DOMIAN
 export const API_MEDIA_DOMAIN_PREFIX = ApiRegistry().MEDIA_API_DOMAIN
+
+
 export const SIGN_IN_API_SUFFIX = API_DOMAIN_PREFIX + 'auth/account/agent/authenticate'
+export const AUTH_ACCOUNT_INFO = 'auth/u/account/info'

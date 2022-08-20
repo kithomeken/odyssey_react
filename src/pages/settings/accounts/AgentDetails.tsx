@@ -133,7 +133,7 @@ export const AgentDetails = () => {
                         progress: undefined,
                     });
                 } else {
-                    let toastText = dataResponse.message
+                    let toastText = dataResponse.error.message
 
                     toast.error(toastText, {
                         position: "top-right",

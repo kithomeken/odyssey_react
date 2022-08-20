@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router
 
 import './assets/css/tailwind.css'
 import './assets/css/cuba.odyssey.css'
+import './assets/css/tailwind_colors.css'
 import "react-toastify/dist/ReactToastify.css";
 import './assets/icons/fontawesome_pro/css/all.css'
 
