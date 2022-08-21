@@ -2,12 +2,10 @@ import { sessionService } from 'redux-react-session';
 import { configureStore, ThunkAction, Action, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync';
 
-import authenticationReducer from './auth/authenticationReducers';
 import locationRecuder from './routing/locationReducer';
 import checkInvitationsReducer from './invitations/checkInvitationsReducer';
 import { acceptInvitationsReducer } from './invitations/acceptInvitationReducer';
-import { postInvitationAuthReducer } from './invitations/postInvitationAuthReducer';
-import { postAuthReducer } from './auth/postAuthReducer';
+import { accountAuthenticationReducer } from './auth/accountAuthenticationReducer';
 
 const middlewares = [
     createStateSyncMiddleware(),
@@ -15,12 +13,11 @@ const middlewares = [
 
 export const store = configureStore({
     reducer: {
+        auth: accountAuthenticationReducer,
+
         acceptedInvitation: acceptInvitationsReducer,
         checkInvitations: checkInvitationsReducer,
-        authentication: authenticationReducer,
         locationRouting: locationRecuder,
-        autoAuth: postInvitationAuthReducer,
-        postAuth: postAuthReducer,
     },
     middleware: [...getDefaultMiddleware(), ...middlewares],
 });
