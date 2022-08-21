@@ -104,6 +104,11 @@ export const accountAuthenticationReducer = (state = initialState, action: any) 
 
         case 'ACCOUNT_SIGNED_OUT_':
         case 'ACCOUNT_SIGN_OUT_EXCEPTION_':
+            // Revoke authentication access
+            CookieServices.remove(ACCOUNT_INFO_COOKIE)
+            CookieServices.remove(UUID_COOKIE_NAME)
+            CookieServices.remove(SANCTUM_COOKIE_NAME)
+
             return {
                 ...initialState,
                 uaid: null,
