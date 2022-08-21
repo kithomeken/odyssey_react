@@ -38,9 +38,7 @@ export function accountAuthenticationActions(propsIn: Props) {
                 if (locationState.email !== decryptedEmailAddr) {
                     dispatch({
                         type: "DATA_INTEGRITY_COMPROMISED_",
-                        response: {
-                            'redirect': true
-                        }
+                        response: null,
                     })
                 } else {
                     /*
@@ -50,9 +48,7 @@ export function accountAuthenticationActions(propsIn: Props) {
                     */
                     dispatch({
                         type: "ACCOUNT_AUTHENTICATION_PENDING_",
-                        response: {
-                            redirect: false,
-                        },
+                        response: null,
                     });
 
                     let formData = new FormData
