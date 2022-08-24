@@ -1,15 +1,9 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import tempararyAvatar from '../../assets/avatars/C6C2E60B0A5CC3A09F638284A21571F3.png'
-import Crypto from "../../encryption/Crypto"
-import { ACCOUNT_NAME_COOKIE } from "../../global/CookieNames"
-import CookieService from "../../services/CookieServices"
+import { AccountDropDown } from "../global/AccountDropDown"
+import { SettingsDropDown } from "../global/SettingsDropDown"
 
 export const TopNavigation = () => {
-    const encryptedAccountName = CookieService.get(ACCOUNT_NAME_COOKIE)
-    const decryptedAccountName = Crypto.decryptDataUsingAES256(encryptedAccountName)
-    const displayNone = {display: 'none'}
-    
     return (
         <React.Fragment>
             <nav className="bg-white shadow fixed w-full z-10">
@@ -27,7 +21,7 @@ export const TopNavigation = () => {
                                 </svg>
                             </button>
                         </div>
-                        
+
                         <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                             <div className="hidden sm:block">
                                 <div className="flex space-x-4">
@@ -39,32 +33,22 @@ export const TopNavigation = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                            <button className="text-gray-800 p-1 ml-3 rounded-full hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                            <button className="text-slate-500 p-1 ml-3 rounded hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                                 <span className="sr-only">View notifications</span>
-                                <svg className="h-6 w-6" x-description="Heroicon name: outline/bell" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <svg className="h-7 w-7" x-description="Heroicon name: outline/bell" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                                 </svg>
                             </button>
 
+                            <div className="p-1 ml-3 rounded hover:text-slate-700 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-white">
+                                <SettingsDropDown />
+                            </div>
+
                             <div className="ml-3 relative">
                                 <div>
-                                    <button type="button" className="flex text-sm focus:outline-none items-center border-l border-gray-300 pl-3" id="user-menu-button" x-ref="button">
-                                        <span className="sr-only">Open user menu</span>
-                                        <span className="text-sm mr-2">{decryptedAccountName}</span>
-                                        <img className="rounded-full h-10 w-10" src={tempararyAvatar} alt="" />
-                                    </button>
-                                </div>
-                                
-                                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" style={displayNone}>
-                                    <button className="block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-0">
-                                        Your Profile
-                                    </button>
-                                    
-                                    <button className="block px-4 py-2 text-sm text-gray-700" role="menuitem" id="user-menu-item-2">
-                                        Sign out
-                                    </button>
+                                    <AccountDropDown />
                                 </div>
                             </div>
                         </div>
