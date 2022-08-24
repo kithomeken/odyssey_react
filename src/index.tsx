@@ -3,16 +3,20 @@ import ReactDOM from 'react-dom';
 import {createBrowserHistory} from 'history';
 
 import App from './App';
-import { store } from '../src/store/store';
+import { persistor, store } from '../src/store/store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
+import { PersistGate } from 'redux-persist/integration/react';
+import Loading from './components/layouts/Loading';
 
 export const browserHistory = createBrowserHistory();
 
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
-            <App />
+            <PersistGate loading={<Loading />} persistor={persistor}>
+                <App />
+            </PersistGate>
         </Provider>
     </React.StrictMode>,
     document.getElementById('root')

@@ -1,13 +1,22 @@
+/*
+ * Master authenticated routes accessible 
+ * By master account types, provided that they 
+ * are authenticated.
+*/
+
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+
+import Auth from "./Auth";
 import Navigation from "../../components/settings/Navigation";
 import TopHeader from "../../components/settings/TopHeader";
-import Auth from "./Auth";
+import { useAppSelector } from "../../store/hooks";
 
-export default function RequireAuthentication() {
+export default function MasterAuthorizedRoutesController() {
     const location: any = useLocation()
     const currentLocation = location.pathname
+    const authenticationState = useAppSelector(state => state.auth)
     
-    if (!Auth.isAuthenticated()) {
+    if (!authenticationState.isAuthenticated) {
         return <Navigate to="/auth/sign-in" state={{ from: currentLocation }} replace />;
     }
 

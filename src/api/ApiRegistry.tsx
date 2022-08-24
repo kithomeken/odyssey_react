@@ -30,5 +30,13 @@ export const API_DOMAIN_PREFIX = ApiRegistry().API_DOMIAN
 export const API_MEDIA_DOMAIN_PREFIX = ApiRegistry().MEDIA_API_DOMAIN
 
 
+/* 
+* Authentication Routes 
+*/
+
+export const AUTHENTICATED_ACCOUNT_SIGN_OUT = API_DOMAIN_PREFIX + 'auth/u/account/sign-out'
+export const AUTHENTICATED_ACCOUNT_INFO = API_DOMAIN_PREFIX + 'auth/u/account/info'
+
+
 export const SIGN_IN_API_SUFFIX = API_DOMAIN_PREFIX + 'auth/account/agent/authenticate'
-export const AUTH_ACCOUNT_INFO = 'auth/u/account/info'
+

@@ -1,40 +1,46 @@
+import {Helmet} from "react-helmet";
 import React, {useState} from "react";
 import {useDispatch} from "react-redux";
-import {Helmet} from "react-helmet"
 import {Navigate, useLocation} from "react-router";
 
 import {useAppSelector} from "../../store/hooks";
 import { APPLICATION_NAME } from "../../global/ConstantsRegistry";
-import {accountAuthentication} from "../../store/auth/authenticationActions";
+import { accountAuthenticationActions } from "../../store/auth/accountAuthenticationActions";
+import Crypto from "../../encryption/Crypto";
+import { postAuthRoute, protectedRoutes } from "../../routes/auth/protectedRoutes";
 
 const SignIn = () => {
-    const projectApplicationName = APPLICATION_NAME
-    const authState = useAppSelector(state => state.authentication);
-    const dispatch = useDispatch();
-    const location = useLocation()
-    const locationState: any = location.state
     const [credentials, setCredentials] = useState({
         email: "",
         password: "",
     });
 
+    const dispatch = useDispatch();
+    const location = useLocation()
+    const locationState: any = location.state
+    const authenticationState = useAppSelector(state => state.auth);
+
     const handleSubmit = (e: any) => {
-        e.preventDefault();        
-        dispatch(accountAuthentication(credentials.email, credentials.password));
+        e.preventDefault();
+        const props = {
+            auto: false,
+            credentials: credentials,            
+        }
+
+        dispatch(accountAuthenticationActions(props))
     };
 
-    if (authState.uuid) {
-        const from = locationState?.from
+    if (authenticationState.isAuthenticated) {
         const state = {
-            from : from,
+            from : locationState.from,
             postAuth: true
         }
 
-        return <Navigate 
-            replace 
-            state={state}
-            to={`/ac/post/auth/access/sntm/oen/seal/${authState.uuid}`} 
-        />;
+        console.log('Redirecting to post auth');
+        const POST_AUTH_RT: any = (postAuthRoute.find((routeName) => routeName.name === 'POST_AUTH_'))?.path
+        const redirectRoute = POST_AUTH_RT + '?auid=' + authenticationState.uaid
+        
+        return <Navigate state={state} replace to={redirectRoute} />;
     }
 
     return (
@@ -47,7 +53,7 @@ const SignIn = () => {
                 <section className="gx-container">
                     <header className="landing-header">
                         <div className="landing-header__left mb-0">
-                            <h2 className="odyssey text-green-500 nunito">{projectApplicationName}</h2>
+                            <h2 className="odyssey text-green-500 nunito">{APPLICATION_NAME}</h2>
                             <span className="pui-pill selected mt-0 mb-3">Account Sign In</span>
                         </div>
                     </header>
@@ -62,9 +68,9 @@ const SignIn = () => {
                                 />
 
                                 {
-                                    authState.error.length > 0 && 
+                                    authenticationState.error && 
                                     <span className='invalid-feedback font-small text-red-600 pl-3'>
-                                        {authState.error}
+                                        {authenticationState.error}
                                     </span>
                                 }
                             </div>
@@ -81,7 +87,7 @@ const SignIn = () => {
                                 <button className="bg-green-500 relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white hover:bg-green-500 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-green-600" type="submit">
                                     <span>
                                         {
-                                            authState.loading ? (
+                                            authenticationState.processing ? (
                                                 <>
                                                     <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                                                         <span className="fad text-white fa-spinner-third fa-2x m-auto block fa-spin"></span>

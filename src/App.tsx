@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
 
@@ -8,34 +8,43 @@ import './assets/css/tailwind_colors.css'
 import "react-toastify/dist/ReactToastify.css";
 import './assets/icons/fontawesome_pro/css/all.css'
 
-import Home from './pages/home/Home';
 import Error404 from './pages/errors/Error404';
 
-import FromIndexToHome from './lib/redirects/FromIndexToHome';
-import RequireAuthentication from './lib/router/RequireAuthentication';
-
 import { guestRoutes } from './routes/auth/guestRoutes';
+import { accountRoutes } from './routes/settings/accountRoutes';
 import { generalRoutes } from './routes/settings/generalRoutes';
 import { securityRoutes } from './routes/settings/securityRoutes';
 import { featuresRoutes } from './routes/settings/featuresRoutes';
-import CheckAuthentication from './lib/router/CheckAuthentication';
-import PostAuthentication from './pages/auth/PostAuthentication';
-import { accountRoutes } from './routes/settings/accountRoutes';
+import { postAuthRoute, protectedRoutes } from './routes/auth/protectedRoutes';
 
-const redirectedRoutes = [
-    { path: "/home", element: <Home />, activeMenu: 'Y' },
-    { path: "/", element: <FromIndexToHome />, activeMenu: 'Y' },
-    { path: "/ac/post/auth/access/sntm/oen/seal/:uuid", element: <PostAuthentication />, activeMenu: 'N'},
-]
+import AuthRouteController from './lib/router/AuthRouteController';
+import PostAuthRouteController from './lib/router/PostAuthRouteController';
+import StandardRoutesController from './lib/router/StandardRoutesController';
+import MasterAuthorizedRoutesController from './lib/router/MasterAuthorizedRoutesController';
+import SpecialAuthorizationRoutesControllers from './lib/router/SpecialAuthorizationRoutesController';
 
-let protectedRoutes: Array<any> = []
+let standardRoutes: Array<any> = []
+let configurationRoutes: Array<any> = []
+let postAuthenticationRoutes: Array<any> = []
+let masterConfigurationRoutes: Array<any> = []
 
-protectedRoutes = redirectedRoutes.concat(
-    generalRoutes,
+standardRoutes = standardRoutes.concat(
+    protectedRoutes,
+);
+
+postAuthenticationRoutes = postAuthenticationRoutes.concat(
+    postAuthRoute,
+)
+
+masterConfigurationRoutes = masterConfigurationRoutes.concat(
     securityRoutes,
     featuresRoutes,
+)
+
+configurationRoutes = configurationRoutes.concat(
     accountRoutes,
-);
+    generalRoutes,
+)
 
 interface RouteContextType {
     currentpage: string,
@@ -47,8 +56,7 @@ const RoutingContext = React.createContext<RouteContextType>(null!)
 function App() {
     const RouterProvider = ({children}: {children: React.ReactNode}) => {
         const currentLocation = useLocation()        
-        const [route, setRoute] = useState({ 
-            //--> it can be replaced with useRef or localStorage
+        const [route, setRoute] = useState({
             currentpage: currentLocation.pathname,
             from: ''
         });
@@ -65,10 +73,11 @@ function App() {
     return (
         <Router>
             <RouterProvider>
+                
                 <ToastContainer />
 
                 <Routes>
-                    <Route element={<CheckAuthentication />}>
+                    <Route element={<AuthRouteController />}>
                         {guestRoutes.map((route, index) => {
                                 return (
                                     <Route
@@ -80,10 +89,10 @@ function App() {
                             })
                         }
                     </Route>
-                    
-                    <Route element={<RequireAuthentication />} >
+
+                    <Route element={<PostAuthRouteController />} >
                         {
-                            protectedRoutes.map((route, index) => {
+                            postAuthenticationRoutes.map((route, index) => {
                                 return (
                                     <Route
                                         path={route.path}
@@ -94,8 +103,51 @@ function App() {
                             })
                         }
                     </Route>
+                    
+                    <Route element={<StandardRoutesController />} >
+                        {
+                            standardRoutes.map((route, index) => {
+                                return (
+                                    <Route
+                                        path={route.path}
+                                        element={route.element}
+                                        key={index}
+                                    />
+                                )
+                            })
+                        }
+                    </Route>
+                    
+                    <Route element={<SpecialAuthorizationRoutesControllers />} >
+                        {
+                            configurationRoutes.map((route, index) => {
+                                return (
+                                    <Route
+                                        path={route.path}
+                                        element={route.element}
+                                        key={index}
+                                    />
+                                )
+                            })
+                        }
+                    </Route>
+                    
+                    <Route element={<MasterAuthorizedRoutesController />} >
+                        {
+                            masterConfigurationRoutes.map((route, index) => {
+                                return (
+                                    <Route
+                                        path={route.path}
+                                        element={route.element}
+                                        key={index}
+                                    />
+                                )
+                            })
+                        }
+                    </Route>
+                    
+                    <Route path="*" element={<Error404 />} />
 
-                    <Route path="*" element={<Error404 />} />                
                 </Routes>
             </RouterProvider>
         </Router>
