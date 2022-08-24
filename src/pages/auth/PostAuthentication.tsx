@@ -2,43 +2,41 @@ import React from 'react'
 import {useDispatch} from "react-redux";
 import {Helmet} from "react-helmet"
 
-import postSignInWait from '../../assets/images/post_sign_in_wait.png'
-import Crypto from '../../encryption/Crypto';
-import HttpServices from '../../services/HttpServices';
-import CookieServices from '../../services/CookieServices';
-import { COOKIE_OPTIONS } from '../../global/ConstantsRegistry';
-
 import { Navigate } from 'react-router-dom';
-import { usePromiseEffect } from '../../lib/hooks/usePromiseEffect';
-import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_NAME_COOKIE } from '../../global/CookieNames';
+import { useAppSelector } from '../../store/hooks';
+import postSignInWait from '../../assets/images/post_sign_in_wait.png'
+import { postAccountAuthenticationActions } from '../../store/auth/postAccountAuthenticationActions';
 
-const PostAuthentication = () => {
+export const PostAuthentication = () => {
     const dispatch = useDispatch()
-    const postAuthenticationProcess = usePromiseEffect(async () => {
-        const response: any = await HttpServices.httpGet('auth/account/agent/info')
-
-        if (response.status !== 200) {
-            throw new Error("Something went wrong while signing user in.");
-        }
-
-        console.log(response);
-        const accountName = response.data.first_name + ' ' + response.data.last_name
-        const accountEmail = response.data.email
-
-        const encryptedAccountName = Crypto.encryptDataUsingAES256(accountName)
-        const encryptedAccountEmail = Crypto.encryptDataUsingAES256(accountEmail)
-                
-        CookieServices.set(ACCOUNT_NAME_COOKIE, encryptedAccountName, COOKIE_OPTIONS)
-        CookieServices.set(ACCOUNT_EMAIL_COOKIE, encryptedAccountEmail, COOKIE_OPTIONS)
-
-        return {response}
-    }, [dispatch])
+    const authenticationState = useAppSelector(state => state.auth)
+    console.log('Post authentication');
     
-    if (postAuthenticationProcess.status === 'fulfilled') {
-        return <Navigate replace to="/home" />
+
+    React.useEffect(() => {
+        fetchAuthenticateAccountDetails()
+    }, []);
+
+    const fetchAuthenticateAccountDetails = () => {
+        'Dispatched post auth actions'
+        dispatch(postAccountAuthenticationActions())
     }
 
-    return(
+    const redirectToSignIn = () => {
+        console.log('Back to sign in - post auth');
+        
+        return <Navigate replace to="/auth/sign-in" />
+    }
+
+    if (!authenticationState.isAuthenticated) {
+        redirectToSignIn()
+    } else {
+        if (authenticationState.accountName !== null && authenticationState.accountName !== undefined) {            
+            return <Navigate replace to="/home" />
+        }
+    }
+
+    return (
         <React.Fragment>
             <Helmet>
                 <title>Signing you in... </title>
@@ -47,10 +45,10 @@ const PostAuthentication = () => {
             <div className="wrapper">
                 <section className="gx-container">
                     <div className="w-full">
-                        <img src={postSignInWait} width="70px" className="block text-center m-auto" aria-details="https://www.flaticon.com/free-icons/login" alt="Login icons created by Eucalyp - Flaticon" />
+                        <img src={postSignInWait} width="50px" className="block text-center m-auto" aria-details="https://www.flaticon.com/free-icons/login" alt="Login icons created by Eucalyp - Flaticon" />
 
-                        <p className="text-center mb-0 mt-4 text-green-600">
-                            Please wait as we sign you in...
+                        <p className="text-center mb-0 text-sm mt-4 text-green-600">
+                            Please wait as we sign you in. <br/> Do not close your browser
                         </p>
                     </div>
 
@@ -59,9 +57,6 @@ const PostAuthentication = () => {
                     </div>
                 </section>
             </div>
-
         </React.Fragment>
     )
 }
-
-export default PostAuthentication
