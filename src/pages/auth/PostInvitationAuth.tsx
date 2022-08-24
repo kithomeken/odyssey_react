@@ -6,14 +6,12 @@ import { Navigate, useLocation } from "react-router-dom"
 import postSignInWait from '../../assets/images/post_sign_in_wait.png'
 import { guestRoutes } from "../../routes/auth/guestRoutes"
 import { postInvitationAuthActions } from "../../store/invitations/postInvitationAuthActions"
-import { useAppSelector } from "../../store/hooks"
-import { postAuthActions } from "../../store/auth/postAuthActions"
 
 export const PostInvitationAuth = () => {
     const dispatch = useDispatch()
     const location = useLocation()
-    const autoAuthState = useAppSelector(state => state.autoAuth)
-    const postAuthState = useAppSelector(state => state.postAuth)
+    // const autoAuthState = useAppSelector(state => state.autoAuth)
+    // const postAuthState = useAppSelector(state => state.postAuth)
 
     let searchParams: any = {};
     let searchKey = location.search?.split("?")[1]?.split("&");
@@ -36,17 +34,17 @@ export const PostInvitationAuth = () => {
         dispatch(postInvitationAuthActions(location.state, searchParams))
     }
 
-    if (autoAuthState.redirectToAuth) {
-        return redirectToSignIn()
-    }
+    // if (autoAuthState.redirectToAuth) {
+    //     return redirectToSignIn()
+    // }
 
-    if (autoAuthState.isAuthenticated) {
-        dispatch(postAuthActions())
-    }
+    // if (autoAuthState.isAuthenticated) {
+    //     dispatch(postAuthActions())
+    // }
 
-    if (postAuthState.redirect) {
-        return <Navigate replace to="/home" />
-    }
+    // if (postAuthState.redirect) {
+    //     return <Navigate replace to="/home" />
+    // }
 
     return (
         <React.Fragment>
