@@ -36,6 +36,9 @@ export const postAccountAuthenticationActions = () => {
             }
         })
         .catch((error) => {
+            console.log(error);
+            
+
             dispatch({
                 type: "ACCOUNT_INFO_EXCEPTION_",
                 response: "User account is not authenticated",

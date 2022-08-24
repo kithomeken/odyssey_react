@@ -4,7 +4,7 @@ import Crypto from "../../encryption/Crypto";
 import { SIGN_IN_API_SUFFIX } from "../../api/ApiRegistry";
 
 interface Props {
-    auto: false,
+    auto: boolean,
     urlParams?: any,
     credentials?: any,
     locationState?: any,
