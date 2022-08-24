@@ -1,5 +1,8 @@
-import { sessionService } from 'redux-react-session';
-import { configureStore, ThunkAction, Action, getDefaultMiddleware } from '@reduxjs/toolkit';
+import * as rp from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+import { sessionReducer, sessionService } from 'redux-react-session';
+import { persistStore, persistReducer } from 'redux-persist'
+import { configureStore, ThunkAction, Action, getDefaultMiddleware, combineReducers } from '@reduxjs/toolkit';
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync';
 
 import locationRecuder from './routing/locationReducer';
@@ -11,20 +14,36 @@ const middlewares = [
     createStateSyncMiddleware(),
 ];
 
-export const store = configureStore({
-    reducer: {
-        auth: accountAuthenticationReducer,
+const persistConfig = {
+    key: 'root',
+    storage,
+}
 
-        acceptedInvitation: acceptInvitationsReducer,
-        checkInvitations: checkInvitationsReducer,
-        locationRouting: locationRecuder,
-    },
-    middleware: [...getDefaultMiddleware(), ...middlewares],
+const rootReducer = combineReducers({
+    session: sessionReducer,
+    locationRouting: locationRecuder,
+    auth: accountAuthenticationReducer,
+
+    acceptedInvitation: acceptInvitationsReducer,
+    checkInvitations: checkInvitationsReducer,
+})
+
+const persistedReducer = persistReducer(persistConfig, rootReducer)
+
+export const store = configureStore({
+    reducer: persistedReducer,
+    middleware: [...getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [rp.FLUSH, rp.REHYDRATE, rp.PAUSE, rp.PERSIST, rp.PURGE, rp.REGISTER],
+        },
+      }), ...middlewares],
 });
+
 
 initStateWithPrevTab(store);
 sessionService.initSessionService(store);
 
+export const persistor = persistStore(store)
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;
 export type AppThunk<ReturnType = void> = ThunkAction<
