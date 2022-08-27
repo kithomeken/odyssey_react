@@ -3,15 +3,16 @@ import { Helmet } from "react-helmet"
 import { useDispatch } from "react-redux"
 import { Navigate, useLocation } from "react-router-dom"
 
-import postSignInWait from '../../assets/images/post_sign_in_wait.png'
+import { useAppSelector } from "../../store/hooks"
 import { guestRoutes } from "../../routes/auth/guestRoutes"
-import { postInvitationAuthActions } from "../../store/invitations/postInvitationAuthActions"
+import postSignInWait from '../../assets/images/post_sign_in_wait.png'
+import { accountAuthenticationActions } from "../../store/auth/accountAuthenticationActions"
+import { postAccountAuthenticationActions } from "../../store/auth/postAccountAuthenticationActions"
 
 export const PostInvitationAuth = () => {
     const dispatch = useDispatch()
     const location = useLocation()
-    // const autoAuthState = useAppSelector(state => state.autoAuth)
-    // const postAuthState = useAppSelector(state => state.postAuth)
+    const authenticationState = useAppSelector(state => state.auth)
 
     let searchParams: any = {};
     let searchKey = location.search?.split("?")[1]?.split("&");
@@ -31,20 +32,22 @@ export const PostInvitationAuth = () => {
     }
 
     const autoAuthenticateVerifiedAccount = () => {
-        dispatch(postInvitationAuthActions(location.state, searchParams))
+        const props = {
+            auto: true,
+            urlParams: searchParams,
+            locationState: location.state
+        }
+
+        dispatch(accountAuthenticationActions(props))
     }
 
-    // if (autoAuthState.redirectToAuth) {
-    //     return redirectToSignIn()
-    // }
+    if (authenticationState.error !== null && authenticationState.error !== undefined) {
+        return redirectToSignIn()
+    }
 
-    // if (autoAuthState.isAuthenticated) {
-    //     dispatch(postAuthActions())
-    // }
-
-    // if (postAuthState.redirect) {
-    //     return <Navigate replace to="/home" />
-    // }
+    if (authenticationState.isAuthenticated) {
+        dispatch(postAccountAuthenticationActions())
+    }
 
     return (
         <React.Fragment>
