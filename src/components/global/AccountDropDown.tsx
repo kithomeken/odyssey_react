@@ -35,7 +35,7 @@ export const AccountDropDown = () => {
                                 className={
                                     classNames(
                                         open ? 'text-slate-700' : null,
-                                        "flex flex-row items-center w-auto px-3 rounded py-1 bg-white text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-0 focus:ring-offset focus:ring-offset-slate-100 focus:ring-emerald-500 align-middle"
+                                        "flex flex-row items-center w-auto px-3 rounded py-1 bg-white text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-0 focus:ring-offset focus:ring-offset-slate-100 focus:ring-emerald-500 align-middle"
                                     )
                                 }>
                                 <span className="text-sm mr-2">{authenticationState.accountName}</span>
