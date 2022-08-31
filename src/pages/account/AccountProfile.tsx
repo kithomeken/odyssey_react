@@ -1,21 +1,23 @@
 import { Helmet } from "react-helmet"
 import React, { useState } from "react"
 
+import { Security } from "./Security"
+import { ChangeEmail } from "./ChangeEmail"
+import { Preferences } from "./Preferences"
 import { RecentActivity } from "./RecentActivity"
 import { useAppSelector } from "../../store/hooks"
 import { HEADER_SECTION_BG } from "../../global/ConstantsRegistry"
-import { ChangeEmail } from "./ChangeEmail"
-import { AccountSecurity } from "./AccountSecurity"
-import { Preferences } from "./Preferences"
 
 export const AccountProfile = () => {
     const [state, setstate] = useState({
         data: {
-            email: null
+            email: null,
+            preferences: null,
         },
         activeTab: 'recent',
         tabStatus: {
-            email: 'pending'
+            email: 'pending',
+            preferences: 'pending',
         }
     })
 
@@ -41,7 +43,7 @@ export const AccountProfile = () => {
             <>    
                 <div className="w-full">
                     <button type="button" onClick={() => activateTab('recent')} className={classNames(
-                        state.activeTab === 'recent' ? 'text-green-700' : 'text-slate-700 hover:bg-slate-100',
+                        state.activeTab === 'recent' ? 'text-green-700 bg-green-100' : 'text-slate-700 hover:bg-slate-100',
                         "text-sm items-center w-full text-left py-2 px-4 rounded"
                     )}>
                         <span className="flex flex-row align-middle items-center">
@@ -52,7 +54,7 @@ export const AccountProfile = () => {
                     </button>
 
                     <button type="button" onClick={() => activateTab('email')} className={classNames(
-                        state.activeTab === 'email' ? 'text-green-700' : 'text-slate-700 hover:bg-slate-100',
+                        state.activeTab === 'email' ? 'text-green-700 bg-green-100' : 'text-slate-700 hover:bg-slate-100',
                         "text-sm items-center w-full text-left py-2 px-4 rounded mt-2"
                     )}>
                         <span className="flex flex-row align-middle items-center">
@@ -63,7 +65,7 @@ export const AccountProfile = () => {
                     </button>
 
                     <button type="button" onClick={() => activateTab('security')} className={classNames(
-                        state.activeTab === 'security' ? 'text-green-700' : 'text-slate-700 hover:bg-slate-100',
+                        state.activeTab === 'security' ? 'text-green-700 bg-green-100' : 'text-slate-700 hover:bg-slate-100',
                         "text-sm items-center w-full text-left py-2 px-4 rounded mt-2"
                     )}>
                         <span className="flex flex-row align-middle items-center">
@@ -74,7 +76,7 @@ export const AccountProfile = () => {
                     </button>
 
                     <button type="button" onClick={() => activateTab('preferences')} className={classNames(
-                        state.activeTab === 'preferences' ? 'text-green-700' : 'text-slate-700 hover:bg-slate-100',
+                        state.activeTab === 'preferences' ? 'text-green-700 bg-green-100' : 'text-slate-700 hover:bg-slate-100',
                         "text-sm items-center w-full text-left py-2 px-4 rounded mb-4 mt-2"
                     )}>
                         <span className="flex flex-row align-middle items-center">
@@ -124,10 +126,15 @@ export const AccountProfile = () => {
                 return <RecentActivity />
             
             case 'security':
-                return <AccountSecurity />
+                return <Security />
             
             case 'preferences':
-                return <Preferences />
+                return <Preferences 
+                data={state.data.preferences} 
+                updateTabStatus={updateTabStatus} 
+                status={state.tabStatus.preferences} 
+                updateTabDataState={updateTabDataState}
+                />
             
             case 'email':
                 return <ChangeEmail 

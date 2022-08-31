@@ -15,7 +15,7 @@ interface Props {
     updateTabDataState: any,
 }
 
-export const ChangeEmail: FC<Props> = ({data, status, updateTabStatus, updateTabDataState}) => {
+export const ChangeEmail: FC<Props> = ({ data, status, updateTabStatus, updateTabDataState }) => {
     const [state, setstate] = useState({
         isPostingForm: false,
         input: {
@@ -190,25 +190,22 @@ export const ChangeEmail: FC<Props> = ({data, status, updateTabStatus, updateTab
             formData.append('email', input.email)
             const response = await HttpServices.httpPost(CHANGE_ACCOUNT_EMAIL_ADDR, formData)
 
-            if (response.status === 200) {
+            if (response.data.success) {
                 input.email = ''
+
                 setstate({
                     ...state, input
                 })
 
                 fetchAccountEmailHistory()
             } else {
-                let toastText = "Something went wrong, could not complete request"
+                let {errors} = state
+                const errorMessage = response.data.error.message
 
-                toast.error(toastText, {
-                    position: "top-right",
-                    autoClose: 7000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
+                errors.email = errorMessage
+                setstate({
+                    ...state, errors
+                })
             }
         } catch (error) {
             let toastText = "Something went wrong, could not complete request"
@@ -342,9 +339,16 @@ export const ChangeEmail: FC<Props> = ({data, status, updateTabStatus, updateTab
         }
     }
 
+    const emailChangesLeft = () => {
+        const emailCount = data.emails.length
+        const remainder = 4 - emailCount
+
+        return remainder
+    }
+
     return (
         <React.Fragment>
-            <div className="w-full">
+            <div className="w-9/12 m-auto">
                 <p className="text-lg text-slate-600 mb-3">
                     Change your e-mail
                 </p>
@@ -365,137 +369,161 @@ export const ChangeEmail: FC<Props> = ({data, status, updateTabStatus, updateTab
                             </p>
 
                             {
-                                data.verified === null ? (
-                                    <div className="w-9/12 pt-3 pb-2">
+                                emailChangesLeft() === 0 ? (
+                                    <div className="w-12/12 py-3">
                                         <div className="rounded-md mb-2 border-0 border-sky-400 bg-sky-100 py-4 px-4">
                                             <div className="flex flex-row text-sky-700">
-                                                <i className="fas fa-exclamation-circle fa-lg mt-1 text-blue-700 flex-none"></i>
+                                                <i className="fas fa-info-circle fa-lg mt-1 text-blue-700 flex-none"></i>
 
                                                 <div className="flex-auto ml-1">
-                                                    <span className="text- pl-3 block text-blue-800 mb-1">
-                                                        Verification pending
+                                                    <span className="text-sm pl-3 block text-blue-900 mb-1">
+                                                        No action required
                                                     </span>
 
-                                                    <span className="text-sm pl-3 block text-blue-800 mb-4">
-                                                        A verification email was sent to <span className="text-slate-800">{data.emails[0].email}</span>, kindly check your email to complete the update.
+                                                    <span className="text-sm pl-3 block text-blue-700">
+                                                        You've exhausted the maximum changes allowed for email addresses.
                                                     </span>
-
-                                                    <div className="flex flex-row">
-                                                        <button onClick={resendEmailVerificationApiCall} className="text-xs pl-3 text-sky-700 hover:text-sky-800 block hover:underline">
-                                                            {
-                                                                state.process.type === 'resend' ? 'Resending' : 'Resend email'
-                                                            }
-                                                        </button>
-
-                                                        <span className="mx-2 text-sm">|</span>
-
-                                                        <button onClick={undoAccountEmailChangeApiCall} className="text-xs text-sky-700 hover:text-sky-900 block hover:underline">
-                                                            {
-                                                                state.process.type === 'undo' ? 'Undoing' : 'Undo email change'
-                                                            }
-                                                        </button>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="w-9/12 py-3">
-                                            <div className="rounded-md mb-2 border-0 border-amber-400 bg-amber-100 py-4 px-4">
-                                                <div className="flex flex-row items-center align-middle text-amber-700">
-                                                    <i className="fad fa-exclamation-triangle fa-lg mt-1 text-amber-600 flex-none"></i>
+                                        {
+                                            data.verified === null ? (
+                                                <div className="w-/12 pt-3 pb-2">
+                                                    <div className="rounded-md mb-2 border-0 border-sky-400 bg-sky-100 py-4 px-4">
+                                                        <div className="flex flex-row text-sky-700">
+                                                            <i className="fas fa-exclamation-circle fa-lg mt-1 text-blue-700 flex-none"></i>
 
-                                                    <div className="flex-auto ml-1">
-                                                        <span className="text-sm pl-3 block">
-                                                            You can only change your email a maximum of 3 times.
-                                                        </span>
+                                                            <div className="flex-auto ml-1">
+                                                                <span className="text- pl-3 block text-blue-800 mb-1">
+                                                                    Verification pending
+                                                                </span>
+
+                                                                <span className="text-sm pl-3 block text-blue-800 mb-4">
+                                                                    A verification email was sent to <span className="text-slate-800">{data.emails[0].email}</span>, kindly check your email to complete the update.
+                                                                </span>
+
+                                                                <div className="flex flex-row">
+                                                                    <button onClick={resendEmailVerificationApiCall} className="text-xs pl-3 text-sky-700 hover:text-sky-800 block hover:underline">
+                                                                        {
+                                                                            state.process.type === 'resend' ? 'Resending' : 'Resend email'
+                                                                        }
+                                                                    </button>
+
+                                                                    <span className="mx-2 text-sm">|</span>
+
+                                                                    <button onClick={undoAccountEmailChangeApiCall} className="text-xs text-sky-700 hover:text-sky-900 block hover:underline">
+                                                                        {
+                                                                            state.process.type === 'undo' ? 'Undoing' : 'Undo email change'
+                                                                        }
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            ) : (
+                                                <>
+                                                    <div className="w-12/12 py-3">
+                                                        <div className="rounded-md mb-2 border-0 border-orange-400 bg-orange-100 py-4 px-4">
+                                                            <div className="flex flex-row items-center align-middle text-orange-700">
+                                                                <i className="fas fa-exclamation-circle fa-lg text-orange-600 flex-none"></i>
 
-                                            <span className="text-xs block text-slate-500 pb-3">
-                                                Email changes left - 3
-                                            </span>
-                                        </div>
+                                                                <div className="flex-auto">
+                                                                    <span className="text-sm pl-3 block">
+                                                                        You can only change your email a maximum of 3 times.
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-                                        <form className=" w-9/12 rounded-md shadow-none space-y-px" onSubmit={onFormSubmitHandler}>
-                                            <div className="w-full text-sm mb-4">
-                                                <div className="relative z-0 w-96">
-                                                    {
-                                                        state.isPostingForm ? (
-                                                            <input
-                                                                type="email"
-                                                                name="email"
-                                                                placeholder=" "
-                                                                required
-                                                                disabled
-                                                                onChange={onChangeHandler}
-                                                                value={state.input.email}
-                                                                autoComplete="off"
-                                                                className="pt-2 pb-2 block w-full text-slate-700 mt-0 bg-transparent border rounded px-4 appearance-none focus:outline-none focus:ring-0 focus:border-green-500 border-gray-300 text-sm disabled:cursor-not-allowed disabled:opacity-50"
-                                                            />
-                                                        ) : (
-                                                            <input
-                                                                type="email"
-                                                                name="email"
-                                                                placeholder=" "
-                                                                required
-                                                                onBlur={onInputBlur}
-                                                                autoComplete="off"
-                                                                onChange={onChangeHandler}
-                                                                value={state.input.email}
-                                                                className={classNames(
-                                                                    state.errors.email.length > 0 ? 'text-red-700 border-red-400' : 'text-slate-700 border-gray-300',
-                                                                    "pt-2 pb-2 block w-full  mt-0 bg-transparent border rounded px-4 appearance-none focus:outline-none focus:ring-0 focus:border-green-500 text-sm"
-                                                                )}
-                                                            />
-                                                        )
-                                                    }
+                                                        <span className="text-xs block text-slate-500 pb-3">
+                                                            Email changes left - {emailChangesLeft()}
+                                                        </span>
+                                                    </div>
 
-                                                    <label htmlFor="email" className={classNames(
-                                                        state.isPostingForm ? 'text-gray-400' : 'text-gray-500',
-                                                        state.errors.email.length ? 'text-red-500' : 'text-gray-500',
-                                                        "absolute duration-300 bg-white top-2 px-2 ml-2 -z-1 origin-0"
-                                                    )}>E-mail Address</label>
-                                                </div>
+                                                    <form className=" w-9/12 rounded-md shadow-none space-y-px" onSubmit={onFormSubmitHandler}>
+                                                        <div className="w-full text-sm mb-4">
+                                                            <div className="relative z-0 w-96">
+                                                                {
+                                                                    state.isPostingForm ? (
+                                                                        <input
+                                                                            type="email"
+                                                                            name="email"
+                                                                            placeholder=" "
+                                                                            required
+                                                                            disabled
+                                                                            onChange={onChangeHandler}
+                                                                            value={state.input.email}
+                                                                            autoComplete="off"
+                                                                            className="pt-2 pb-2 block w-full text-slate-700 mt-0 bg-transparent border rounded px-4 appearance-none focus:outline-none focus:ring-0 focus:border-green-500 border-gray-300 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+                                                                        />
+                                                                    ) : (
+                                                                        <input
+                                                                            type="email"
+                                                                            name="email"
+                                                                            placeholder=" "
+                                                                            required
+                                                                            onBlur={onInputBlur}
+                                                                            autoComplete="off"
+                                                                            onChange={onChangeHandler}
+                                                                            value={state.input.email}
+                                                                            className={classNames(
+                                                                                state.errors.email.length > 0 ? 'text-red-700 border-red-400' : 'text-slate-700 border-gray-300',
+                                                                                "pt-2 pb-2 block w-full  mt-0 bg-transparent border rounded px-4 appearance-none focus:outline-none focus:ring-0 focus:border-green-500 text-sm"
+                                                                            )}
+                                                                        />
+                                                                    )
+                                                                }
 
-                                                {
-                                                    state.errors.email.length > 0 &&
-                                                    <span className='invalid-feedback text-xs block text-red-600 pl-0 py-1'>
-                                                        {state.errors.email}
-                                                    </span>
-                                                }
-                                            </div>
+                                                                <label htmlFor="email" className={classNames(
+                                                                    state.isPostingForm ? 'text-gray-400' : 'text-gray-500',
+                                                                    state.errors.email.length ? 'text-red-500' : 'text-gray-500',
+                                                                    "absolute duration-300 bg-white top-2 px-2 ml-2 -z-1 origin-0"
+                                                                )}>E-mail Address</label>
+                                                            </div>
 
-                                            <div className="w-96 flex flex-row pb-5">
-                                                {
-                                                    state.isPostingForm ? (
-                                                        <button
-                                                            type="button"
-                                                            className={`inline-flex items-center px-4 py-1 border border-emerald-600 rounded shadow-sm text-sm text-white bg-emerald-600 focus:outline-none focus:ring-0 focus:ring-offset-2  disabled:opacity-50`}>
-                                                            <span className="left-0 inset-y-0 flex items-center">
-                                                                <span className="pr-2">
-                                                                    Updating
+                                                            {
+                                                                state.errors.email.length > 0 &&
+                                                                <span className='invalid-feedback text-xs block text-red-600 pl-0 py-1'>
+                                                                    {state.errors.email}
                                                                 </span>
+                                                            }
+                                                        </div>
 
-                                                                <span className="w-5 h-5">
-                                                                    <i className="fad fa-spinner-third fa-lg fa-spin"></i>
-                                                                </span>
-                                                            </span>
-                                                        </button>
-                                                    ) : (
-                                                        <button type="submit" className={`inline-flex items-center px-4 py-1 border border-emerald-500 rounded shadow-sm text-sm text-white bg-emerald-500 hover:bg-emerald-600 hover:border-emerald-600 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50`}>
-                                                            <span className="text-sm w-16">
-                                                                Update
-                                                            </span>
-                                                        </button>
-                                                    )
-                                                }
-                                            </div>
+                                                        <div className="w-96 flex flex-row pb-5">
+                                                            {
+                                                                state.isPostingForm ? (
+                                                                    <button
+                                                                        type="button"
+                                                                        className={`inline-flex items-center px-4 py-1 border border-emerald-600 rounded shadow-sm text-sm text-white bg-emerald-600 focus:outline-none focus:ring-0 focus:ring-offset-2  disabled:opacity-50`}>
+                                                                        <span className="left-0 inset-y-0 flex items-center">
+                                                                            <span className="pr-2">
+                                                                                Changing
+                                                                            </span>
 
-                                            <hr />
-                                        </form>
+                                                                            <span className="w-5 h-5">
+                                                                                <i className="fad fa-spinner-third fa-lg fa-spin"></i>
+                                                                            </span>
+                                                                        </span>
+                                                                    </button>
+                                                                ) : (
+                                                                    <button type="submit" className={`inline-flex items-center px-4 py-1 border border-emerald-500 rounded shadow-sm text-sm text-white bg-emerald-500 hover:bg-emerald-600 hover:border-emerald-600 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-emerald-500 disabled:opacity-50`}>
+                                                                        <span className="text-sm w-16">
+                                                                            Change
+                                                                        </span>
+                                                                    </button>
+                                                                )
+                                                            }
+                                                        </div>
+
+                                                        <hr />
+                                                    </form>
+                                                </>
+                                            )
+                                        }
                                     </>
                                 )
                             }
@@ -509,7 +537,7 @@ export const ChangeEmail: FC<Props> = ({data, status, updateTabStatus, updateTab
                                     </span>
                                 </p>
 
-                                <div className="flex flex-row border-b pb-2 align-middle w-9/12">
+                                <div className="flex flex-row border-b pb-2 align-middle w-12/12">
                                     <div className="flex-auto">
                                         <span className="py-3 text-left text-xs text-emerald-600 uppercase font-normal tracking-wider">
                                             E-mail Address
@@ -526,7 +554,7 @@ export const ChangeEmail: FC<Props> = ({data, status, updateTabStatus, updateTab
                                 {
                                     data.emails.map((account: any, index: any) => {
                                         return (
-                                            <div key={index} className="flex flex-row border-b w-9/12 divide-gray-200 align-middle">
+                                            <div key={index} className="flex flex-row border-b w-12/12 divide-gray-200 align-middle">
                                                 <div className="flex-auto">
                                                     <div className="py-2 whitespace-wrap">
                                                         <span className="block text-slate-600 mb-1 text-sm">
@@ -539,7 +567,7 @@ export const ChangeEmail: FC<Props> = ({data, status, updateTabStatus, updateTab
                                                     <div className="py-2 whitespace-wrap">
                                                         {
                                                             data.verified === null && index === 0 ? (
-                                                                <span className="block text-amber-600 mb-1 text-xs">
+                                                                <span className="block text-orange-600 mb-1 text-xs">
                                                                     Pending Verification
                                                                 </span>
                                                             ) : (
