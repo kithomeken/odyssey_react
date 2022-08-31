@@ -1,14 +1,13 @@
 import * as rp from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
-import { sessionReducer, sessionService } from 'redux-react-session';
 import { persistStore, persistReducer } from 'redux-persist'
+import { sessionService } from 'redux-react-session';
 import { configureStore, ThunkAction, Action, getDefaultMiddleware, combineReducers } from '@reduxjs/toolkit';
 import { createStateSyncMiddleware, initStateWithPrevTab } from 'redux-state-sync';
 
 import locationRecuder from './routing/locationReducer';
-import checkInvitationsReducer from './invitations/checkInvitationsReducer';
-import { acceptInvitationsReducer } from './invitations/acceptInvitationReducer';
 import { accountAuthenticationReducer } from './auth/accountAuthenticationReducer';
+import invitationReducer from './invitations/invitationReducer';
 
 const middlewares = [
     createStateSyncMiddleware(),
@@ -20,12 +19,9 @@ const persistConfig = {
 }
 
 const rootReducer = combineReducers({
-    session: sessionReducer,
+    invite: invitationReducer,
     locationRouting: locationRecuder,
     auth: accountAuthenticationReducer,
-
-    acceptedInvitation: acceptInvitationsReducer,
-    checkInvitations: checkInvitationsReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
