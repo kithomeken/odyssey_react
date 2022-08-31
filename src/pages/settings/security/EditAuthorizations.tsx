@@ -3,7 +3,8 @@ import { Helmet } from "react-helmet"
 import { useParams } from "react-router-dom"
 import { toast } from "react-toastify"
 
-import { AUTH_TEAM_CONFIGURE_ADMIN_RIGHTS_API_ROUTE, AUTH_TEAM_CONFIGURE_TICKETS_RIGHTS_API_ROUTE, AUTH_TEAM_DETAILS_API_ROUTE } from "../../../api/ApiRoutes"
+import { AUTH_TEAM_CONFIGURE_ADMIN_RIGHTS_API_ROUTE, AUTH_TEAM_CONFIGURE_TICKETS_RIGHTS_API_ROUTE } from "../../../api/ApiRoutes"
+import { AUTH_TEAM_DETAILS_API_ROUTE, AUTH_TEAM_SET_AGENT_ACCOUNT_RIGHTS_API_ROUTE, AUTH_TEAM_SET_PRODUCTS_RIGHTS_API_ROUTE } from "../../../api/ApiRoutes"
 import Loading from "../../../components/layouts/Loading"
 import BreadCrumbs from "../../../components/settings/BreadCrumbs"
 import Header from "../../../components/settings/Header"
@@ -12,7 +13,9 @@ import { HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
 import DateFormating from "../../../lib/hooks/DateFormating"
 import HttpServices from "../../../services/HttpServices"
 import EmptyResultsReturned from "../../errors/EmptyResultsReturned"
+import { AccountRights } from "./AccountRights"
 import { AdministativeRights } from "./AdministrativeRights"
+import { ProductAndCompaniesRights } from "./ProductAndCompaniesRights"
 import { TicketsRights } from "./TicketRights"
 
 const EditAuthorizations = () => {
@@ -25,9 +28,13 @@ const EditAuthorizations = () => {
             access_type: '',
             ticket_access: '',
             created_at: '',
-            adminRights: '',
         },
         rights: {
+            agent: '',
+            client: '',
+            products: '',
+            companies: '',
+
             admin: '',
             tickets: null,
             escalations: null,
@@ -39,12 +46,13 @@ const EditAuthorizations = () => {
         tabStatus: {
             admin: 'pending',
             tickets: 'pending',
+            products: 'pending',
         },
         show: {
             amendDetails: false
         },
-        activeTab: 'admin',
-        status: 'fulfilled',
+        activeTab: 'account',
+        status: 'pending',
         requestFailed: false,
     })
 
@@ -58,30 +66,25 @@ const EditAuthorizations = () => {
         { linkItem: false, title: "Edit" },
     ]
 
-    function fetchAuthorizationDetailsWithStatus() {
-        setstate({
-            ...state,
-            status: 'pending'
-        })
-
-        fetchAuthorizationDetailsWithoutStatus()
-    }
-
-    async function fetchAuthorizationDetailsWithoutStatus() {
+    async function authorizationDetailsApiCall() {
         try {
             const authTeamApiPoint = AUTH_TEAM_DETAILS_API_ROUTE + '/' + params.uuid
             const response: any = await HttpServices.httpGet(authTeamApiPoint)
+            const payload = response.data.payload
 
             let { data } = state
+            let { rights } = state
             let { features } = state
             let status = state.status
 
             status = 'fulfilled'
-            data = response.data.data
-            features.support = response.data.data_2.support
+            data = payload.auth_team
+            features.support = payload.support
+            rights.agent = payload.rights.agent
+            rights.client = payload.rights.client            
 
             setstate({
-                ...state, data, status, features
+                ...state, data, status, features, rights
             })
         } catch (e) {
             let status = state.status
@@ -96,7 +99,7 @@ const EditAuthorizations = () => {
     }
 
     React.useEffect(() => {
-        fetchAuthorizationDetailsWithStatus();
+        authorizationDetailsApiCall();
     }, []);
 
     const classNames = (...classes: any[]) => {
@@ -135,6 +138,128 @@ const EditAuthorizations = () => {
             })
 
             configureAdminRightsApiEndPoint(e.target.name, toggleStatus)
+        }
+    }
+
+    const onAgentAccountRightsCheckboxHandler = async (e: any) => {
+        const denyRequest = disableAdministrativeRights()
+
+        if (!denyRequest) {
+            let { rights }: any = state
+            let checked = e.target.checked;
+            const stateBefore = rights.agent[e.target.name]
+
+            let toggleStatus = checked ? 'Y' : 'N'
+            rights.agent[e.target.name] = toggleStatus
+
+            setstate({
+                ...state, rights
+            })
+
+            try {
+                let input = {
+                    uuid: params.uuid,
+                    input_key: e.target.name,
+                    input_value: toggleStatus,
+                }
+    
+                const response = await HttpServices.httpPost(AUTH_TEAM_SET_AGENT_ACCOUNT_RIGHTS_API_ROUTE, input)
+
+                if (response.status === 200) {
+                    // Do nothing
+                } else {
+                    toast.error('Something went wrong with your request. Try again later', {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+
+                    rights.agent[e.target.name] = stateBefore
+                    setstate({
+                        ...state, rights
+                    })
+                }
+            } catch (error) {
+                toast.error('Something went wrong with your request. Try again later', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+
+                rights.agent[e.target.name] = stateBefore
+                setstate({
+                    ...state, rights
+                })
+            }
+        }
+    }
+
+    const onProductsRightsCheckboxHandler = async (e: any) => {
+        const denyRequest = disableAdministrativeRights()
+
+        if (!denyRequest) {
+            let { rights }: any = state
+            let checked = e.target.checked;
+            const stateBefore = rights.products[e.target.name]
+
+            let toggleStatus = checked ? 'Y' : 'N'
+            rights.products[e.target.name] = toggleStatus
+
+            setstate({
+                ...state, rights
+            })
+
+            try {
+                let input = {
+                    uuid: params.uuid,
+                    input_key: e.target.name,
+                    input_value: toggleStatus,
+                }
+    
+                const response = await HttpServices.httpPost(AUTH_TEAM_SET_PRODUCTS_RIGHTS_API_ROUTE, input)
+
+                if (response.status === 200) {
+                    // Do nothing
+                } else {
+                    toast.error('Something went wrong with your request. Try again later', {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+
+                    rights.products[e.target.name] = stateBefore
+                    setstate({
+                        ...state, rights
+                    })
+                }
+            } catch (error) {
+                toast.error('Something went wrong with your request. Try again later', {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+
+                rights.products[e.target.name] = stateBefore
+                setstate({
+                    ...state, rights
+                })
+            }
         }
     }
 
@@ -291,13 +416,25 @@ const EditAuthorizations = () => {
 
     const loadRespectiveTab = (tabName = 'admin') => {
         switch (tabName) {
-            case 'admin':
-                return <AdministativeRights
+            case 'account':
+                return <AccountRights
+                    agentCheckboxHandler={onAgentAccountRightsCheckboxHandler}
                     disableCheckbox={disableAdministrativeRights()}
-                    onCheckboxHandler={onAdminRightsChangeHandler}
                     support={state.features.support}
-                    stateFromParent={state.data}
+                    state={state.rights} 
                 />
+
+            case 'products':
+                return <ProductAndCompaniesRights
+                    productCheckboxHandler={onProductsRightsCheckboxHandler}
+                    disableCheckbox={disableAdministrativeRights()}
+                    support={state.features.support}
+                    state={state.rights} 
+                    teamId={params.uuid} 
+                    status={state.tabStatus.products} 
+                    updateTabStatus={updateTabStatus} 
+                    updateRightsTabState={updateRightsTabState} 
+                    companyCheckboxHandler={onProductsRightsCheckboxHandler}                />
 
             case 'tickets':
                 return <TicketsRights
@@ -422,12 +559,21 @@ const EditAuthorizations = () => {
                                             </div>
 
                                             <div className="w-10/12 pb-3 flex flex-row">
-                                                <div className="w-auto cursor-pointer" onClick={() => activateTab('admin')}>
+                                                <div className="w-auto cursor-pointer" onClick={() => activateTab('account')}>
                                                     <button className={classNames(
-                                                        state.activeTab === 'admin' ? 'text-emerald-700 border-b-2 bg-emerald-50 border-emerald-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
+                                                        state.activeTab === 'account' ? 'text-emerald-700 border-b-2 bg-emerald-50 border-emerald-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
                                                         "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
                                                     )}>
-                                                        <span className="lolrtn robot">Administrative Rights</span>
+                                                        <span className="lolrtn robot">Account Management</span>
+                                                    </button>
+                                                </div>
+                                                
+                                                <div className="w-auto cursor-pointer" onClick={() => activateTab('products')}>
+                                                    <button className={classNames(
+                                                        state.activeTab === 'products' ? 'text-emerald-700 border-b-2 bg-emerald-50 border-emerald-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
+                                                        "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
+                                                    )}>
+                                                        <span className="lolrtn robot">Products & Companies</span>
                                                     </button>
                                                 </div>
 
