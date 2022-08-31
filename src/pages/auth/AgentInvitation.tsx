@@ -7,10 +7,9 @@ import Crypto from "../../encryption/Crypto";
 import { Status401 } from "../errors/Status401";
 import Loading from "../../components/layouts/Loading";
 import { APPLICATION_NAME } from "../../global/ConstantsRegistry"
-import { guestRoutes } from "../../routes/auth/guestRoutes";
 import { useAppSelector } from "../../store/hooks";
-import { acceptInvitationActions } from "../../store/invitations/acceptInvitationActions";
-import { checkInvitationsActions } from "../../store/invitations/checkInvitationsActions";
+import { postAuthRoute } from "../../routes/auth/protectedRoutes";
+import { invitationActions } from "../../store/invitations/invitationActions";
 
 export const AgentInvitation = () => {
     const [state, setstate] = useState({
@@ -30,10 +29,7 @@ export const AgentInvitation = () => {
 
     const location = useLocation()
     const dispatch = useDispatch()
-    let invitation = {
-        check: useAppSelector(state => state.checkInvitations),
-        accept: useAppSelector(state => state.acceptedInvitation),
-    }
+    const inviteState = useAppSelector(state => state.invite)
 
     let searchParams: any = {};
     let searchKey = location.search?.split("?")[1]?.split("&");
@@ -44,7 +40,12 @@ export const AgentInvitation = () => {
     });
 
     const checkInvitationValidity = () => {
-        dispatch(checkInvitationsActions(searchParams.endp))
+        const props = {
+            action: "checking",
+            encodedEndPoint: searchParams.endp,            
+        }
+
+        dispatch(invitationActions(props))
     }
 
     React.useEffect(() => {
@@ -144,11 +145,11 @@ export const AgentInvitation = () => {
             let { errors } = state
             let targetName = e.target.name
             let targetValue = e.target.value
-            const pwdPolicy = invitation.check.response.payload.policies
+            // const pwdPolicy = invitation.check.response.payload.policies
 
             switch (targetName) {
                 case 'password':
-                    if (targetValue.length < 1) {
+                    /* if (targetValue.length < 1) {
                         errors[targetName] = 'Password cannot be empty'
                     } else if (targetValue.length < pwdPolicy.min_length) {
                         errors[targetName] = 'Password cannot be less than ' + pwdPolicy.min_length + ' characters'
@@ -156,7 +157,7 @@ export const AgentInvitation = () => {
                         errors[targetName] = 'Password cannot be more than ' + pwdPolicy.max_length + ' characters'
                     } else {
 
-                    }
+                    } */
                     break;
 
                 case 'confirm_passwd':
@@ -178,16 +179,22 @@ export const AgentInvitation = () => {
 
     const onAcceptingInvitationHandler = (e: any) => {
         e.preventDefault()
-        if (!invitation.accept.isPostingInvite) {
-            dispatch(acceptInvitationActions(state.input, searchParams.endp))
+        if (!inviteState.processing) {
+            const props = {
+                input: state.input,
+                action: "accepting",
+                encodedEndPoint: searchParams.endp,            
+            }
+
+            dispatch(invitationActions(props))
         }
     }    
     
-    if (invitation.accept.authenticate) {
-        const emailAddr = invitation.check.response.payload.email
+    if (inviteState.verified) {
+        const emailAddr = inviteState.response.payload.email
         const encryptedEmailAddr = Crypto.encryptDataUsingAES256(emailAddr)
 
-        const postInvitationAuth = (guestRoutes.find((routeName) => routeName.name === 'POST_INVITATION_AUTH_'))?.path
+        const postInvitationAuth = (postAuthRoute.find((routeName) => routeName.name === 'POST_INVITATION_AUTH_'))?.path
         const autoSignIn = postInvitationAuth + "?signature=" + searchParams.signature + "&auid=" + encryptedEmailAddr
 
         const autoAuthState = {
@@ -203,19 +210,19 @@ export const AgentInvitation = () => {
         <React.Fragment>
             <Helmet>
                 <title>
-                    {invitation.check.title}
+                    Welcome To {APPLICATION_NAME}
                 </title>
             </Helmet>
 
             <div className="wrapper all-white">
                 <section className="gx-container">
                     {
-                        invitation.check.loading ? (
+                        inviteState.processing ? (
                             <div className="py-4">
                                 <Loading />
                             </div>
                         ) : (
-                            invitation.check.isInvitationValid ? (
+                            inviteState.valid ? (
                                 <>
                                     <header className="landing-header">
                                         <div className="landing-header__left mb-0">
@@ -247,7 +254,7 @@ export const AgentInvitation = () => {
                                                             onBlur={onInputBlur}
                                                             onChange={onInputChangeHandler}
                                                             value={state.input.first_name}
-                                                            disabled={invitation.accept.isPostingInvite}
+                                                            disabled={inviteState.processing}
                                                             className={
                                                                 classNames(
                                                                     state.errors.first_name.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
@@ -260,7 +267,7 @@ export const AgentInvitation = () => {
                                                             className={
                                                                 classNames(
                                                                     state.errors.first_name.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
-                                                                    invitation.accept.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
+                                                                    inviteState.processing ? 'text-slate-400' : 'text-slate-700',
                                                                     "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                                 )
                                                             }>
@@ -279,7 +286,7 @@ export const AgentInvitation = () => {
                                                             onBlur={onInputBlur}
                                                             value={state.input.last_name}
                                                             onChange={onInputChangeHandler}
-                                                            disabled={invitation.accept.isPostingInvite}
+                                                            disabled={inviteState.processing}
                                                             className={
                                                                 classNames(
                                                                     state.errors.last_name.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
@@ -291,7 +298,7 @@ export const AgentInvitation = () => {
                                                             className={
                                                                 classNames(
                                                                     state.errors.last_name.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
-                                                                    invitation.accept.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
+                                                                    inviteState.processing ? 'text-slate-400' : 'text-slate-700',
                                                                     "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                                 )
                                                             }>
@@ -328,7 +335,7 @@ export const AgentInvitation = () => {
                                                     onBlur={onPasswordInputBlur}
                                                     value={state.input.password}
                                                     onChange={onPasswordChangeHandler}
-                                                    disabled={invitation.accept.isPostingInvite}
+                                                    disabled={inviteState.processing}
                                                     className={
                                                         classNames(
                                                             state.errors.password.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
@@ -340,7 +347,7 @@ export const AgentInvitation = () => {
                                                     className={
                                                         classNames(
                                                             state.errors.password.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
-                                                            invitation.accept.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
+                                                            inviteState.processing ? 'text-slate-400' : 'text-slate-700',
                                                             "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                         )
                                                     }>
@@ -366,7 +373,7 @@ export const AgentInvitation = () => {
                                                     onBlur={onPasswordInputBlur}
                                                     value={state.input.confirm_passwd}
                                                     onChange={onPasswordChangeHandler}
-                                                    disabled={invitation.accept.isPostingInvite}
+                                                    disabled={inviteState.processing}
                                                     className={
                                                         classNames(
                                                             state.errors.confirm_passwd.length > 0 ? 'text-red-900 border-red-400 focus:border-red-600' : 'text-slate-900 border-gray-300 focus:border-green-500',
@@ -378,7 +385,7 @@ export const AgentInvitation = () => {
                                                     className={
                                                         classNames(
                                                             state.errors.confirm_passwd.length > 0 ? 'text-red-700 peer-focus:text-red-600' : 'peer-focus:text-green-600',
-                                                            invitation.accept.isPostingInvite ? 'text-slate-400' : 'text-slate-700',
+                                                            inviteState.processing ? 'text-slate-400' : 'text-slate-700',
                                                             "absolute text-sm duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2  peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 left-1"
                                                         )
                                                     }>
@@ -396,7 +403,7 @@ export const AgentInvitation = () => {
 
                                         <div className="mb-3 pt-3 px-0 flex flex-row-reverse">
                                             {
-                                                invitation.accept.isPostingInvite ? (
+                                                inviteState.processing ? (
                                                     <button type="button" disabled className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-6 py-1-5 bg-green-600 hover:bg-green-600 text-white sm:ml-3 sm:w-auto sm:text-sm disabled:bg-green-600">
                                                         <span>
                                                             <span className="left-0 inset-y-0 flex items-center align-middle">
