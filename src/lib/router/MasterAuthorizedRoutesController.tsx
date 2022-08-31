@@ -37,7 +37,7 @@ export default function MasterAuthorizedRoutesController() {
         
                         <TopHeader />
         
-                        <div className="flex flex-col w-full mb-5" style={marginLeft}>
+                        <div className="flex flex-col w-full" style={marginLeft}>
         
                             <div className="w-full overflow-y-auto">
                                 <div className="kiOAkj" style={marginTop}>

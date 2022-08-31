@@ -2,17 +2,16 @@ import React, { Fragment } from "react"
 import { Menu, Transition } from "@headlessui/react"
 
 import { useDispatch } from "react-redux"
-import { Navigate } from "react-router-dom"
-import Crypto from "../../encryption/Crypto"
 import { useAppSelector } from "../../store/hooks"
-import CookieService from "../../services/CookieServices"
-import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_INFO_COOKIE, ACCOUNT_NAME_COOKIE } from "../../global/CookieNames"
 import { accountSignOutActions } from "../../store/auth/accountSignOutActions"
 import tempararyAvatar from '../../assets/avatars/C6C2E60B0A5CC3A09F638284A21571F3.png'
+import { protectedRoutes } from "../../routes/auth/protectedRoutes"
+import { Link } from "react-router-dom"
 
 export const AccountDropDown = () => {
     const dispatch = useDispatch()
     const authenticationState = useAppSelector(state => state.auth)
+    const accountProfile = (protectedRoutes.find((routeName) => routeName.name === 'PROF_AC'))?.path
 
     function classNames(...classes) {
         return classes.filter(Boolean).join(' ')
@@ -36,7 +35,7 @@ export const AccountDropDown = () => {
                                 className={
                                     classNames(
                                         open ? 'text-slate-700' : null,
-                                        "flex flex-row items-center w-auto px-1 rounded py-1 bg-white text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-0 focus:ring-offset focus:ring-offset-slate-100 focus:ring-emerald-500 align-middle"
+                                        "flex flex-row items-center w-auto px-3 rounded py-1 bg-white text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-0 focus:ring-offset focus:ring-offset-slate-100 focus:ring-emerald-500 align-middle"
                                     )
                                 }>
                                 <span className="text-sm mr-2">{authenticationState.accountName}</span>
@@ -84,7 +83,10 @@ export const AccountDropDown = () => {
 
                                     <Menu.Item>
                                         {({ active }) => (
-                                            <button className={classNames(
+                                            <Link 
+                                                to={accountProfile}
+                                                target="_blank"
+                                                className={classNames(
                                                 active ? 'bg-slate-100 text-slate-800' : 'text-slate-700',
                                                 'px-4 py-3 text-sm text-left w-full block mt-2'
                                             )}
@@ -95,10 +97,10 @@ export const AccountDropDown = () => {
                                                     </span>
 
                                                     <span className="ml-2 flex-auto">
-                                                        Manage You Account
+                                                        Manage Your Account
                                                     </span>
                                                 </span>
-                                            </button>
+                                            </Link>
                                         )}
                                     </Menu.Item>
 

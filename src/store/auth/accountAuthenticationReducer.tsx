@@ -1,7 +1,7 @@
 import Crypto from "../../encryption/Crypto";
 import CookieServices from "../../services/CookieServices";
 import { COOKIE_OPTIONS } from "../../global/ConstantsRegistry";
-import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_INFO_COOKIE, ACCOUNT_NAME_COOKIE, SANCTUM_COOKIE_NAME, UUID_COOKIE_NAME } from "../../global/CookieNames";
+import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_NAME_COOKIE, SANCTUM_COOKIE_NAME, UUID_COOKIE_NAME } from "../../global/CookieNames";
 
 const initialState = {
     uaid: null,
@@ -14,7 +14,6 @@ const initialState = {
 
 export const accountAuthenticationReducer = (state = initialState, action: any) => {
     const uaidString = CookieServices.get(UUID_COOKIE_NAME)
-    console.log(action.type);
 
     switch (action.type) {
         case 'DATA_INTEGRITY_COMPROMISED_':
@@ -22,6 +21,7 @@ export const accountAuthenticationReducer = (state = initialState, action: any) 
                 ...initialState,
                 processing: false,
                 isAuthenticated: false,
+                error: 'Auto-sign in failed',
             }
     
         case 'ACCOUNT_AUTHENTICATION_PENDING_':
@@ -82,7 +82,8 @@ export const accountAuthenticationReducer = (state = initialState, action: any) 
 
         case 'ACCOUNT_INFO_ERROR_':
         case 'ACCOUNT_INFO_EXCEPTION_':
-            CookieServices.remove(ACCOUNT_INFO_COOKIE)
+            CookieServices.remove(ACCOUNT_NAME_COOKIE)
+            CookieServices.remove(ACCOUNT_EMAIL_COOKIE)
             CookieServices.remove(UUID_COOKIE_NAME)
             CookieServices.remove(SANCTUM_COOKIE_NAME)
 
@@ -112,7 +113,8 @@ export const accountAuthenticationReducer = (state = initialState, action: any) 
         case 'ACCOUNT_SIGNED_OUT_':
         case 'ACCOUNT_SIGN_OUT_EXCEPTION_':
             // Revoke authentication access
-            CookieServices.remove(ACCOUNT_INFO_COOKIE)
+            CookieServices.remove(ACCOUNT_NAME_COOKIE)
+            CookieServices.remove(ACCOUNT_EMAIL_COOKIE)
             CookieServices.remove(UUID_COOKIE_NAME)
             CookieServices.remove(SANCTUM_COOKIE_NAME)
 

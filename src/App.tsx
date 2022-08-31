@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
-import { BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 
 import './assets/css/tailwind.css'
 import './assets/css/cuba.odyssey.css'
-import './assets/css/tailwind_colors.css'
 import "react-toastify/dist/ReactToastify.css";
 import './assets/icons/fontawesome_pro/css/all.css'
 
@@ -22,6 +21,7 @@ import PostAuthRouteController from './lib/router/PostAuthRouteController';
 import StandardRoutesController from './lib/router/StandardRoutesController';
 import MasterAuthorizedRoutesController from './lib/router/MasterAuthorizedRoutesController';
 import SpecialAuthorizationRoutesControllers from './lib/router/SpecialAuthorizationRoutesController';
+import { exceptionalRoutes } from './routes/exceptionalRoutes';
 
 let standardRoutes: Array<any> = []
 let configurationRoutes: Array<any> = []
@@ -54,39 +54,39 @@ interface RouteContextType {
 const RoutingContext = React.createContext<RouteContextType>(null!)
 
 function App() {
-    const RouterProvider = ({children}: {children: React.ReactNode}) => {
-        const currentLocation = useLocation()        
+    const RouterProvider = ({ children }: { children: React.ReactNode }) => {
+        const currentLocation = useLocation()
         const [route, setRoute] = useState({
             currentpage: currentLocation.pathname,
             from: ''
         });
-        
-        useEffect(()=> {
-            setRoute((prev) => ({currentpage: currentLocation.pathname, from: prev.currentpage}) )
+
+        useEffect(() => {
+            setRoute((prev) => ({ currentpage: currentLocation.pathname, from: prev.currentpage }))
         }, [currentLocation]);
 
         return <RoutingContext.Provider value={route}>
             {children}
         </RoutingContext.Provider>
     }
-    
+
     return (
         <Router>
             <RouterProvider>
-                
+
                 <ToastContainer />
 
                 <Routes>
                     <Route element={<AuthRouteController />}>
                         {guestRoutes.map((route, index) => {
-                                return (
-                                    <Route
-                                        path={route.path}
-                                        element={route.element}
-                                        key={index}
-                                    />
-                                )
-                            })
+                            return (
+                                <Route
+                                    path={route.path}
+                                    element={route.element}
+                                    key={index}
+                                />
+                            )
+                        })
                         }
                     </Route>
 
@@ -103,7 +103,7 @@ function App() {
                             })
                         }
                     </Route>
-                    
+
                     <Route element={<StandardRoutesController />} >
                         {
                             standardRoutes.map((route, index) => {
@@ -117,7 +117,7 @@ function App() {
                             })
                         }
                     </Route>
-                    
+
                     <Route element={<SpecialAuthorizationRoutesControllers />} >
                         {
                             configurationRoutes.map((route, index) => {
@@ -131,7 +131,7 @@ function App() {
                             })
                         }
                     </Route>
-                    
+
                     <Route element={<MasterAuthorizedRoutesController />} >
                         {
                             masterConfigurationRoutes.map((route, index) => {
@@ -145,8 +145,27 @@ function App() {
                             })
                         }
                     </Route>
-                    
+
                     <Route path="*" element={<Error404 />} />
+
+                    {
+                        /* 
+                         * Routes that do not rely on authentication. 
+                         * Can be accessed by both authenticated and
+                         * unauthenticated users 
+                         * 
+                         * Different from authentication 
+                        */
+                        exceptionalRoutes.map((route, index) => {
+                            return (
+                                <Route
+                                    path={route.path}
+                                    element={route.element}
+                                    key={index}
+                                />
+                            )
+                        })
+                    }
 
                 </Routes>
             </RouterProvider>
