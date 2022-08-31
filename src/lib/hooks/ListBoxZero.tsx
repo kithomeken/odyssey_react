@@ -3,7 +3,7 @@ import { FC, Fragment } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 
 interface Props {
-    label: any, 
+    label?: any, 
     state: any, 
     width?: any,
     listButton: any, 
