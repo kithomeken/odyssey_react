@@ -14,7 +14,6 @@ export const guestRoutes: Array<GuestRouteInterface> = [
     { path: "/auth/sign-in", element: <SignIn />, caseSensitive: true, name: 'SIGN_IN' },
     { path: "/auth/forgot-password", element: <ForgotPassword />, caseSensitive: true, name: 'FGRT_PWD' },
     { path: "/api/u/auth/account/invtn/agn", element: <AgentInvitation />, caseSensitive: true, name: 'AGN_INV' },
-    { path: "/auth-auto/sign-in/post/inv", element: <PostInvitationAuth />, caseSensitive: true, name: 'POST_INVITATION_AUTH_' },
 ]
 
 
