@@ -54,6 +54,12 @@ export const AUTH_TEAM_CONFIGURE_ADMIN_RIGHTS_API_ROUTE = 'portal/a/site-master/
 export const AUTH_TEAM_TICKET_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/tickets' // uuid
 export const AUTH_TEAM_CONFIGURE_TICKETS_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/tickets/configure'
 
+export const AUTH_TEAM_SET_AGENT_ACCOUNT_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/account/agents/configure'
+export const AUTH_TEAM_PRODUCT_AND_COMPANY_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/products' // uuid
+export const AUTH_TEAM_SET_PRODUCTS_RIGHTS_API_ROUTE = 'portal/a/site-master/security/auth-teams/rights/products/configure'
+
+
+
 // Ticket Types
 export const TICKET_TYPES_LIST_API_ROUTE = 'portal/a/site-master/tickets/types/all'
 export const TICKET_TYPES_CHECK_API_ROUTE = 'portal/a/site-master/tickets/types/check'
