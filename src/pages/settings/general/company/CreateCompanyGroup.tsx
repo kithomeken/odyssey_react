@@ -530,7 +530,7 @@ const CreateCompanyGroup = () => {
                     fetchOrganizationDetailsApiCall.status === 'rejected' ? (
                         <Error500 />
                     ) : fetchOrganizationDetailsApiCall.status === 'fulfilled' ? (
-                        <div className="w-8/12">
+                        <div className="w-10/12">
                             {
                                 state.requestFailed ? (
                                     <div className="mb-3">
