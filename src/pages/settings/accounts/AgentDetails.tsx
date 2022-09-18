@@ -18,6 +18,8 @@ import emptySearchBox from '../../../assets/images/empty_results_returned.png'
 import { ChangeAuthTeam } from "./ChangeAuthTeam"
 import { ActionModal } from "../../../components/lib/ActionModal"
 import { accountRoutes } from "../../../routes/settings/accountRoutes"
+import { useAppSelector } from "../../../store/hooks"
+import Crypto from "../../../encryption/Crypto"
 
 export const AgentDetails = () => {
     const [state, setstate] = useState({
@@ -36,6 +38,9 @@ export const AgentDetails = () => {
             suspendingAcc: false
         }
     })
+
+    const authenticationState = useAppSelector(state => state.auth)
+    const userAccountUuid = Crypto.decryptDataUsingAES256(authenticationState.uaid)
 
     // Header button
     const showButton = false
@@ -81,6 +86,36 @@ export const AgentDetails = () => {
     const getFirstLetterFromName = () => {
         let firstName = state.data.agent.first_name
         return firstName.charAt(0)
+    }
+
+    const accountProfileColorCode = () => {
+        let firstName = state.data.agent.first_name
+        const letterHead = firstName.charAt(0)
+        let colorCode = 'green'
+
+        if (letterHead.match(new RegExp('[A-C]'))) {
+            colorCode = 'red'
+        } else if (letterHead.match(new RegExp('[D-F]'))) {
+            colorCode = 'orange'
+        } else if (letterHead.match(new RegExp('[G-J]'))) {
+            colorCode = 'yellow'
+        } else if (letterHead.match(new RegExp('[K-M]'))) {
+            const profileColorRange = Array('green', 'emerald')
+            colorCode = profileColorRange[Math.floor(Math.random() * profileColorRange.length)]
+        } else if (letterHead.match(new RegExp('[N-Q]'))) {
+            const profileColorRange = Array('teal', 'cyan')
+            colorCode = profileColorRange[Math.floor(Math.random() * profileColorRange.length)]
+        } else if (letterHead.match(new RegExp('[R-T]'))) {
+            const profileColorRange = Array('blue', 'indigo')
+            colorCode = profileColorRange[Math.floor(Math.random() * profileColorRange.length)]
+        } else if (letterHead.match(new RegExp('[U-W]'))) {
+            const profileColorRange = Array('purple', 'fuchsia')
+            colorCode = profileColorRange[Math.floor(Math.random() * profileColorRange.length)]
+        } else if (letterHead.match(new RegExp('[X-Z]'))) {
+            colorCode = 'rose'
+        }
+
+        return colorCode
     }
 
     function classNames(...classes) {
@@ -316,18 +351,22 @@ export const AgentDetails = () => {
         } else {
             return (
                 <>
-                    <Menu.Item>
-                        {({ active }) => (
-                            <button
-                                className={classNames(
-                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                    'block px-4 py-2 text-sm text-left w-full'
+                    {
+                        userAccountUuid !== params.uuid ? (
+                            <Menu.Item>
+                                {({ active }) => (
+                                    <button
+                                        className={classNames(
+                                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                            'block px-4 py-2 text-sm text-left w-full'
+                                        )}
+                                    >
+                                        Suggest Account Changes
+                                    </button>
                                 )}
-                            >
-                                Suggest Account Changes
-                            </button>
-                        )}
-                    </Menu.Item>
+                            </Menu.Item>
+                        ) : null
+                    }
                 </>
             )
         }
@@ -411,7 +450,23 @@ export const AgentDetails = () => {
                                 <div className="flex flex-row">
                                     <div className="w-3/12 rounded pr-4 pt-2 pb-4">
                                         <div className="w-full flex flex-row">
-                                            <div className="h-16 w-16 flex flex-row align-middle bg-emerald-600 mb-4 rounded-full">
+                                            <div className={
+                                                classNames(
+                                                    accountProfileColorCode() === 'orange' ? 'bg-orange-500' : null,
+                                                    accountProfileColorCode() === 'red' ? 'bg-red-500' : null,
+                                                    accountProfileColorCode() === 'yellow' ? 'bg-yellow-500' : null,
+                                                    accountProfileColorCode() === 'green' ? 'bg-green-500' : null,
+                                                    accountProfileColorCode() === 'emerald' ? 'bg-emerald-500' : null,
+                                                    accountProfileColorCode() === 'teal' ? 'bg-teal-500' : null,
+                                                    accountProfileColorCode() === 'cyan' ? 'bg-cyan-500' : null,
+                                                    accountProfileColorCode() === 'blue' ? 'bg-blue-500' : null,
+                                                    accountProfileColorCode() === 'indigo' ? 'bg-indigo-500' : null,
+                                                    accountProfileColorCode() === 'purple' ? 'bg-purple-500' : null,
+                                                    accountProfileColorCode() === 'fuchsia' ? 'bg-fuchsia-500' : null,
+                                                    accountProfileColorCode() === 'rose' ? 'bg-rose-500' : null,
+                                                    "h-16 w-16 flex flex-row align-middle mb-4 rounded-full"
+                                                )
+                                            }>
                                                 <p className="m-auto text-2xl text-white">
                                                     {getFirstLetterFromName()}
                                                 </p>
@@ -442,33 +497,37 @@ export const AgentDetails = () => {
 
                                                             {
                                                                 state.data.agent.is_active === 'Y' ? (
-                                                                    <Menu.Item>
-                                                                        {({ active }) => (
-                                                                            <button
-                                                                                onClick={showOrHideSuspendAccountModal}
-                                                                                className={classNames(
-                                                                                    active ? 'bg-red-100 text-red-900' : 'text-red-700',
-                                                                                    'block px-4 py-2 text-sm text-left w-full'
-                                                                                )}
-                                                                            >
-                                                                                Suspend Account
-                                                                            </button>
-                                                                        )}
-                                                                    </Menu.Item>
+                                                                    userAccountUuid !== params.uuid ? (
+                                                                        <Menu.Item>
+                                                                            {({ active }) => (
+                                                                                <button
+                                                                                    onClick={showOrHideSuspendAccountModal}
+                                                                                    className={classNames(
+                                                                                        active ? 'bg-red-100 text-red-900' : 'text-red-700',
+                                                                                        'block px-4 py-2 text-sm text-left w-full'
+                                                                                    )}
+                                                                                >
+                                                                                    Suspend Account
+                                                                                </button>
+                                                                            )}
+                                                                        </Menu.Item>
+                                                                    ) : null
                                                                 ) : (
-                                                                    <Menu.Item>
-                                                                        {({ active }) => (
-                                                                            <button
-                                                                                onClick={restoreAccountAccessApiCall}
-                                                                                className={classNames(
-                                                                                    active ? 'bg-amber-100 text-amber-800' : 'text-amber-700',
-                                                                                    'block px-4 py-2 text-sm text-left w-full'
-                                                                                )}
-                                                                            >
-                                                                                Restore Access
-                                                                            </button>
-                                                                        )}
-                                                                    </Menu.Item>
+                                                                    userAccountUuid !== params.uuid ? (
+                                                                        <Menu.Item>
+                                                                            {({ active }) => (
+                                                                                <button
+                                                                                    onClick={restoreAccountAccessApiCall}
+                                                                                    className={classNames(
+                                                                                        active ? 'bg-amber-100 text-amber-800' : 'text-amber-700',
+                                                                                        'block px-4 py-2 text-sm text-left w-full'
+                                                                                    )}
+                                                                                >
+                                                                                    Restore Access
+                                                                                </button>
+                                                                            )}
+                                                                        </Menu.Item>
+                                                                    ) : null
                                                                 )
                                                             }
 
@@ -545,12 +604,12 @@ export const AgentDetails = () => {
                                     <div className="w-8/12 pl-4 pt-2 pb-4 h-screen">
                                         {
                                             state.data.agent.is_active === 'N' ? (
-                                                <div className="form-group rounded border-0 border-amber-400 bg-amber-100 py-4 px-4">
-                                                    <div className="flex flex-row align-middle text-amber-500">
-                                                        <i className="fad fa-exclamation-triangle fa-lg mt-1 text-amber-700 flex-none"></i>
+                                                <div className="form-group rounded border-0 bg-orange-100 py-4 px-4">
+                                                    <div className="flex flex-row align-middle text-orange-600">
+                                                        <i className="fas fa-exclamation-circle fa-lg mt-1 text-orange-600 flex-none"></i>
 
                                                         <div className="flex-auto ml-1">
-                                                            <span className="text-sm pl-3 text-slate-700 block">
+                                                            <span className="text-sm pl-3 text-orange-600 block">
                                                                 This account has been suspended. User will not be able to collaborate with your team.
                                                             </span>
 
@@ -571,13 +630,13 @@ export const AgentDetails = () => {
                                                     </p>
                                                 </div>
 
-                                                <button 
-                                                type="button" 
-                                                disabled={
-                                                    state.data.agent.is_active !== 'Y' ? true : false
-                                                }
-                                                onClick={showOrHideChangeAuthTeamModal} 
-                                                className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
+                                                <button
+                                                    type="button"
+                                                    disabled={
+                                                        state.data.agent.is_active !== 'Y' ? true : false
+                                                    }
+                                                    onClick={showOrHideChangeAuthTeamModal}
+                                                    className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
                                                     <span>
                                                         <span className="left-0 inset-y-0 flex items-center">
                                                             <span className="w-5 h-5">
@@ -643,12 +702,12 @@ export const AgentDetails = () => {
                                                     </p>
                                                 </div>
 
-                                                <button 
-                                                type="button" 
-                                                disabled={
-                                                    state.data.agent.is_active !== 'Y' ? true : false
-                                                }
-                                                className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
+                                                <button
+                                                    type="button"
+                                                    disabled={
+                                                        state.data.agent.is_active !== 'Y' ? true : false
+                                                    }
+                                                    className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
                                                     <span>
                                                         <span className="left-0 inset-y-0 flex flex-row align-middle">
                                                             <span className="w-5 h-5">

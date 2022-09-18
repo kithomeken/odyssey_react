@@ -1,13 +1,16 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import tempararyAvatar from '../../assets/avatars/C6C2E60B0A5CC3A09F638284A21571F3.png'
+
 import Crypto from "../../encryption/Crypto"
-import { ACCOUNT_NAME_COOKIE } from "../../global/CookieNames"
-import CookieService from "../../services/CookieServices"
+import CookieServices from "../../services/CookieServices"
+import { ACCOUNT_INFO_COOKIE } from "../../global/CookieNames"
+import tempararyAvatar from '../../assets/avatars/C6C2E60B0A5CC3A09F638284A21571F3.png'
 
 const TopHeader = () => {
-    const encryptedAccountName = CookieService.get(ACCOUNT_NAME_COOKIE)
-    const decryptedAccountName = Crypto.decryptDataUsingAES256(encryptedAccountName)
+    const enAccountInfo = CookieServices.get(ACCOUNT_INFO_COOKIE)
+    const deAccountInfo = Crypto.decryptDataUsingAES256(enAccountInfo)
+    const accountInfo = JSON.parse(deAccountInfo)
+
     const displayNone = {display: 'none'}
     
     return (
@@ -56,7 +59,7 @@ const TopHeader = () => {
                                 <div>
                                     <button type="button" className="flex text-sm focus:outline-none items-center border-l border-gray-300 pl-3" id="user-menu-button" x-ref="button">
                                         <span className="sr-only">Open user menu</span>
-                                        <span className="text-sm mr-2">{decryptedAccountName}</span>
+                                        <span className="text-sm mr-2">{accountInfo.account_name}</span>
                                         <img className="rounded-full h-10 w-10" src={tempararyAvatar} alt="" />
                                     </button>
                                 </div>
