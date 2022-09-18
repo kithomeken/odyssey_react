@@ -220,7 +220,7 @@ export const SettingsDropDown = ({ show }) => {
                                                     </span>
 
                                                     <span className="ml-3 flex-auto">
-                                                        System
+                                                        System Configurations
 
                                                         <span className="block truncate text-xs text-slate-400">
                                                             General configurations, authorization and permi...
