@@ -10,10 +10,11 @@ import SuccessBanner from "../../../components/layouts/SuccessBanner"
 
 interface Props {
     show: any,
-    showOrHideModal: any
+    showOrHideModal: any,
+    reloadAgentsDatatable: any,
 }
 
-export const InviteAgents: FC<Props> = ({ show, showOrHideModal }) => {
+export const InviteAgents: FC<Props> = ({ show, showOrHideModal, reloadAgentsDatatable }) => {
     const [state, setstate] = useState({
         requestFailed: false,
         isPostingForm: false,
@@ -239,6 +240,7 @@ export const InviteAgents: FC<Props> = ({ show, showOrHideModal }) => {
                     ...state, agents
                 })
 
+                reloadAgentsDatatable()
                 showOrHideModal()
             } else {
                 let errorMessages = response.data.message

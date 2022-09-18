@@ -22,7 +22,10 @@ import StandardRoutesController from './lib/router/StandardRoutesController';
 import MasterAuthorizedRoutesController from './lib/router/MasterAuthorizedRoutesController';
 import SpecialAuthorizationRoutesControllers from './lib/router/SpecialAuthorizationRoutesController';
 import { exceptionalRoutes } from './routes/exceptionalRoutes';
+import { standardErrorRoutes } from './routes/errorRoutes';
+import ErrorRoutesController from './lib/router/ErrorRouteController';
 
+let errorRoutes: Array<any> = []
 let standardRoutes: Array<any> = []
 let configurationRoutes: Array<any> = []
 let postAuthenticationRoutes: Array<any> = []
@@ -45,6 +48,12 @@ configurationRoutes = configurationRoutes.concat(
     accountRoutes,
     generalRoutes,
 )
+
+errorRoutes = errorRoutes.concat(
+    standardErrorRoutes,
+)
+
+export const allConfigurationRoutes = configurationRoutes
 
 interface RouteContextType {
     currentpage: string,
@@ -148,13 +157,32 @@ function App() {
 
                     <Route path="*" element={<Error404 />} />
 
+                    <Route element={<ErrorRoutesController />} >
+                        /* 
+                         * Redirection routes for error messages
+                         * 
+                        */
+                        {
+                            errorRoutes.map((route, index) => {
+                                return (
+                                    <Route
+                                        path={route.path}
+                                        element={route.element}
+                                        key={index}
+                                    />
+                                )
+                            })
+                        }
+                    </Route>
+
                     {
                         /* 
                          * Routes that do not rely on authentication. 
                          * Can be accessed by both authenticated and
                          * unauthenticated users 
                          * 
-                         * Different from authentication 
+                         * Different from authentication
+                         * Redirection for error messages
                         */
                         exceptionalRoutes.map((route, index) => {
                             return (

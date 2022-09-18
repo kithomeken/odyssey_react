@@ -1,38 +1,34 @@
 import React from 'react'
-import {useDispatch} from "react-redux";
 import {Helmet} from "react-helmet"
+import {useDispatch} from "react-redux";
+import { Navigate, useLocation } from 'react-router-dom';
 
-import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 import postSignInWait from '../../assets/images/post_sign_in_wait.png'
 import { postAccountAuthenticationActions } from '../../store/auth/postAccountAuthenticationActions';
 
 export const PostAuthentication = () => {
     const dispatch = useDispatch()
+    const location = useLocation()
     const authenticationState = useAppSelector(state => state.auth)
-    console.log('Post authentication');
     
-
     React.useEffect(() => {
         fetchAuthenticateAccountDetails()
     }, []);
 
     const fetchAuthenticateAccountDetails = () => {
-        'Dispatched post auth actions'
         dispatch(postAccountAuthenticationActions())
     }
 
-    const redirectToSignIn = () => {
-        console.log('Back to sign in - post auth');
-        
-        return <Navigate replace to="/auth/sign-in" />
-    }
+    if (authenticationState.isAuthenticated) {
+        if (authenticationState.accountName !== null && authenticationState.accountName !== undefined) {
+            const locationState: any = location.state
 
-    if (!authenticationState.isAuthenticated) {
-        redirectToSignIn()
-    } else {
-        if (authenticationState.accountName !== null && authenticationState.accountName !== undefined) {            
-            return <Navigate replace to="/home" />
+            if (locationState.from === null || locationState.from === undefined) {
+                return <Navigate replace to="/home" />
+            } else {
+                return <Navigate replace to={locationState.from} />
+            }
         }
     }
 

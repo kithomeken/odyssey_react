@@ -1,7 +1,8 @@
 import Crypto from "../../encryption/Crypto";
 import CookieServices from "../../services/CookieServices";
 import { COOKIE_OPTIONS } from "../../global/ConstantsRegistry";
-import { ACCOUNT_EMAIL_COOKIE, ACCOUNT_NAME_COOKIE, SANCTUM_COOKIE_NAME, UUID_COOKIE_NAME } from "../../global/CookieNames";
+import { ACCOUNT_INFO_COOKIE, SANCTUM_COOKIE_NAME, UUID_COOKIE_NAME } from "../../global/CookieNames";
+import Auth from "../../lib/router/Auth";
 
 const initialState = {
     uaid: null,
@@ -64,26 +65,23 @@ export const accountAuthenticationReducer = (state = initialState, action: any) 
             }
 
         case 'ACCOUNT_INFO_LOADED_':
-            const accountDetails = action.response.account
-            const enAccountName = Crypto.encryptDataUsingAES256(accountDetails.account_name)
-            CookieServices.set(ACCOUNT_NAME_COOKIE, enAccountName, COOKIE_OPTIONS)
-            
-            const enAccountEmail = Crypto.encryptDataUsingAES256(accountDetails.email)
-            CookieServices.set(ACCOUNT_EMAIL_COOKIE, enAccountEmail, COOKIE_OPTIONS)
+            const jsonAccountInfo = action.response.account
+            const stringAccountInfo = JSON.stringify(jsonAccountInfo)
+
+            const enAccountInfo = Crypto.encryptDataUsingAES256(stringAccountInfo)
+            CookieServices.set(ACCOUNT_INFO_COOKIE, enAccountInfo, COOKIE_OPTIONS)
 
             return {
                 ...initialState,
                 uaid: uaidString,
                 processing: false,
                 isAuthenticated: true,
-                email: accountDetails.email,
-                accountName: accountDetails.account_name,
+                email: jsonAccountInfo.email,
+                accountName: jsonAccountInfo.account_name,
             }
 
         case 'ACCOUNT_INFO_ERROR_':
         case 'ACCOUNT_INFO_EXCEPTION_':
-            CookieServices.remove(ACCOUNT_NAME_COOKIE)
-            CookieServices.remove(ACCOUNT_EMAIL_COOKIE)
             CookieServices.remove(UUID_COOKIE_NAME)
             CookieServices.remove(SANCTUM_COOKIE_NAME)
 
@@ -95,27 +93,37 @@ export const accountAuthenticationReducer = (state = initialState, action: any) 
             }
 
         case 'ACCOUNT_SIGN_OUT_PROCESSING_':
-            let ckAccountName = CookieServices.get(ACCOUNT_NAME_COOKIE)
-            ckAccountName = Crypto.decryptDataUsingAES256(ckAccountName)
-            
-            let ckAccountEmail = CookieServices.get(ACCOUNT_EMAIL_COOKIE)
-            ckAccountEmail = Crypto.decryptDataUsingAES256(ckAccountEmail)
+            const encryptedAccountInfo = Auth.isCookieSet(ACCOUNT_INFO_COOKIE)
+            let reduxState = null
 
-            return {
-                ...initialState,
-                processing: true,
-                uaid: uaidString,
-                isAuthenticated: true,
-                email: ckAccountEmail,
-                accountName: ckAccountName,
+            if (encryptedAccountInfo !== null) {
+                const decryptedAccountInfo = Crypto.decryptDataUsingAES256(encryptedAccountInfo)
+                const accountInfo = JSON.parse(decryptedAccountInfo)  
+
+                reduxState = {
+                    ...initialState,
+                    processing: true,
+                    uaid: uaidString,
+                    isAuthenticated: true,
+                    email: accountInfo.email,
+                    accountName: accountInfo.account_name,
+                }  
+            } else {
+                reduxState = {
+                    ...initialState,
+                    processing: true,
+                    uaid: uaidString,
+                    isAuthenticated: true,
+                    email: null,
+                    accountName: null,
+                }  
             }
 
+            return reduxState
+
         case 'ACCOUNT_SIGNED_OUT_':
-        case 'ACCOUNT_SIGN_OUT_EXCEPTION_':
             // Revoke authentication access
-            CookieServices.remove(ACCOUNT_NAME_COOKIE)
-            CookieServices.remove(ACCOUNT_EMAIL_COOKIE)
-            CookieServices.remove(UUID_COOKIE_NAME)
+            // Remove token cookie only
             CookieServices.remove(SANCTUM_COOKIE_NAME)
 
             return {
@@ -123,7 +131,28 @@ export const accountAuthenticationReducer = (state = initialState, action: any) 
                 processing: false,
                 isAuthenticated: false,
             }
-       
+
+        case 'SPECIAL_ACCOUNT_SIGNED_OUT_':
+        case 'ACCOUNT_SIGN_OUT_EXCEPTION_':
+            /* 
+             * Special account sign out
+             * for suspended account and 
+             * expired accounts.
+             * 
+             * This is to facilitate fetching 
+             * of the updated account information
+             * once user logs in once again.
+            */
+            CookieServices.remove(UUID_COOKIE_NAME)
+            CookieServices.remove(SANCTUM_COOKIE_NAME)
+            CookieServices.remove(ACCOUNT_INFO_COOKIE)
+
+            return {
+                ...initialState,
+                processing: false,
+                isAuthenticated: false,
+            }
+
         default:
             return state;
     }
