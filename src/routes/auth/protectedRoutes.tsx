@@ -15,7 +15,7 @@ interface ProtectedRouteInterface {
 export const protectedRoutes: Array<ProtectedRouteInterface> = [
     { path: "/home", element: <Home />, activeMenu: 'Y', caseSensitive: true, name: 'HOME_' },
     { path: "/", element: <FromIndexToHome />, activeMenu: 'N', caseSensitive: true, name: 'INDEX_' },
-    { path: "/u/default/authenticated/account/prof", element: <AccountProfile />, activeMenu: 'N', caseSensitive: true, name: 'PROF_AC' },
+    { path: "/u/default/account/profile", element: <AccountProfile />, activeMenu: 'N', caseSensitive: true, name: 'PROF_AC' },
 ]
 
 export const postAuthRoute: Array<ProtectedRouteInterface> = [
