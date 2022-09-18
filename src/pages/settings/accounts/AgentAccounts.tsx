@@ -40,7 +40,11 @@ export const AgentAccounts = () => {
         })
     }
 
-    async function fetchAllAgentsApiCall(hideModal = 'Y') {
+    function classNames(...classes) {
+        return classes.filter(Boolean).join(' ')
+    }
+
+    async function fetchAllAgentsApiCall() {
         try {
             let { data } = state
             let status = state.status
@@ -50,10 +54,9 @@ export const AgentAccounts = () => {
             status = 'fulfilled'
 
             setstate({
-                ...state, status, data
+                ...state, status, data, show: false
             })
         } catch (e) {
-            console.warn(e);
             let status = state.status
             status = 'rejected'
 
@@ -69,16 +72,69 @@ export const AgentAccounts = () => {
         fetchAllAgentsApiCall();
     }, []);
 
+    const getFirstLetterFromName = (accountName: any) => {
+        return accountName.charAt(0)
+    }
+
+    const accountProfileColorCode = (accountName: any) => {
+        const letterHead = getFirstLetterFromName(accountName)
+        let colorCode = 'green'
+
+        if (letterHead.match(new RegExp('[A-C]'))) {
+            colorCode = 'red'
+        } else if (letterHead.match(new RegExp('[D-F]'))) {
+            colorCode = 'orange'
+        } else if (letterHead.match(new RegExp('[G-J]'))) {
+            colorCode = 'yellow'
+        } else if (letterHead.match(new RegExp('[K-M]'))) {
+            colorCode = 'green'
+        } else if (letterHead.match(new RegExp('[N-Q]'))) {
+            colorCode = 'cyan'
+        } else if (letterHead.match(new RegExp('[R-T]'))) {
+            colorCode = 'blue'
+        } else if (letterHead.match(new RegExp('[U-W]'))) {
+            colorCode = 'purple'
+        } else if (letterHead.match(new RegExp('[X-Z]'))) {
+            colorCode = 'rose'
+        }
+
+        return colorCode
+    }
+
     const columns = React.useMemo(
         () => [
             {
                 Header: 'Name',
                 accessor: (data: { first_name: any, last_name: any, email_verified_at: any }) => (
-                    <span>
+                    <span className="flex flex-row align-middle items-center">
+                        <div className={
+                            classNames(
+                                accountProfileColorCode(data.first_name) === 'red' ? 'bg-red-500' : null,
+                                accountProfileColorCode(data.first_name) === 'orange' ? 'bg-orange-500' : null,
+                                accountProfileColorCode(data.first_name) === 'yellow' ? 'bg-yellow-500' : null,
+                                accountProfileColorCode(data.first_name) === 'green' ? 'bg-green-500' : null,
+                                accountProfileColorCode(data.first_name) === 'emerald' ? 'bg-emerald-500' : null,
+                                accountProfileColorCode(data.first_name) === 'teal' ? 'bg-teal-500' : null,
+                                accountProfileColorCode(data.first_name) === 'cyan' ? 'bg-cyan-500' : null,
+                                accountProfileColorCode(data.first_name) === 'blue' ? 'bg-blue-500' : null,
+                                accountProfileColorCode(data.first_name) === 'indigo' ? 'bg-indigo-500' : null,
+                                accountProfileColorCode(data.first_name) === 'purple' ? 'bg-purple-500' : null,
+                                accountProfileColorCode(data.first_name) === 'fuchsia' ? 'bg-fuchsia-500' : null,
+                                accountProfileColorCode(data.first_name) === 'rose' ? 'bg-rose-500' : null,
+                                "w-7 h-7 rounded-full mr-3 flex flex-row align-middle"
+                            )
+                        }>
+                            <p className="m-auto text-sm text-white">
+                                {getFirstLetterFromName(data.first_name)}
+                            </p>
+                        </div>
+
                         <span className="block text-black text-sm py-1">
                             {
                                 data.email_verified_at === null || data.email_verified_at === undefined ? (
-                                    <span>-</span>
+                                    <span>
+                                        {data.first_name}
+                                    </span>
                                 ) : (
                                     <>
                                         {data.first_name} {data.last_name}
@@ -190,6 +246,7 @@ export const AgentAccounts = () => {
             <InviteAgents
                 show={state.show}
                 showOrHideModal={showOrHideModal}
+                reloadAgentsDatatable={fetchAllAgentsApiCall}
             />
         </React.Fragment>
     )
