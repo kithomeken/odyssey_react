@@ -1,18 +1,11 @@
-import CookieServices from '../../services/CookieServices'
-import { useAppDispatch, useAppSelector } from '../../store/hooks'
-import { accountSignOutActions } from '../../store/auth/accountSignOutActions'
 import { ACCOUNT_INFO_COOKIE, SANCTUM_COOKIE_NAME } from '../../global/CookieNames'
 import Crypto from '../../encryption/Crypto'
+import StorageServices from "../../services/StorageServices";
+import {KEY_ACCOUNT_INFO} from "../../global/ConstantsRegistry";
 
 class Auth {
     checkAuthentication(authenticationState) {
-        let sessionState = {
-            'isAuthenticated': false,
-            'suspendedAccount': false,
-            'accountInfoExists': false,
-            'resetAccountSession': false,
-            'accountAccessExpired': false,
-        }
+        let sessionState
 
         if (!authenticationState.isAuthenticated) {
             // Redux session state not authenticated
@@ -26,10 +19,10 @@ class Auth {
         } else {
             /* 
              * Redux session state is authenticated 
-             * Countercheck with available session cookies
+             * Counter-check with available session cookies
             */
             const sanctumCookie = this.isCookieSet(SANCTUM_COOKIE_NAME)
-            const accountInfoCookie = this.isCookieSet(ACCOUNT_INFO_COOKIE)
+            const encryptedAccountInfo = StorageServices.getLocalStorage(KEY_ACCOUNT_INFO)
 
             if (sanctumCookie === null) {
                 // Change redux session state to not authenticated
@@ -41,8 +34,8 @@ class Auth {
                     'accountAccessExpired': false,
                 }
             } else {
-                if (accountInfoCookie === null) {
-                    // Repull account information from postAuthentication
+                if (encryptedAccountInfo === null) {
+                    // Re-pull account information from postAuthentication
                     sessionState = {
                         'isAuthenticated': true,
                         'suspendedAccount': false,
@@ -52,8 +45,7 @@ class Auth {
                     }
                 } else {
                     // Compare account information from redux and cookie
-                    const enAccountInfo = CookieServices.get(ACCOUNT_INFO_COOKIE)
-                    const deAccountInfo = Crypto.decryptDataUsingAES256(enAccountInfo)
+                    const deAccountInfo = Crypto.decryptDataUsingAES256(encryptedAccountInfo)
                     const accountInfo = JSON.parse(deAccountInfo)
 
                     if (accountInfo.email === authenticationState.email) {
@@ -109,12 +101,12 @@ class Auth {
     }
 
     isCookieSet(cookieName) {
-        var cookieArr = document.cookie.split(";");
+        const cookieArr = document.cookie.split(";");
 
-        for (var i = 0; i < cookieArr.length; i++) {
-            var cookiePair = cookieArr[i].split("=");
+        for (let i = 0; i < cookieArr.length; i++) {
+            let cookiePair = cookieArr[i].split("=");
 
-            if (cookieName == cookiePair[0].trim()) {
+            if (cookieName === cookiePair[0].trim()) {
                 return decodeURIComponent(cookiePair[1]);
             }
         }

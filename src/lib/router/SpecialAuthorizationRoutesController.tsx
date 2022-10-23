@@ -83,10 +83,6 @@ export default function SpecialAuthorizationRoutesControllers() {
     return (
         <div>
             <div className="flex h-screen">
-                <Special_Authorization_Navigation
-                    activeMenu={getSpecialAuthActiveMenu()}
-                />
-
                 <TopHeader
                     showSettings={false}
                 />
