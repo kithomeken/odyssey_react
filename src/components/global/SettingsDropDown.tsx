@@ -7,6 +7,7 @@ import { accountRoutes } from "../../routes/settings/accountRoutes"
 import { generalRoutes } from "../../routes/settings/generalRoutes"
 import HttpServices from "../../services/HttpServices"
 import Loading from "../layouts/Loading"
+import {ACCOUNT_TEAM_RIGHTS} from "../../api/accountApiRoutes";
 
 export const SettingsDropDown = ({ show }) => {
     const [state, setstate] = useState({
@@ -23,7 +24,7 @@ export const SettingsDropDown = ({ show }) => {
 
     const fetchAuthorizationTeamRightsApiCall = async () => {
         try {
-            const response = await HttpServices.httpGet(ACCOUNT_AUTH_TEAM_RIGHTS)
+            const response = await HttpServices.httpGet(ACCOUNT_TEAM_RIGHTS)
             const payload = response.data.payload
 
             let { rights } = state

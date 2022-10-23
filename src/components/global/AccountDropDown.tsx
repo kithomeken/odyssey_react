@@ -4,7 +4,7 @@ import { Menu, Transition } from "@headlessui/react"
 import { useDispatch } from "react-redux"
 import { useAppSelector } from "../../store/hooks"
 import { accountSignOutActions } from "../../store/auth/accountSignOutActions"
-import tempararyAvatar from '../../assets/avatars/C6C2E60B0A5CC3A09F638284A21571F3.png'
+import temporaryAvatar from '../../assets/avatars/C6C2E60B0A5CC3A09F638284A21571F3.png'
 import { protectedRoutes } from "../../routes/auth/protectedRoutes"
 import { Link } from "react-router-dom"
 
@@ -39,7 +39,7 @@ export const AccountDropDown = () => {
                                     )
                                 }>
                                 <span className="text-sm mr-2">{authenticationState.accountName}</span>
-                                <img className="rounded-full h-10 w-10" src={tempararyAvatar} alt="" />
+                                <img className="rounded-full h-10 w-10" src={temporaryAvatar} alt="" />
                             </Menu.Button>
                         </div>
 
