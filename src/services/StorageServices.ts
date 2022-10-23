@@ -4,7 +4,7 @@
 
 class StorageServices {
     getLocalStorage(key: string) {
-        localStorage.getItem(key)
+        return localStorage.getItem(key)
     }
 
     setLocalStorage(key: string, value: any) {
