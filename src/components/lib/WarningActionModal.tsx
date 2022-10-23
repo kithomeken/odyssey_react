@@ -75,7 +75,7 @@ export const WarningActionModal: FC<Props> = ({ show, title, details, showOrHide
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                         {
                                             title.length > 1 ? (
-                                                <Dialog.Title as="h3" className="text-lg leading-6 mb-2 font-medium text-amber-600">
+                                                <Dialog.Title as="h3" className="text-lg leading-6 mb-2 text-amber-600">
                                                     {title}
                                                 </Dialog.Title>
                                             ) : null
@@ -114,7 +114,7 @@ export const WarningActionModal: FC<Props> = ({ show, title, details, showOrHide
                                                     </span>
                                                 </button>
                                             ) : (
-                                                <button type="button" onClick={actionEvent} className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-amber-500 text-white hover:bg-amber-700 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-amber-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                <button type="button" onClick={actionEvent} className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-amber-600 text-white hover:bg-amber-700 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-amber-500 sm:ml-3 sm:w-auto sm:text-sm">
                                                     {actionButton.before}
                                                 </button>
                                             )

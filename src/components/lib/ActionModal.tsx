@@ -75,7 +75,7 @@ export const ActionModal: FC<Props> = ({ show, title, details, showOrHide, isPos
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                         {
                                             title.length > 1 ? (
-                                                <Dialog.Title as="h3" className="text-lg leading-6 mb-2 font-medium text-red-600">
+                                                <Dialog.Title as="h3" className="text-lg leading-6 mb-2 text-red-600">
                                                     {title}
                                                 </Dialog.Title>
                                             ) : null
