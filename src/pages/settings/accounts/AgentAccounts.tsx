@@ -1,17 +1,17 @@
-import React, { useState } from "react"
 import { Helmet } from "react-helmet"
+import React, { useState } from "react"
 import { Link } from "react-router-dom"
-import { AGENT_LIST_API_ROUTE } from "../../../api/ApiRoutes"
-import BreadCrumbs from "../../../components/settings/BreadCrumbs"
-import Header from "../../../components/settings/Header"
-import HeaderParagraph from "../../../components/settings/HeaderParagraph"
-import { HEADER_SECTION_BG, APPLICATION_NAME } from "../../../global/ConstantsRegistry"
-import DateFormating from "../../../lib/hooks/DateFormating"
-import NoDataReactTable from "../../../lib/hooks/NoDataReactTable"
-import ReactTable from "../../../lib/hooks/ReactTable"
-import HttpServices from "../../../services/HttpServices"
+
 import Error500 from "../../errors/Error500"
 import { InviteAgents } from "./InviteAgents"
+import ReactTable from "../../../lib/hooks/ReactTable"
+import Header from "../../../components/settings/Header"
+import HttpServices from "../../../services/HttpServices"
+import NoDataReactTable from "../../../lib/hooks/NoDataReactTable"
+import BreadCrumbs from "../../../components/settings/BreadCrumbs"
+import { APPLICATION_NAME } from "../../../global/ConstantsRegistry"
+import HeaderParagraph from "../../../components/settings/HeaderParagraph"
+import { AGENT_LIST_API_ROUTE } from "../../../api/v1/api.AccountRoutes"
 
 export const AgentAccounts = () => {
     const [state, setstate] = useState({
@@ -26,7 +26,7 @@ export const AgentAccounts = () => {
     const showButton = true
     const actionButton = true
     const buttonTitle = "Invite Team"
-    const buttonIcon = true
+    const buttonIcon = false
     const iconType = "fas fa-plus-circle"
 
     const breadCrumb = [
@@ -50,7 +50,7 @@ export const AgentAccounts = () => {
             let status = state.status
             const response: any = await HttpServices.httpGet(AGENT_LIST_API_ROUTE)
 
-            data = response.data.data
+            data = response.data.payload.agents
             status = 'fulfilled'
 
             setstate({
@@ -105,42 +105,10 @@ export const AgentAccounts = () => {
         () => [
             {
                 Header: 'Name',
-                accessor: (data: { first_name: any, last_name: any, email_verified_at: any }) => (
+                accessor: (data: { account_name: any, email_verified_at: any }) => (
                     <span className="flex flex-row align-middle items-center">
-                        <div className={
-                            classNames(
-                                accountProfileColorCode(data.first_name) === 'red' ? 'bg-red-500' : null,
-                                accountProfileColorCode(data.first_name) === 'orange' ? 'bg-orange-500' : null,
-                                accountProfileColorCode(data.first_name) === 'yellow' ? 'bg-yellow-500' : null,
-                                accountProfileColorCode(data.first_name) === 'green' ? 'bg-green-500' : null,
-                                accountProfileColorCode(data.first_name) === 'emerald' ? 'bg-emerald-500' : null,
-                                accountProfileColorCode(data.first_name) === 'teal' ? 'bg-teal-500' : null,
-                                accountProfileColorCode(data.first_name) === 'cyan' ? 'bg-cyan-500' : null,
-                                accountProfileColorCode(data.first_name) === 'blue' ? 'bg-blue-500' : null,
-                                accountProfileColorCode(data.first_name) === 'indigo' ? 'bg-indigo-500' : null,
-                                accountProfileColorCode(data.first_name) === 'purple' ? 'bg-purple-500' : null,
-                                accountProfileColorCode(data.first_name) === 'fuchsia' ? 'bg-fuchsia-500' : null,
-                                accountProfileColorCode(data.first_name) === 'rose' ? 'bg-rose-500' : null,
-                                "w-7 h-7 rounded-full mr-3 flex flex-row align-middle"
-                            )
-                        }>
-                            <p className="m-auto text-sm text-white">
-                                {getFirstLetterFromName(data.first_name)}
-                            </p>
-                        </div>
-
                         <span className="block text-black text-sm py-1">
-                            {
-                                data.email_verified_at === null || data.email_verified_at === undefined ? (
-                                    <span>
-                                        {data.first_name}
-                                    </span>
-                                ) : (
-                                    <>
-                                        {data.first_name} {data.last_name}
-                                    </>
-                                )
-                            }
+                            {data.account_name}
                         </span>
                     </span>
                 ),
@@ -197,14 +165,13 @@ export const AgentAccounts = () => {
         []
     )
 
-
     return (
         <React.Fragment>
             <Helmet>
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+            <div className={`px-12 py-3 w-full form-group mb-3`}>
                 <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
                 <Header title={pageTitle}
