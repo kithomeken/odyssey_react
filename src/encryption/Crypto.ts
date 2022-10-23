@@ -1,35 +1,50 @@
 import * as crypto from 'crypto-js'
+
 import EncryptionKeys from "./EncryptionKeys"
+import StorageServices from "../services/StorageServices";
 
 class Crypto {
     encryptDataUsingAES256(plainText: any) {
         let iv: any
-        let key = EncryptionKeys.keyBase()
-        iv = EncryptionKeys.ivBase()
-
-        var cipherText = crypto.AES.encrypt(plainText, key, {
+        iv = EncryptionKeys.getIvBase()
+        let key = EncryptionKeys.getKeyBase()
+        
+        return crypto.AES.encrypt(plainText, key, {
             keySize: 128 / 8,
             iv: iv,
             mode: crypto.mode.CBC,
             padding: crypto.pad.Pkcs7
         }).toString();
-
-        return cipherText;
     }
 
     decryptDataUsingAES256(cipherText: any) {
-        let iv: any
-        let key = EncryptionKeys.keyBase()
-        iv = EncryptionKeys.ivBase()
+        try {
+            let iv: any
+            iv = EncryptionKeys.getIvBase()
+            let key = EncryptionKeys.getKeyBase()
 
-        var plainText = crypto.AES.decrypt(cipherText, key, {
-            keySize: 128 / 8,
-            iv: iv,
-            mode: crypto.mode.CBC,
-            padding: crypto.pad.Pkcs7
-        }).toString(crypto.enc.Utf8);
+            return crypto.AES.decrypt(cipherText, key, {
+                keySize: 128 / 8,
+                iv: iv,
+                mode: crypto.mode.CBC,
+                padding: crypto.pad.Pkcs7
+            }).toString(crypto.enc.Utf8)
+        } catch (e) {
+            /*
+            * Encryption keys used to decrypt the data
+            * do not match the keys used when encrypting
+            * the data.
+            *
+            * Solution: Clear storage, this will prompt
+            * user to sign in afresh setting new
+            * encryption keys.
+            * */
 
-        return plainText
+            StorageServices.clearLocalStorage()
+            /*
+            * TODO: Clear sanctum cookie too.
+            * */
+        }
     }
 }
 
