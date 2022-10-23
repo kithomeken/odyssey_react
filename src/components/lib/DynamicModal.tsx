@@ -1,6 +1,7 @@
 import { Transition, Dialog } from "@headlessui/react"
 import React, { FC, Fragment, useState } from "react"
 import { toast } from "react-toastify"
+import { CommsBreakdown } from "../../pages/errors/CommsBreakdown"
 import Error500 from "../../pages/errors/Error500"
 import Loading from "../layouts/Loading"
 
@@ -26,7 +27,7 @@ interface Props {
 
 export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, description, onFormSubmitHandler, isPostingForm, formComponents, actionButton, preLoadsData, preLoadStatus, dispErrorMessage, errorTitle, errorMessage }) => {
     const [state, setstate] = useState({
-        size: size
+        modalSize: size
     })
 
     const checkIfFormIsPostingData = () => {
@@ -150,15 +151,15 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                         <div
                             className={
                                 classNames(
-                                    size === 'sm' ? 'sm:max-w-sm' : null,
-                                    size === 'md' ? 'sm:max-w-md' : null,
-                                    size === 'lg' ? 'sm:max-w-lg' : null,
-                                    size === 'xl' ? 'sm:max-w-xl' : null,
-                                    size === '2xl' ? 'sm:max-w-2xl' : null,
-                                    size === '3xl' ? 'sm:max-w-3xl' : null,
-                                    size === '4xl' ? 'sm:max-w-4xl' : null,
-                                    size === '5xl' ? 'sm:max-w-5xl' : null,
-                                    size === '6xl' ? 'sm:max-w-6xl' : null,
+                                    state.modalSize === 'sm' ? 'sm:max-w-sm' : null,
+                                    state.modalSize === 'md' ? 'sm:max-w-md' : null,
+                                    state.modalSize === 'lg' ? 'sm:max-w-lg' : null,
+                                    state.modalSize === 'xl' ? 'sm:max-w-xl' : null,
+                                    state.modalSize === '2xl' ? 'sm:max-w-2xl' : null,
+                                    state.modalSize === '3xl' ? 'sm:max-w-3xl' : null,
+                                    state.modalSize === '4xl' ? 'sm:max-w-4xl' : null,
+                                    state.modalSize === '5xl' ? 'sm:max-w-5xl' : null,
+                                    state.modalSize === '6xl' ? 'sm:max-w-6xl' : null,
                                     'inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full'
                                 )
                             }>
@@ -187,16 +188,28 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
                                                             </div>
                                                         </div>
                                                         <div className="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                            <button 
-                                                            type="button" 
-                                                            onClick={checkIfFormIsPostingData}
-                                                            className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-red-600 font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                            <button
+                                                                type="button"
+                                                                onClick={checkIfFormIsPostingData}
+                                                                className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-red-600 font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
                                                                 Close
                                                             </button>
                                                         </div>
                                                     </>
                                                 ) : (
-                                                    <Error500 />
+                                                    <>
+                                                        <CommsBreakdown />
+
+                                                        <div className="bg-gray-100 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                                            <div className="w-12/12 space-y-px">
+                                                                <div className="flex flex-row-reverse items-center align-middle">
+                                                                    <button type="button" className="w-full inline-flex justify-center text-sm rounded-md border-0 border-transparent shadow-none px-3 py-1 bg-inherit text-gray-600 hover:bg-gray-200 sm:ml-3 sm:w-auto sm:text-sm" onClick={checkIfFormIsPostingData}>
+                                                                        Cancel
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </>
                                                 )
                                             }
 
