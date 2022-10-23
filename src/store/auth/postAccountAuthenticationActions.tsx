@@ -3,7 +3,8 @@ import axios from "axios";
 import Crypto from "../../encryption/Crypto";
 import CookieServices from "../../services/CookieServices";
 import { SANCTUM_COOKIE_NAME } from "../../global/CookieNames";
-import { AUTHENTICATED_ACCOUNT_INFO } from "../../api/ApiRegistry";
+import {API_DOMAIN, AUTHENTICATED_ACCOUNT_INFO} from "../../api/ApiRegistry";
+import {ACCOUNT_DETAILS} from "../../api/accountApiRoutes";
 
 export const postAccountAuthenticationActions = () => {
     return (dispatch: (argo: {type: string, response: any}) => void) => {
@@ -20,8 +21,10 @@ export const postAccountAuthenticationActions = () => {
             }
         }
 
+        const authenticatedAccountInfo = API_DOMAIN + ACCOUNT_DETAILS
+
         axios
-        .get(AUTHENTICATED_ACCOUNT_INFO, authorizationBearer)
+        .get(authenticatedAccountInfo, authorizationBearer)
         .then((response) => {
             if (response.data.success) {
                 dispatch({
