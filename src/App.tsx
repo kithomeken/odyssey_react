@@ -25,6 +25,7 @@ import { exceptionalRoutes } from './routes/exceptionalRoutes';
 import { standardErrorRoutes } from './routes/errorRoutes';
 import ErrorRoutesController from './lib/router/ErrorRouteController';
 import {SettingsMenu} from "./pages/settings/SettingsMenu";
+import { Routes_Project } from './routes/standard/routes.Projects';
 
 let errorRoutes: Array<any> = []
 let standardRoutes: Array<any> = []
@@ -46,6 +47,9 @@ export const settingsMenuRoute: Array<SettingsMenuRouteInterface> = [
 standardRoutes = standardRoutes.concat(
     protectedRoutes,
     settingsMenuRoute,
+
+    // New Route Formating
+    Routes_Project,
 );
 
 postAuthenticationRoutes = postAuthenticationRoutes.concat(

@@ -350,13 +350,27 @@ const Productview = () => {
                                                 </div>
                                             ) : (
                                                 <div>
-                                                    <p className="form-group text-sm text-red-500 flex items-center align-middle">
-                                                        <i className="fal fa-clock"></i>
-                                                        <span className="ml-2">
-                                                            <span className="text-red-600">Decommissioned On: </span>
-                                                            <DateFormating dateString={state.data.product.deleted_at} />
-                                                        </span>
-                                                    </p>
+                                                    <div className="form-group rounded border-0 bg-orange-100 py-4 px-4">
+                                                        <div className="flex flex-row align-middle text-orange-600">
+                                                            <i className="fas fa-exclamation-circle fa-lg mt-1 text-orange-600 flex-none"></i>
+
+                                                            <div className="flex-auto ml-1">
+                                                                <span className="text-sm pl-3 text-orange-600 block">
+                                                                    This product has been decommissioned. No more tickets will be raised for this product.
+
+                                                                    <span className="block mt-3">
+                                                                        <p className="text-sm flex items-center align-middle">
+                                                                            <i className="fal fa-clock text-orange-700"></i>
+                                                                            <span className="ml-2">
+                                                                                <span className="text-orange-700">Decommissioned On: </span>
+                                                                                <DateFormating dateString={state.data.product.deleted_at} />
+                                                                            </span>
+                                                                        </p>
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             )
                                         }
@@ -376,7 +390,31 @@ const Productview = () => {
                                         <div className="w-full form-group">
                                             {
                                                 state.data.subscriptions.length < 1 ? (
-                                                    <NoDataReactTable columns={columns} />
+                                                    <div className="form-group rounded border-0 bg-sky-100 py-4 px-4">
+                                                        <div className="flex flex-row align-middle text-blue-700">
+                                                            <i className="fas fa-info-circle fa-lg mt-1 text-blue-700 flex-none"></i>
+
+                                                            <div className="flex-auto ml-1">
+                                                                <span className="text-sm pl-3 text-blue-700 block">
+                                                                    No companies are subscribed to this product.
+
+                                                                    {
+                                                                        state.data.product.deleted_at === null ? (
+                                                                            <span className="block mt-2">
+                                                                                To enlist a company for subscription, go to
+
+                                                                                <Link to={companyGroupLink} className="ml-1 underline text-blue-800">
+                                                                                    Company Groups
+                                                                                </Link>
+
+                                                                                , select a company and add this product to their subscription.
+                                                                            </span>
+                                                                        ) : null
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 ) : (
                                                     <ReactTable columns={columns} data={state.data.subscriptions} />
                                                 )
