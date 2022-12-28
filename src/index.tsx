@@ -1,15 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {createBrowserHistory} from 'history';
 
 import App from './App';
-import { persistor, store } from '../src/store/store';
 import { Provider } from 'react-redux';
+import { persistor, store } from './store/store';
 import * as serviceWorker from './serviceWorker';
-import { PersistGate } from 'redux-persist/integration/react';
 import Loading from './components/layouts/Loading';
+import { PersistGate } from 'redux-persist/integration/react';
 
-export const browserHistory = createBrowserHistory();
 
 ReactDOM.render(
     <React.StrictMode>

@@ -1,8 +1,9 @@
+import Auth from "../../lib/router/Auth";
 import Crypto from "../../encryption/Crypto";
 import CookieServices from "../../services/CookieServices";
-import { COOKIE_OPTIONS } from "../../global/ConstantsRegistry";
+import StorageServices from "../../services/StorageServices";
+import {COOKIE_OPTIONS, KEY_ACCOUNT_INFO} from "../../global/ConstantsRegistry";
 import { ACCOUNT_INFO_COOKIE, SANCTUM_COOKIE_NAME, UUID_COOKIE_NAME } from "../../global/CookieNames";
-import Auth from "../../lib/router/Auth";
 
 const initialState = {
     uaid: null,
@@ -69,7 +70,7 @@ export const accountAuthenticationReducer = (state = initialState, action: any) 
             const stringAccountInfo = JSON.stringify(jsonAccountInfo)
 
             const enAccountInfo = Crypto.encryptDataUsingAES256(stringAccountInfo)
-            CookieServices.set(ACCOUNT_INFO_COOKIE, enAccountInfo, COOKIE_OPTIONS)
+            StorageServices.setLocalStorage(KEY_ACCOUNT_INFO, enAccountInfo)
 
             return {
                 ...initialState,

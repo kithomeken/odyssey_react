@@ -24,6 +24,8 @@ import SpecialAuthorizationRoutesControllers from './lib/router/SpecialAuthoriza
 import { exceptionalRoutes } from './routes/exceptionalRoutes';
 import { standardErrorRoutes } from './routes/errorRoutes';
 import ErrorRoutesController from './lib/router/ErrorRouteController';
+import {SettingsMenu} from "./pages/settings/SettingsMenu";
+import { Routes_Project } from './routes/standard/routes.Projects';
 
 let errorRoutes: Array<any> = []
 let standardRoutes: Array<any> = []
@@ -31,8 +33,23 @@ let configurationRoutes: Array<any> = []
 let postAuthenticationRoutes: Array<any> = []
 let masterConfigurationRoutes: Array<any> = []
 
+interface SettingsMenuRouteInterface {
+    name: string,
+    path: string;
+    element: any;
+    caseSensitive?: boolean;
+}
+
+export const settingsMenuRoute: Array<SettingsMenuRouteInterface> = [
+    { path: "/u/default/settings", element: <SettingsMenu />, caseSensitive: true, name: 'SETTINGS_' },
+]
+
 standardRoutes = standardRoutes.concat(
     protectedRoutes,
+    settingsMenuRoute,
+
+    // New Route Formating
+    Routes_Project,
 );
 
 postAuthenticationRoutes = postAuthenticationRoutes.concat(

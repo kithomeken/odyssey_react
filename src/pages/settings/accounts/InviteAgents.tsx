@@ -1,12 +1,11 @@
 import React, { FC, useState } from "react"
 
+import { toast } from "react-toastify"
+import HttpServices from "../../../services/HttpServices"
 import ErrorBanner from "../../../components/layouts/ErrorBanner"
 import { DynamicModal } from "../../../components/lib/DynamicModal"
+import { AGENT_INVITATION_API_ROUTE } from "../../../api/v1/api.AccountRoutes"
 import team_collaoration_image from '../../../assets/images/team_collaboration.png'
-import { toast } from "react-toastify"
-import { AGENT_INVITATION_API_ROUTE } from "../../../api/ApiRoutes"
-import HttpServices from "../../../services/HttpServices"
-import SuccessBanner from "../../../components/layouts/SuccessBanner"
 
 interface Props {
     show: any,

@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { Helmet } from "react-helmet"
 import { Link } from "react-router-dom"
 
-import { PRODUCT_LIST_API_ROUTE } from "../../../../api/ApiRoutes"
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
 import Header from "../../../../components/settings/Header"
 import NoDataReactTable from "../../../../lib/hooks/NoDataReactTable"
@@ -14,6 +13,7 @@ import DateFormating from "../../../../lib/hooks/DateFormating";
 import HeaderParagraph from "../../../../components/settings/HeaderParagraph";
 import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry";
 import AddProduct from "./AddProduct";
+import { PRODUCT_LIST_API_ROUTE } from "../../../../api/v1/api.GeneralRoutes"
 
 const ProductManagement = () => {
     const [state, setstate] = useState({
@@ -30,9 +30,7 @@ const ProductManagement = () => {
     const showButton = true
     const actionButton = true
     const buttonTitle = "Create Product"
-    const buttonIcon = true
-    const iconType = "fas fa-plus-circle"
-    const buttonLink = generalRoutes[3].path
+    const buttonIcon = false
 
     const breadCrumb = [
         { linkItem: true, title: "General Settings", url: orgDetailsRoute },
@@ -56,7 +54,7 @@ const ProductManagement = () => {
             let status = state.status
             let show = state.show
 
-            data = response.data.data
+            data = response.data.payload.products
             status = 'fulfilled'
 
             hideModal === 'Y' ? (
@@ -98,14 +96,10 @@ const ProductManagement = () => {
         () => [
             {
                 Header: 'Product Name',
-                accessor: (data: { name: any, description: any }) => (
+                accessor: (data: { name: any }) => (
                     <span>
                         <span className="block text-black text-sm">
                             {data.name}
-                        </span>
-
-                        <span className="block text-gray-500 mb-0 text-sm">
-                            {data.description}
                         </span>
                     </span>
                 ),
@@ -150,7 +144,7 @@ const ProductManagement = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+            <div className={`px-12 pt-3 pb-1 w-full form-group mb-3`}>
                 <BreadCrumbs breadCrumbDetails={breadCrumb} />
 
                 <Header title={pageTitle}
@@ -159,8 +153,6 @@ const ProductManagement = () => {
                     actionEvent={showOrHideModal}
                     buttonTitle={buttonTitle}
                     buttonIcon={buttonIcon}
-                    iconType={iconType}
-                    buttonLink={buttonLink}
                 />
 
                 <HeaderParagraph title="Configure the various products your team(s) support within your business workflow to Odyssey's workstreams and track the tickets raised on each." />

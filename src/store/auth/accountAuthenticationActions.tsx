@@ -1,7 +1,8 @@
 import axios from "axios";
 
 import Crypto from "../../encryption/Crypto";
-import { SIGN_IN_API_SUFFIX } from "../../api/ApiRegistry";
+import {API_DOMAIN} from "../../api/ApiRegistry";
+import {AUTH_SIGN_IN} from "../../api/accountApiRoutes";
 
 interface Props {
     auto: boolean,
@@ -81,8 +82,10 @@ export function accountAuthenticationActions(propsIn: Props) {
 }
 
 function accountSignIn(formData: any, dispatch: any) {
+    const signInApi = API_DOMAIN + AUTH_SIGN_IN
+
     axios
-        .post(SIGN_IN_API_SUFFIX, formData)
+        .post(signInApi, formData)
         .then((response) => {
             if (response.data.success) {
                 dispatch({

@@ -17,7 +17,7 @@ class BreadCrumbs extends Component<Props> {
 
         return  (
             <React.Fragment>
-                <ul className="w-full flex flex-row items-center mt-2 text-xs text-gray-500">
+                <ul className="w-full flex flex-row items-center mt-4 mb-2 text-xs text-gray-500">
                     <li>
                         <span className="w-5 h-5">
                             <span className="fal fa-cog"></span>

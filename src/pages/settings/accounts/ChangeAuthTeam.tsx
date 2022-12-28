@@ -2,7 +2,7 @@ import { Listbox } from "@headlessui/react";
 import React, { FC, useState } from "react";
 import { toast } from "react-toastify"
 
-import { AGENT_CHANGE_AUTH_TEAM_API_ROUTE, AGENT_AUTH_TEAM_LIST_API_ROUTE } from "../../../api/ApiRoutes";
+import { AGENT_AUTH_TEAM_LIST_API_ROUTE, AGENT_CHANGE_AUTH_TEAM_API_ROUTE } from "../../../api/v1/api.AccountRoutes";
 import { DynamicModal } from "../../../components/lib/DynamicModal";
 import { ListBoxZero } from "../../../lib/hooks/ListBoxZero";
 import HttpServices from "../../../services/HttpServices";
@@ -38,7 +38,7 @@ export const ChangeAuthTeam: FC<Props> = ({ show, showOrHide, uuid, account_name
 
             if (response.data.success) {
                 let { data } = state
-                data = response.data.data
+                data = response.data.payload.authTeams
 
                 setstate({
                     ...state, data, status: 'fulfilled',
@@ -126,7 +126,7 @@ export const ChangeAuthTeam: FC<Props> = ({ show, showOrHide, uuid, account_name
             const response: any = await HttpServices.httpPost(AGENT_CHANGE_AUTH_TEAM_API_ROUTE, formData)            
             
             if (response.data.success) {
-                updateAuthorizationTeamState(response.data.data)
+                updateAuthorizationTeamState(response.data.payload.authTeam)
                 showOrHide()
             } else {
                 const toastText = "Something went wrong. Could not change Authorization Team."
@@ -174,6 +174,9 @@ export const ChangeAuthTeam: FC<Props> = ({ show, showOrHide, uuid, account_name
                 showOrHideModal={showOrHide}
                 isPostingForm={state.isPostingForm}
                 onFormSubmitHandler={onFormSubmitHandler}
+                dispErrorMessage={false}
+                errorTitle="Error"
+                errorMessage="An error occurred when fetching the Auth teams"
                 actionButton={{
                     before: "Change Auth",
                     after: "Changing"

@@ -1,12 +1,18 @@
 import { Transition } from "@headlessui/react"
 import React, { FC, useState } from "react"
 import { toast } from "react-toastify"
-import { AUTHENTICATED_ACCOUNT_EMAIL_HIST, CHANGE_ACCOUNT_EMAIL_ADDR, RESEND_CHANGE_EMAIL_VERIFICATION, UNDO_CHANGE_ACCOUNT_EMAIL_ADDR } from "../../api/ApiRegistry"
+import { CHANGE_ACCOUNT_EMAIL_ADDR, RESEND_CHANGE_EMAIL_VERIFICATION, UNDO_CHANGE_ACCOUNT_EMAIL_ADDR } from "../../api/ApiRegistry"
 import Loading from "../../components/layouts/Loading"
 import DateFormating from "../../lib/hooks/DateFormating"
 import HttpServices from "../../services/HttpServices"
 import { useAppSelector } from "../../store/hooks"
 import Error500 from "../errors/Error500"
+import {
+    ACCOUNT_EMAIL_CHANGE,
+    ACCOUNT_EMAIL_HISTORY,
+    ACCOUNT_EMAIL_UNDO_CHANGE,
+    ACCOUNT_EMAIL_VERIFICATION
+} from "../../api/accountApiRoutes";
 
 interface Props {
     data: any,
@@ -34,7 +40,7 @@ export const ChangeEmail: FC<Props> = ({ data, status, updateTabStatus, updateTa
 
     const fetchAccountEmailHistory = async () => {
         try {
-            const response = await HttpServices.httpGet(AUTHENTICATED_ACCOUNT_EMAIL_HIST)
+            const response = await HttpServices.httpGet(ACCOUNT_EMAIL_HISTORY)
 
             if (response.data.success) {
                 status = 'fulfilled'
@@ -51,7 +57,7 @@ export const ChangeEmail: FC<Props> = ({ data, status, updateTabStatus, updateTa
     }
 
     React.useEffect(() => {
-        fetchAccountEmailHistory();
+        fetchAccountEmailHistory()
     }, []);
 
     const classNames = (...classes: any[]) => {
@@ -188,7 +194,7 @@ export const ChangeEmail: FC<Props> = ({ data, status, updateTabStatus, updateTa
         try {
             let formData = new FormData()
             formData.append('email', input.email)
-            const response = await HttpServices.httpPost(CHANGE_ACCOUNT_EMAIL_ADDR, formData)
+            const response = await HttpServices.httpPost(ACCOUNT_EMAIL_CHANGE, formData)
 
             if (response.data.success) {
                 input.email = ''
@@ -238,7 +244,7 @@ export const ChangeEmail: FC<Props> = ({ data, status, updateTabStatus, updateTa
                     ...state, process
                 })
 
-                const response = await HttpServices.httpPostWithoutData(UNDO_CHANGE_ACCOUNT_EMAIL_ADDR)
+                const response = await HttpServices.httpPostWithoutData(ACCOUNT_EMAIL_UNDO_CHANGE)
                 if (response.status === 200) {
                     fetchAccountEmailHistory()
                 } else {
@@ -289,7 +295,7 @@ export const ChangeEmail: FC<Props> = ({ data, status, updateTabStatus, updateTa
                     ...state, process
                 })
 
-                const response = await HttpServices.httpPostWithoutData(RESEND_CHANGE_EMAIL_VERIFICATION)
+                const response = await HttpServices.httpPostWithoutData(ACCOUNT_EMAIL_VERIFICATION)
 
                 if (response.data.success) {
                     let toastText = "Verification email resent"

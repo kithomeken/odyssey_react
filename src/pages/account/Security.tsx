@@ -1,12 +1,11 @@
 import React, { useState } from "react"
 import { toast } from "react-toastify"
+import { useDispatch } from "react-redux"
 
 import HttpServices from "../../services/HttpServices"
 import twoFactorImage from '../../assets/images/5064257.png'
+import {ACCOUNT_PASSWORD_CHANGE} from "../../api/accountApiRoutes";
 import { FloatingLabelInput } from "../../components/lib/FloatingLabelInput"
-import { WarningActionModal } from "../../components/lib/WarningActionModal"
-import { CHANGE_ACCOUNT_PASSWORD } from "../../api/ApiRegistry"
-import { useDispatch } from "react-redux"
 import { accountSignOutActions } from "../../store/auth/accountSignOutActions"
 
 export const Security = () => {
@@ -90,7 +89,7 @@ export const Security = () => {
             formData.append('current', input.current)
             formData.append('password', input.new)
 
-            const response = await HttpServices.httpPost(CHANGE_ACCOUNT_PASSWORD, formData)
+            const response = await HttpServices.httpPost(ACCOUNT_PASSWORD_CHANGE, formData)
 
             if (response.data.success) {
                 // Dispatch sign out redux action to clear the session
@@ -137,7 +136,7 @@ export const Security = () => {
     return (
         <React.Fragment>
             <div className="w-9/12 m-auto">
-                <p className="text-lg text-slate-600 mb-3">
+                <p className="text-xl text-slate-600 mb-3">
                     Security
                 </p>
 
@@ -224,17 +223,19 @@ export const Security = () => {
                 <hr />
 
                 <div className="w-full pl-1 pt-3 pb-3">
-                    <p className="text-sm text-emerald-600 mb-3">
-                        Two-step authentication
+                    <div className="flex flex-row align-middle">
+                        <p className="text-sm text-emerald-600 mb-3 flex-auto">
+                            Two-step authentication
 
-                        <span className="text-sm text-slate-500 block">
-                            Add an extra layer of security around your account.
+                            <span className="text-sm text-slate-500 block">
+                                Add an extra layer of security around your account.
+                            </span>
+                        </p>
+
+                        <span className="text-sm text-blue-600 block mb-3">
+                            Setup
                         </span>
-                    </p>
-
-                    <span className="text-sm text-blue-600 block mb-3">
-                        Setup two-step verification
-                    </span>
+                    </div>
 
                     <div className="m-auto w-56">
                         <div className="pb-4 m-auto">

@@ -1,44 +1,44 @@
-import React, { useState } from "react"
-import { Helmet } from "react-helmet"
-import { useParams } from "react-router-dom"
 import swal from 'sweetalert';
+import { Helmet } from "react-helmet"
+import { toast } from "react-toastify"
+import React, { useState } from "react"
+import { Menu } from "@headlessui/react";
+import { Link, useParams } from "react-router-dom"
 
+import ProductEdit from "./ProductChange";
 import Error500 from "../../../errors/Error500"
 import Header from "../../../../components/settings/Header"
 import HttpServices from "../../../../services/HttpServices"
 import DateFormating from "../../../../lib/hooks/DateFormating"
-import { PRODUCT_DECOMMISSION_API_ROUTE, PRODUCT_REINSTATE_API_ROUTE, PRODUCT_VIEW_API_ROUTE } from "../../../../api/ApiRoutes"
+import { ActionModal } from '../../../../components/lib/ActionModal';
 import BreadCrumbs from "../../../../components/settings/BreadCrumbs"
-import SuccessBanner from "../../../../components/layouts/SuccessBanner";
-import ErrorBanner from "../../../../components/layouts/ErrorBanner";
-import ProductEdit from "./ProductChange";
-import HeaderParagraph from "../../../../components/settings/HeaderParagraph";
-import { HEADER_SECTION_BG } from "../../../../global/ConstantsRegistry";
+import { DropDownWithButton } from "../../../../components/lib/DropDownWithButton";
+import { PRODUCT_DECOMMISSION_API_ROUTE, PRODUCT_LIST_API_ROUTE, PRODUCT_REINSTATE_API_ROUTE } from "../../../../api/v1/api.GeneralRoutes";
+import NoDataReactTable from '../../../../lib/hooks/NoDataReactTable';
+import ReactTable from '../../../../lib/hooks/ReactTable';
+import { WarningActionModal } from '../../../../components/lib/WarningActionModal';
+import { generalRoutes } from '../../../../routes/settings/generalRoutes';
 
 const Productview = () => {
     const [state, setstate] = useState({
+        data: null,
         status: 'pending',
         requestFailed: false,
-        banner: {
-            show: false,
-            type: 'error',
-            message: '',
+        modals: {
+            showEditing: false,
+            showReinstatement: false,
+            showDecommissioning: false,
         },
-        panel: {
-            show: false,
-        },
-        product: {
-            name: '',
-            description: '',
-            deleted_at: '',
-            updated_at: '',
-
+        postingForm: {
+            decommissioning: false,
+            reinstating: false,
         },
     })
 
     const showButton = false
     const params = useParams();
     const pageTitle = "Product View"
+    const companyGroupLink = (generalRoutes.find((routeName) => routeName.name === 'CMPNY'))?.path
 
     const breadCrumb = [
         { linkItem: true, title: "General Settings", url: "" },
@@ -51,19 +51,16 @@ const Productview = () => {
 
         try {
             const productId = params.uuid
-            const response: any = await HttpServices.httpGet(PRODUCT_VIEW_API_ROUTE + '/' + productId)
-            let { product } = state
+            const response: any = await HttpServices.httpGet(PRODUCT_LIST_API_ROUTE + '/' + productId)
+            let { data } = state
             let status = state.status
 
-            product = response.data.data
+            data = response.data.payload
             status = 'fulfilled'
 
             setstate({
-                ...state,
-                product,
-                status,
+                ...state, data, status,
             })
-            
         } catch (e) {
             console.warn(e);
             let status = state.status
@@ -93,90 +90,171 @@ const Productview = () => {
         })
     }
 
-    const onClickDecommissionProduct = () => {
-        swal({
-            title: "Are you sure?",
-            text: "Once you decommission this product, no more tickets will be raised for this product.",
-            dangerMode: true,
-            buttons: ["Cancel", "Proceed"],
+    const showOrHideDecommissionProductModal = () => {
+        let { modals } = state
+        modals.showDecommissioning = !state.modals.showDecommissioning
+
+        setstate({
+            ...state, modals
         })
-            .then((willDelete) => {
-                if (willDelete) {
-                    setStatusAsPending()
-                    decommissionProductApiCall()
-                }
-            });
     }
 
     const decommissionProductApiCall = async () => {
-        let { banner }: any = state
+        let { data } = state
+        let { postingForm } = state
 
-        try {
-            const response: any = await HttpServices.httpPost(PRODUCT_DECOMMISSION_API_ROUTE, params)
+        if (data.product.deleted_at === null && !postingForm.decommissioning) {
+            try {
+                postingForm.decommissioning = true
+                setstate({
+                    ...state, postingForm
+                })
 
-            if (response.data.success) {
-                fetchProductDetailsApiCall()
-            } else {
-                banner.type = 'error'
-                banner.show = true
-                banner.message = 'Could not decommission product. Something went wrong'
+                const response: any = await HttpServices.httpPost(PRODUCT_DECOMMISSION_API_ROUTE, params)
+
+                if (response.data.success) {
+                    let { data } = state
+                    data.product = response.data.payload.product
+
+                    setstate({
+                        ...state, data
+                    })
+
+                    showOrHideDecommissionProductModal()
+                } else {
+                    toast.error('Could not decommission product. Something went wrong', {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+            } catch (error) {
+                toast.error('Could not decommission product. Something went wrong', {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
             }
-        } catch (error) {
-            banner.type = 'error'
-            banner.show = true
-            banner.message = 'Could not decommission product. Something went wrong'
-        }
 
-        setstate({ ...state, banner })
+            postingForm.decommissioning = false
+            setstate({
+                ...state, postingForm
+            })
+        }
     }
 
-    const onClickReinstateProduct = () => {
-        swal({
-            title: "Are you sure?",
-            text: "This actions will reinstate this product. Do you wish to proceed?",
-            dangerMode: true,
-            buttons: ["Cancel", "Proceed"],
+    const showOrHideProductReinstatementModal = () => {
+        let { modals } = state
+        modals.showReinstatement = !state.modals.showReinstatement
+
+        setstate({
+            ...state, modals
         })
-            .then((willDelete) => {
-                if (willDelete) {
-                    setStatusAsPending()
-                    reinstateProductApiCall()
-                }
-            });
     }
 
     const reinstateProductApiCall = async () => {
-        let { banner }: any = state
+        let { data } = state
+        let { postingForm } = state
 
-        try {
-            const response: any = await HttpServices.httpPost(PRODUCT_REINSTATE_API_ROUTE, params)
+        if (data.product.deleted_at !== null && !postingForm.reinstating) {
+            try {
+                postingForm.reinstating = true
+                setstate({
+                    ...state, postingForm
+                })
 
-            if (response.data.success) {
-                // navigate(0)
-                fetchProductDetailsApiCall()
-            } else {
-                banner.type = 'error'
-                banner.show = true
-                banner.message = 'Could not decommission product. Something went wrong'
+                const response: any = await HttpServices.httpPost(PRODUCT_REINSTATE_API_ROUTE, params)
+
+                if (response.data.success) {
+                    let { data } = state
+                    data.product = response.data.payload.product
+
+                    setstate({
+                        ...state, data
+                    })
+
+                    showOrHideProductReinstatementModal()
+                } else {
+                    toast.error('Could not reinstate product. Something went wrong', {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+            } catch (error) {
+                toast.error('Could not reinstate product. Something went wrong', {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
             }
-        } catch (error) {
-            banner.type = 'error'
-            banner.show = true
-            banner.message = 'Could not decommission product. Something went wrong'
+
+            postingForm.reinstating = false
+            setstate({
+                ...state, postingForm
+            })
         }
     }
 
-    const showProductChangePanel = () => {
-        let { panel }: any = state
-        panel.show = true
-        setstate({ ...state, panel })
+    const showOrHideEditProductModal = () => {
+        let { modals } = state
+        modals.showEditing = !state.modals.showEditing
+
+        setstate({
+            ...state, modals
+        })
     }
 
-    const hideProductChangePanel = () => {
-        let { panel }: any = state
-        panel.show = false
-        setstate({ ...state, panel })
+    function classNames(...classes) {
+        return classes.filter(Boolean).join(' ')
     }
+
+    const columns = [
+        {
+            Header: 'Company',
+            accessor: (data: { name: any, uuid: any }) => (
+                <span>
+                    <Link to={`${companyGroupLink}/${data.uuid}`} className="m-auto block py-1 cursor-pointer text-blue-600 hover:text-blue-800 text-sm">
+                        {data.name}
+                    </Link>
+                </span>
+            ),
+        },
+        {
+            Header: 'Country',
+            accessor: (data: { country: any }) => (
+                <span>
+                    <span className="block text-black text-sm">
+                        {data.country}
+                    </span>
+                </span>
+            ),
+        },
+        {
+            Header: ' ',
+            accessor: (data: { created_at: any }) => (
+                <span className="block text-gray-500 mb-0 text-sm float-right">
+                    <DateFormating dateString={data.created_at} />
+                </span>
+            )
+        },
+    ]
 
     return (
         <React.Fragment>
@@ -184,149 +262,209 @@ const Productview = () => {
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+            <div className={`px-12 pt-3 w-full`}>
                 <BreadCrumbs breadCrumbDetails={breadCrumb} />
-
-                {
-                    state.banner.show ? (
-                        <div className="w-10/12 pt-3">
-                            {
-                                state.banner.type === 'error' ? (
-                                    <ErrorBanner
-                                        message={state.banner.message}
-                                    />
-                                ) : state.banner.type === 'success' ? (
-                                    <SuccessBanner
-                                        message={state.banner.message}
-                                    />
-                                ) : null
-                            }
-                        </div>
-                    ) : null
-                }
 
                 <Header title={pageTitle}
                     showButton={showButton}
                 />
-
-                <HeaderParagraph title="Review and update your product details. Please make sure these details are up to date as they'll be used to create tickets." />
             </div>
 
             <div className="w-full px-12 form-group">
                 <div className="w-12/12">
-                    <div className="mb-5">
-                        {
-                            state.status === 'rejected' ? (
-                                <Error500 />
-                            ) : state.status === 'fulfilled' ? (
-                                <div>
-                                    <div className="pt-2 pb-6">
+                    {
+                        state.status === 'rejected' ? (
+                            <Error500 />
+                        ) : state.status === 'fulfilled' ? (
+                            <div>
+                                <div className="pt-2 pb-6">
+                                    <div className="w-9/12 px-2">
                                         <div className="flex flex-row align-middle">
-                                            <div className="w-1/12">
-                                                <p className="form-group text-sm text-gray-600 pt-1">
-                                                    Details:
+                                            <div className="w-6/12">
+                                                <p className="text-3xl mb-2">
+                                                    {state.data.product.name}
                                                 </p>
                                             </div>
 
-                                            <div className="w-full">
-                                                <p className="text-2xl">
-                                                    {state.product.name}
-                                                </p>
-
-                                                <p className="text-sm form-group text-gray-500 w-7/12">
-                                                    {state.product.description}
-                                                </p>
-
+                                            <div className="w-6/12">
                                                 {
-                                                    state.product.deleted_at === null ? (
-                                                        <div>
-                                                            <p className="form-group text-sm text-gray-500 flex items-center align-middle">
-                                                                <i className="fal fa-clock text-gray-700"></i>
-                                                                <span className="ml-2">
-                                                                    <span className="text-gray-700">Last Updated: </span>
-                                                                    <DateFormating dateString={state.product.updated_at} />
-                                                                </span>
-                                                            </p>
-
-                                                            {/* <div className="w-full form-group">
-                                                                <p className="text-sm mb-1">
-                                                                    Tickets raised tagged with product id
-                                                                </p>
-                                                                
-                                                                <p className="text-2xl mb-1">
-                                                                    0
-                                                                </p>
-                                                            </div> */}
-
-                                                            <div className="form-group rounded border border-orange-400 bg-amber-100 py-3 px-4 w-7/12">
-                                                                <div className="flex items-center align-middle text-orange-500">
-                                                                    <i className="fad fa-exclamation-triangle fa-2x text-orange-400"></i>
-                                                                    <span className="text-sm pl-3">
-                                                                        Product currently has no raised tickets under it's wings...
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="form-group flex pt-4 items-center align-middle">
-                                                                <p className="text-sm form-group text-sky-500 pr-5 hover:cursor-pointer" onClick={showProductChangePanel}>
-                                                                    Edit Product Details
-                                                                </p>
-
-                                                                <p className="text-sm form-group text-gray-500 pr-5">
-                                                                    |
-                                                                </p>
-
-                                                                <p className="text-sm form-group text-red-500 hover:cursor-pointer" onClick={onClickDecommissionProduct}>
-                                                                    Decommission Product
-                                                                </p>
-                                                            </div>
-                                                        </div>
+                                                    state.data.product.deleted_at === null ? (
+                                                        <DropDownWithButton
+                                                            danger={false}
+                                                            buttonTitle="Edit"
+                                                            iconProperty="fas fa-clipboard-user fa-lg"
+                                                            onMainActionButton={showOrHideEditProductModal}
+                                                            menuItems={
+                                                                <>
+                                                                    <Menu.Item>
+                                                                        {({ active }) => (
+                                                                            <button
+                                                                                onClick={showOrHideDecommissionProductModal}
+                                                                                className={classNames(
+                                                                                    active ? 'bg-red-100 text-red-900' : 'text-red-700',
+                                                                                    'block px-4 py-2 text-sm text-left w-full'
+                                                                                )}
+                                                                            >
+                                                                                Decommission Product
+                                                                            </button>
+                                                                        )}
+                                                                    </Menu.Item>
+                                                                </>
+                                                            }
+                                                        />
                                                     ) : (
-                                                        <div>
-                                                            <p className="form-group text-sm text-red-500 flex items-center align-middle">
-                                                                <i className="fal fa-clock"></i>
-                                                                <span className="ml-2">
-                                                                    <span className="">Decommissioned On: </span>
-                                                                    <DateFormating dateString={state.product.deleted_at} />
+                                                        <div className="w-full">
+                                                            <button
+                                                                type="button"
+                                                                onClick={showOrHideProductReinstatementModal}
+                                                                className="inline-flex items-center float-right px-3 py-1-5 mr-2 rounded border bg-white border-green-500 shadow-sm text-sm text-green-600 hover:border-green-700 hover:text-green-700 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-emerald-300">
+                                                                <span className="mr-2 fas fa-paper-plane"></span>
+
+                                                                <span className="text-sm">
+                                                                    Reinstate
                                                                 </span>
-                                                            </p>
-
-                                                            <div className="form-group rounded border border-red-400 bg-rose-100 py-3 px-4 w-7/12">
-                                                                <div className="flex items-center align-middle text-red-500">
-                                                                    <i className="fad fa-exclamation-circle fa-2x text-red-400"></i>
-                                                                    <span className="text-sm pl-3">
-                                                                        Product is currently decommissioned...
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="form-group flex pt-4 items-center align-middle">
-                                                                <p className="text-sm form-group text-sky-500 hover:cursor-pointer" onClick={onClickReinstateProduct}>
-                                                                    Reinstate Product
-                                                                </p>
-                                                            </div>
+                                                            </button>
                                                         </div>
                                                     )
                                                 }
+
+
                                             </div>
+
                                         </div>
+
+                                        <p className="text-sm form-group py-1 text-slate-600">
+                                            {state.data.product.description}
+                                        </p>
+
+                                        {
+                                            state.data.product.deleted_at === null ? (
+                                                <div>
+                                                    <p className="form-group text-sm text-gray-500 flex items-center align-middle">
+                                                        <i className="fal fa-clock text-gray-700"></i>
+                                                        <span className="ml-2">
+                                                            <span className="text-gray-700">Last Updated: </span>
+                                                            <DateFormating dateString={state.data.product.updated_at} />
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    <div className="form-group rounded border-0 bg-orange-100 py-4 px-4">
+                                                        <div className="flex flex-row align-middle text-orange-600">
+                                                            <i className="fas fa-exclamation-circle fa-lg mt-1 text-orange-600 flex-none"></i>
+
+                                                            <div className="flex-auto ml-1">
+                                                                <span className="text-sm pl-3 text-orange-600 block">
+                                                                    This product has been decommissioned. No more tickets will be raised for this product.
+
+                                                                    <span className="block mt-3">
+                                                                        <p className="text-sm flex items-center align-middle">
+                                                                            <i className="fal fa-clock text-orange-700"></i>
+                                                                            <span className="ml-2">
+                                                                                <span className="text-orange-700">Decommissioned On: </span>
+                                                                                <DateFormating dateString={state.data.product.deleted_at} />
+                                                                            </span>
+                                                                        </p>
+                                                                    </span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )
+                                        }
+
+                                        <hr />
                                     </div>
 
-                                    <ProductEdit
-                                        uuid={params.uuid}
-                                        show={state.panel.show}
-                                        productProps={state.product}
-                                        hidePanel={hideProductChangePanel}
-                                        fetchFunc={fetchProductDetailsApiCall}
-                                    />
+                                    <div className="w-9/12 px-2 py-4">
+                                        <p className="text text-slate-700 mb-2">
+                                            Companies Subscribed
+                                        </p>
+
+                                        <p className="text-sm form-group py-1 text-slate-600">
+                                            List of companies subscribed to this product
+                                        </p>
+
+                                        <div className="w-full form-group">
+                                            {
+                                                state.data.subscriptions.length < 1 ? (
+                                                    <div className="form-group rounded border-0 bg-sky-100 py-4 px-4">
+                                                        <div className="flex flex-row align-middle text-blue-700">
+                                                            <i className="fas fa-info-circle fa-lg mt-1 text-blue-700 flex-none"></i>
+
+                                                            <div className="flex-auto ml-1">
+                                                                <span className="text-sm pl-3 text-blue-700 block">
+                                                                    No companies are subscribed to this product.
+
+                                                                    {
+                                                                        state.data.product.deleted_at === null ? (
+                                                                            <span className="block mt-2">
+                                                                                To enlist a company for subscription, go to
+
+                                                                                <Link to={companyGroupLink} className="ml-1 underline text-blue-800">
+                                                                                    Company Groups
+                                                                                </Link>
+
+                                                                                , select a company and add this product to their subscription.
+                                                                            </span>
+                                                                        ) : null
+                                                                    }
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <ReactTable columns={columns} data={state.data.subscriptions} />
+                                                )
+                                            }
+                                        </div>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div className="flex flex-col align-middle mt-6 h-16">
-                                    <span className="fad text-green-500 fa-spinner-third fa-2x m-auto block fa-spin"></span>
-                                </div>
-                            )
-                        }
-                    </div>
+
+                                <ProductEdit
+                                    uuid={params.uuid}
+                                    productProps={state.data.product}
+                                    show={state.modals.showEditing}
+                                    hideModal={showOrHideEditProductModal}
+                                    fetchFunc={fetchProductDetailsApiCall}
+                                />
+
+                                <ActionModal
+                                    title="Decommission Product"
+                                    iconClass="fad fa-trash-alt fa-lg"
+                                    show={state.modals.showDecommissioning}
+                                    actionEvent={decommissionProductApiCall}
+                                    showOrHide={showOrHideDecommissionProductModal}
+                                    isPostingForm={state.postingForm.decommissioning}
+                                    details="No more tickets will be raised for this product. Do you wish to proceed?"
+                                    actionButton={{
+                                        before: "Decommission",
+                                        after: "Decommissioning"
+                                    }}
+                                />
+
+                                <WarningActionModal
+                                    show={state.modals.showReinstatement}
+                                    title={"Reinstate Product"}
+                                    details={"This action will reinstate this product. Do you wish to proceed?"}
+                                    iconClass={"fad fa-cloud-upload fa-lg"}
+                                    showOrHide={showOrHideProductReinstatementModal}
+                                    actionEvent={reinstateProductApiCall}
+                                    isPostingForm={state.postingForm.reinstating}
+                                    actionButton={{
+                                        before: "Reinstate",
+                                        after: "Reinstating"
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <div className="flex flex-col align-middle mt-6 h-16">
+                                <span className="fad text-green-500 fa-spinner-third fa-2x m-auto block fa-spin"></span>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
         </React.Fragment>

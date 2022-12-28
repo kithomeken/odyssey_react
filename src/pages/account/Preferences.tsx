@@ -11,6 +11,7 @@ import CookieServices from "../../services/CookieServices"
 import { TIMEZONE_COOKIE_NAME } from "../../global/CookieNames"
 import { COOKIE_OPTIONS } from "../../global/ConstantsRegistry"
 import Crypto from "../../encryption/Crypto"
+import {ACCOUNT_PREFERENCES, ACCOUNT_SET_TIMEZONE} from "../../api/accountApiRoutes";
 
 interface Props {
     data: any,
@@ -41,7 +42,7 @@ export const Preferences: FC<Props> = ({ data, status, updateTabStatus, updateTa
 
     const fetchAccountPreferencesApiCall = async () => {
         try {
-            const response = await HttpServices.httpGet(ACCOUNT_PREFERENCES_)
+            const response = await HttpServices.httpGet(ACCOUNT_PREFERENCES)
 
             if (response.data.success) {
                 status = 'fulfilled'
@@ -95,7 +96,7 @@ export const Preferences: FC<Props> = ({ data, status, updateTabStatus, updateTa
         try {
             let formData = new FormData()
             formData.append('timezone', input.timezone)
-            const response = await HttpServices.httpPost(SET_ACCOUNT_TIMEZONE_, formData)
+            const response = await HttpServices.httpPost(ACCOUNT_SET_TIMEZONE, formData)
 
             if (response.status === 200) {
                 let selectedTimezone = null

@@ -53,17 +53,6 @@ export const AccountProfile = () => {
                         </span>
                     </button>
 
-                    <button type="button" onClick={() => activateTab('email')} className={classNames(
-                        state.activeTab === 'email' ? 'text-green-700 bg-green-100' : 'text-slate-700 hover:bg-slate-100',
-                        "text-sm items-center w-full text-left py-2 px-4 rounded mt-2"
-                    )}>
-                        <span className="flex flex-row align-middle items-center">
-                            <span className="ml-2 flex-auto">
-                                Change E-mail
-                            </span>
-                        </span>
-                    </button>
-
                     <button type="button" onClick={() => activateTab('security')} className={classNames(
                         state.activeTab === 'security' ? 'text-green-700 bg-green-100' : 'text-slate-700 hover:bg-slate-100',
                         "text-sm items-center w-full text-left py-2 px-4 rounded mt-2"

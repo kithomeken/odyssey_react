@@ -1,10 +1,40 @@
+import * as crypto from 'crypto-js'
+
+import StorageServices from "../services/StorageServices";
+import {IV_BASE, KEY_BASE} from "../global/ConstantsRegistry";
+
 class EncryptionKeys {
-    keyBase() {
-        return '1!]c$%`2nbhoVJ5Enuzu~1%YH^oI>)'
+    getKeyBase() {
+        const createdKey = StorageServices.getLocalStorage(KEY_BASE)
+
+        if (createdKey === null || createdKey === undefined) {
+            this.setEncryptionKeys()
+            return  StorageServices.getLocalStorage(KEY_BASE)
+        } else {
+            return createdKey
+        }
     }
 
-    ivBase() {
-        return ']#M|R|@K5e#q=y(8l,wppiMPUOx^#/'
+    getIvBase() {
+        const createdIv = StorageServices.getLocalStorage(IV_BASE)
+
+        if (createdIv === null || createdIv === undefined) {
+            this.setEncryptionKeys()
+            return  StorageServices.getLocalStorage(IV_BASE)
+        } else {
+            return createdIv
+        }
+    }
+
+    setEncryptionKeys() {
+        /*
+        * Create secure random encryption keys to be used
+        * */
+        const secureKeyBase = crypto.lib.WordArray.random(23)
+        const secureIvBase = crypto.lib.WordArray.random(23)
+
+        StorageServices.setLocalStorage(KEY_BASE, secureKeyBase)
+        StorageServices.setLocalStorage(IV_BASE, secureIvBase)
     }
 }
 

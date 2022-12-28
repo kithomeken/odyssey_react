@@ -1,25 +1,24 @@
-import { Menu } from "@headlessui/react"
-import React, { useState } from "react"
 import { Helmet } from "react-helmet"
-import { useParams } from "react-router-dom"
 import { toast } from "react-toastify"
+import React, { useState } from "react"
+import { Menu } from "@headlessui/react"
+import { useParams } from "react-router-dom"
 
-import { AGENT_DETAILS_API_ROUTE, AGENT_RESEND_EMAIL_INV_API_ROUTE, AGENT_SUSPEND_ACCOUNT_API_ROUTE } from "../../../api/ApiRoutes"
-import Loading from "../../../components/layouts/Loading"
-import { DropDown } from "../../../components/lib/DropDown"
-import BreadCrumbs from "../../../components/settings/BreadCrumbs"
-import Header from "../../../components/settings/Header"
-import { HEADER_SECTION_BG } from "../../../global/ConstantsRegistry"
-import DateFormating from "../../../lib/hooks/DateFormating"
-import HttpServices from "../../../services/HttpServices"
 import Error500 from "../../errors/Error500"
-import { ChangeInvitationEmail } from "./ChangeInvitationEmail"
-import emptySearchBox from '../../../assets/images/empty_results_returned.png'
-import { ChangeAuthTeam } from "./ChangeAuthTeam"
-import { ActionModal } from "../../../components/lib/ActionModal"
-import { accountRoutes } from "../../../routes/settings/accountRoutes"
-import { useAppSelector } from "../../../store/hooks"
 import Crypto from "../../../encryption/Crypto"
+import { ChangeAuthTeam } from "./ChangeAuthTeam"
+import { useAppSelector } from "../../../store/hooks"
+import HttpServices from "../../../services/HttpServices"
+import Loading from "../../../components/layouts/Loading"
+import DateFormating from "../../../lib/hooks/DateFormating"
+import { ChangeInvitationEmail } from "./ChangeInvitationEmail"
+import { ActionModal } from "../../../components/lib/ActionModal"
+import BreadCrumbs from "../../../components/settings/BreadCrumbs"
+import { accountRoutes } from "../../../routes/settings/accountRoutes"
+import emptySearchBox from '../../../assets/images/empty_results_returned.png'
+import { DropDownWithButton } from "../../../components/lib/DropDownWithButton"
+import { AGENT_LIST_API_ROUTE, AGENT_RESEND_EMAIL_INV_API_ROUTE, AGENT_RESTORE_ACCOUNT_API_ROUTE, AGENT_SUSPEND_ACCOUNT_API_ROUTE } from "../../../api/v1/api.AccountRoutes"
+import { APPLICATION_NAME } from "../../../global/ConstantsRegistry"
 
 export const AgentDetails = () => {
     const [state, setstate] = useState({
@@ -35,7 +34,8 @@ export const AgentDetails = () => {
             showSuspendAccount: false,
         },
         postingForm: {
-            suspendingAcc: false
+            suspendingAcc: false,
+            restoringAcc: false,
         }
     })
 
@@ -43,7 +43,6 @@ export const AgentDetails = () => {
     const userAccountUuid = Crypto.decryptDataUsingAES256(authenticationState.uaid)
 
     // Header button
-    const showButton = false
     const params = useParams();
     const pageTitle = "Agent Details"
     const AGNT_ACCOUNT_RT: any = (accountRoutes.find((routeName) => routeName.name === 'AGNT'))?.path
@@ -54,14 +53,14 @@ export const AgentDetails = () => {
         { linkItem: false, title: pageTitle },
     ]
 
-    async function fetchAgentAccountDetailsApiCall(hideModal = 'Y') {
+    async function fetchAgentAccountDetailsApiCall() {
         try {
             let { data } = state
             let status = state.status
             const agentId = params.uuid
-            const response: any = await HttpServices.httpGet(AGENT_DETAILS_API_ROUTE + '/' + agentId)
+            const response: any = await HttpServices.httpGet(AGENT_LIST_API_ROUTE + '/' + agentId)
 
-            data = response.data.data
+            data = response.data.payload
             status = 'fulfilled'
 
             setstate({
@@ -249,7 +248,7 @@ export const AgentDetails = () => {
 
                 if (response.data.success) {
                     let { data } = state
-                    data.agent = response.data.data
+                    data.agent = response.data.payload.agent
 
                     setstate({
                         ...state, data
@@ -290,49 +289,70 @@ export const AgentDetails = () => {
         }
     }
 
+    const restoreAccountAccessApiCall = async () => {
+        let { data } = state
+        let { postingForm } = state
+
+        if (data.agent.is_active === 'N' && !postingForm.restoringAcc) {
+            try {
+                let formData = new FormData
+                formData.append('uuid', params.uuid)
+
+                postingForm.restoringAcc = true
+                setstate({
+                    ...state, postingForm
+                })
+
+                const response: any = await HttpServices.httpPost(AGENT_RESTORE_ACCOUNT_API_ROUTE, formData)
+                const dataResponse = response.data
+
+                if (response.data.success) {
+                    let { data } = state
+                    data.agent = response.data.payload.agent
+
+                    setstate({
+                        ...state, data
+                    })
+                } else {
+                    let toastText = dataResponse.message
+
+                    toast.error(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+            } catch (error) {
+                let toastText = 'Something went wrong. Could not complete action'
+
+                toast.error(toastText, {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
+
+            postingForm.restoringAcc = false
+            setstate({
+                ...state, postingForm
+            })
+        }
+    }
+
     function renderDropDownModal() {
         let { data } = state
 
         if (data.agent.email_verified_at === null || data.agent.email_verified_at === undefined) {
             return (
                 <>
-                    <Menu.Item>
-                        {({ active }) => (
-                            <>
-                                {
-                                    state.resendingInvitation ? (
-                                        <button
-                                            className={classNames(
-                                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                                'block px-4 py-2 text-sm text-left w-full'
-                                            )}
-                                        >
-                                            <span className="left-0 inset-y-0 flex items-center">
-                                                <span className="pr-2">
-                                                    Resending...
-                                                </span>
-
-                                                <span className="w-5 h-5 text-emerald-600">
-                                                    <i className="fad fa-spinner-third fa-lg fa-spin"></i>
-                                                </span>
-                                            </span>
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={resendEmailInvitationApiCall}
-                                            className={classNames(
-                                                active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                                'block px-4 py-2 text-sm text-left w-full'
-                                            )}
-                                        >
-                                            Resend Invitation
-                                        </button>
-                                    )
-                                }
-                            </>
-                        )}
-                    </Menu.Item>
-
                     <Menu.Item>
                         {({ active }) => (
                             <button
@@ -372,72 +392,14 @@ export const AgentDetails = () => {
         }
     }
 
-    const restoreAccountAccessApiCall = async () => {
-        if (state.data.agent.is_active === 'Y') {
-            try {
-                let formData = new FormData
-                formData.append('uuid', params.uuid)
-
-                const response: any = await HttpServices.httpPost(AGENT_RESEND_EMAIL_INV_API_ROUTE, formData)
-                const dataResponse = response.data
-
-                if (response.data.success) {
-                    let toastText = 'Email invitation sent to agent'
-
-                    toast.success(toastText, {
-                        position: "top-right",
-                        autoClose: 7000,
-                        hideProgressBar: true,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                    });
-                } else {
-                    let toastText = dataResponse.message
-
-                    toast.error(toastText, {
-                        position: "top-right",
-                        autoClose: 7000,
-                        hideProgressBar: true,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                    });
-                }
-            } catch (error) {
-                let toastText = 'Something went wrong. Could not complete action'
-
-                toast.error(toastText, {
-                    position: "top-right",
-                    autoClose: 7000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                });
-            }
-
-            setstate({
-                ...state, resendingInvitation: false
-            })
-        }
-    }
-
     return (
         <React.Fragment>
             <Helmet>
                 <title>{pageTitle}</title>
             </Helmet>
 
-            <div className={`px-12 py-3 w-full ${HEADER_SECTION_BG} form-group mb-3`}>
+            <div className={`px-12 py-3 w-full`}>
                 <BreadCrumbs breadCrumbDetails={breadCrumb} />
-
-                <Header title={pageTitle}
-                    showButton={showButton}
-                />
             </div>
 
             <div className="w-full px-12 form-group">
@@ -447,246 +409,314 @@ export const AgentDetails = () => {
                             state.status === 'rejected' ? (
                                 <Error500 />
                             ) : state.status === 'fulfilled' ? (
-                                <div className="flex flex-row">
-                                    <div className="w-3/12 rounded pr-4 pt-2 pb-4">
-                                        <div className="w-full flex flex-row">
-                                            <div className={
-                                                classNames(
-                                                    accountProfileColorCode() === 'orange' ? 'bg-orange-500' : null,
-                                                    accountProfileColorCode() === 'red' ? 'bg-red-500' : null,
-                                                    accountProfileColorCode() === 'yellow' ? 'bg-yellow-500' : null,
-                                                    accountProfileColorCode() === 'green' ? 'bg-green-500' : null,
-                                                    accountProfileColorCode() === 'emerald' ? 'bg-emerald-500' : null,
-                                                    accountProfileColorCode() === 'teal' ? 'bg-teal-500' : null,
-                                                    accountProfileColorCode() === 'cyan' ? 'bg-cyan-500' : null,
-                                                    accountProfileColorCode() === 'blue' ? 'bg-blue-500' : null,
-                                                    accountProfileColorCode() === 'indigo' ? 'bg-indigo-500' : null,
-                                                    accountProfileColorCode() === 'purple' ? 'bg-purple-500' : null,
-                                                    accountProfileColorCode() === 'fuchsia' ? 'bg-fuchsia-500' : null,
-                                                    accountProfileColorCode() === 'rose' ? 'bg-rose-500' : null,
-                                                    "h-16 w-16 flex flex-row align-middle mb-4 rounded-full"
-                                                )
-                                            }>
-                                                <p className="m-auto text-2xl text-white">
-                                                    {getFirstLetterFromName()}
+                                <>
+                                    <div className="w-full flex flow-row mb-3">
+                                        <div className="w-6/12">
+                                            <div className="flex-1 min-w-0">
+                                                <h2 className="text-2xl leading-7 text-green-600 sm: mb-0">
+                                                    {pageTitle}
+                                                </h2>
+                                            </div>
+                                        </div>
+
+                                        <div className="w-6/12 flex flex-row-reverse">
+                                            {
+                                                state.data.agent.is_active === 'Y' ? (
+                                                    <>
+                                                        <DropDownWithButton
+                                                            danger={true}
+                                                            buttonTitle="Suspend"
+                                                            iconProperty="fas fa-clipboard-user fa-lg"
+                                                            onMainActionButton={showOrHideSuspendAccountModal}
+                                                            menuItems={
+                                                                <>
+                                                                    {
+                                                                        state.data.agent.is_active === 'Y' ? (
+                                                                            renderDropDownModal()
+                                                                        ) : null
+                                                                    }
+
+                                                                    <Menu.Item>
+                                                                        {({ active }) => (
+                                                                            <button
+                                                                                className={classNames(
+                                                                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
+                                                                                    'block px-4 py-2 text-sm text-left w-full'
+                                                                                )}
+                                                                            >
+                                                                                Account Audit Trail
+                                                                            </button>
+                                                                        )}
+                                                                    </Menu.Item>
+
+                                                                    {
+                                                                        state.data.agent.is_active === 'Y' ? null : (
+                                                                            userAccountUuid !== params.uuid ? (
+                                                                                <Menu.Item>
+                                                                                    {({ active }) => (
+                                                                                        <button
+                                                                                            onClick={restoreAccountAccessApiCall}
+                                                                                            className={classNames(
+                                                                                                active ? 'bg-amber-100 text-amber-800' : 'text-amber-700',
+                                                                                                'block px-4 py-2 text-sm text-left w-full'
+                                                                                            )}
+                                                                                        >
+                                                                                            Restore Access
+                                                                                        </button>
+                                                                                    )}
+                                                                                </Menu.Item>
+                                                                            ) : null
+                                                                        )
+                                                                    }
+                                                                </>
+                                                            }
+                                                        />
+
+                                                        {
+                                                            state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === undefined ? (
+                                                                <>
+                                                                    {
+                                                                        state.resendingInvitation ? (
+                                                                            <button
+                                                                                type="button"
+                                                                                disabled
+                                                                                className="inline-flex items-center px-3 py-1 mr-2 rounded border bg-white border-green-500 shadow-sm text-sm text-green-600 hover:border-green-700 hover:text-green-700 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-emerald-300 disabled:cursor-not-allowed">
+                                                                                <span className="text-sm">
+                                                                                    Sending...
+                                                                                </span>
+
+                                                                                <span className="ml-2 fad fa-spinner-third fa-lg fa-spin"></span>
+                                                                            </button>
+                                                                        ) : (
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={resendEmailInvitationApiCall}
+                                                                                className="inline-flex items-center px-3 py-1 mr-2 rounded border bg-white border-green-500 shadow-sm text-sm text-green-600 hover:border-green-700 hover:text-green-700 focus:outline-none focus:ring-0 focus:ring-offset-2 focus:ring-emerald-300">
+                                                                                <span className="mr-2 fas fa-paper-plane"></span>
+
+                                                                                <span className="text-sm">
+                                                                                    Invitation
+                                                                                </span>
+                                                                            </button>
+                                                                        )
+                                                                    }
+                                                                </>
+                                                            ) : null
+                                                        }
+                                                    </>
+                                                ) : null
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-row">
+                                        <div className="w-3/12 rounded pr-4 pt-2 pb-4">
+                                            <div className="w-full flex flex-row">
+                                                <div className={
+                                                    classNames(
+                                                        accountProfileColorCode() === 'orange' ? 'bg-orange-500' : null,
+                                                        accountProfileColorCode() === 'red' ? 'bg-red-500' : null,
+                                                        accountProfileColorCode() === 'yellow' ? 'bg-yellow-500' : null,
+                                                        accountProfileColorCode() === 'green' ? 'bg-green-500' : null,
+                                                        accountProfileColorCode() === 'emerald' ? 'bg-emerald-500' : null,
+                                                        accountProfileColorCode() === 'teal' ? 'bg-teal-500' : null,
+                                                        accountProfileColorCode() === 'cyan' ? 'bg-cyan-500' : null,
+                                                        accountProfileColorCode() === 'blue' ? 'bg-blue-500' : null,
+                                                        accountProfileColorCode() === 'indigo' ? 'bg-indigo-500' : null,
+                                                        accountProfileColorCode() === 'purple' ? 'bg-purple-500' : null,
+                                                        accountProfileColorCode() === 'fuchsia' ? 'bg-fuchsia-500' : null,
+                                                        accountProfileColorCode() === 'rose' ? 'bg-rose-500' : null,
+                                                        "h-20 w-20 flex flex-row align-middle items-center mb-4 rounded-full"
+                                                    )
+                                                }>
+                                                    <p className="m-auto text-2xl text-white">
+                                                        {getFirstLetterFromName()}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+
+                                            <div className="mb-4">
+                                                <p className="text-sm text-slate-500 mb-0">
+                                                    Account Name
+                                                </p>
+
+                                                {
+                                                    state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === undefined ? (
+                                                        <div className="flex items-center align-middle text-amber-700 px-0 py-3">
+                                                            <i className="fad fa-exclamation-circle fa-lg"></i>
+                                                            <span className="text-xs pl-3 text-amber-700">
+                                                                Account has not been verified.
+                                                            </span>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-sm text-slate-700 mb-0 flex fle-row align-middle">
+                                                            {state.data.agent.first_name} {state.data.agent.last_name}
+                                                        </p>
+                                                    )
+                                                }
+                                            </div>
+
+                                            <div className="mb-4">
+                                                <p className="text-sm text-slate-500 mb-0">
+                                                    E-mail Address
+                                                </p>
+
+                                                <p className="text-sm text-slate-700">
+                                                    {state.data.agent.email}
                                                 </p>
                                             </div>
 
-                                            <div className="flex-auto h-10">
-                                                <DropDown
-                                                    menuItems={
+                                            <hr />
+
+                                            <span className="block text-slate-500 text-xs my-4">
+                                                {
+                                                    state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === undefined ? (
                                                         <>
-                                                            {
-                                                                state.data.agent.is_active === 'Y' ? (
-                                                                    renderDropDownModal()
-                                                                ) : null
-                                                            }
-
-                                                            <Menu.Item>
-                                                                {({ active }) => (
-                                                                    <button
-                                                                        className={classNames(
-                                                                            active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
-                                                                            'block px-4 py-2 text-sm text-left w-full'
-                                                                        )}
-                                                                    >
-                                                                        Account Audit Trail
-                                                                    </button>
-                                                                )}
-                                                            </Menu.Item>
-
-                                                            {
-                                                                state.data.agent.is_active === 'Y' ? (
-                                                                    userAccountUuid !== params.uuid ? (
-                                                                        <Menu.Item>
-                                                                            {({ active }) => (
-                                                                                <button
-                                                                                    onClick={showOrHideSuspendAccountModal}
-                                                                                    className={classNames(
-                                                                                        active ? 'bg-red-100 text-red-900' : 'text-red-700',
-                                                                                        'block px-4 py-2 text-sm text-left w-full'
-                                                                                    )}
-                                                                                >
-                                                                                    Suspend Account
-                                                                                </button>
-                                                                            )}
-                                                                        </Menu.Item>
-                                                                    ) : null
-                                                                ) : (
-                                                                    userAccountUuid !== params.uuid ? (
-                                                                        <Menu.Item>
-                                                                            {({ active }) => (
-                                                                                <button
-                                                                                    onClick={restoreAccountAccessApiCall}
-                                                                                    className={classNames(
-                                                                                        active ? 'bg-amber-100 text-amber-800' : 'text-amber-700',
-                                                                                        'block px-4 py-2 text-sm text-left w-full'
-                                                                                    )}
-                                                                                >
-                                                                                    Restore Access
-                                                                                </button>
-                                                                            )}
-                                                                        </Menu.Item>
-                                                                    ) : null
-                                                                )
-                                                            }
-
-
-                                                        </>
-                                                    }
-                                                />
-                                            </div>
-                                        </div>
-
-
-                                        <div className="mb-4">
-                                            <p className="text-sm text-slate-500 mb-0">
-                                                Account Name
-                                            </p>
-
-                                            {
-                                                state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === undefined ? (
-                                                    <div className="flex items-center align-middle text-amber-700 px-0 py-3">
-                                                        <i className="fad fa-exclamation-circle fa-lg"></i>
-                                                        <span className="text-xs pl-3 text-amber-700">
-                                                            Account has not been verified.
-                                                        </span>
-                                                    </div>
-                                                ) : (
-                                                    <p className="text-sm text-slate-700 mb-0 flex fle-row align-middle">
-                                                        {state.data.agent.first_name} {state.data.agent.last_name}
-                                                    </p>
-                                                )
-                                            }
-                                        </div>
-
-                                        <div className="mb-4">
-                                            <p className="text-sm text-slate-500 mb-0">
-                                                E-mail Address
-                                            </p>
-
-                                            <p className="text-sm text-slate-700">
-                                                {state.data.agent.email}
-                                            </p>
-                                        </div>
-
-                                        <hr />
-
-                                        <span className="block text-slate-500 text-xs my-4">
-                                            {
-                                                state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === undefined ? (
-                                                    <>
-                                                        User invited on
-                                                        <span className="text-slate-700 ml-1">
-                                                            <DateFormating dateString={state.data.agent.created_at} />
-                                                        </span>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        Last active on
-                                                        <span className="text-slate-700 ml-1">
-                                                            <DateFormating dateString={state.data.agent.created_at} />
-                                                        </span>
-                                                    </>
-                                                )
-                                            }
-                                        </span>
-
-                                        {
-                                            state.data.agent.account_type === 'M' ? (
-                                                <span className="bg-fuchsia-700 text-white mb-0 text-xs py-1 px-2 rounded">
-                                                    Master Account
-                                                </span>
-                                            ) : null
-                                        }
-                                    </div>
-
-                                    <div className="w-8/12 pl-4 pt-2 pb-4 h-screen">
-                                        {
-                                            state.data.agent.is_active === 'N' ? (
-                                                <div className="form-group rounded border-0 bg-orange-100 py-4 px-4">
-                                                    <div className="flex flex-row align-middle text-orange-600">
-                                                        <i className="fas fa-exclamation-circle fa-lg mt-1 text-orange-600 flex-none"></i>
-
-                                                        <div className="flex-auto ml-1">
-                                                            <span className="text-sm pl-3 text-orange-600 block">
-                                                                This account has been suspended. User will not be able to collaborate with your team.
+                                                            User invited on
+                                                            <span className="text-slate-700 ml-1">
+                                                                <DateFormating dateString={state.data.agent.created_at} />
                                                             </span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            Last active on
+                                                            <span className="text-slate-700 ml-1">
+                                                                <DateFormating dateString={state.data.agent.created_at} />
+                                                            </span>
+                                                        </>
+                                                    )
+                                                }
+                                            </span>
 
-                                                            <button className="text-sm pl-3 text-blue-600 block hover:underline" onClick={restoreAccountAccessApiCall}>
-                                                                Restore Access
+                                            {
+                                                state.data.agent.account_type === 'M' ? (
+                                                    <span className="bg-fuchsia-700 text-white mb-0 text-xs py-1 px-2 rounded">
+                                                        Master Account
+                                                    </span>
+                                                ) : null
+                                            }
+                                        </div>
+
+                                        <div className="w-9/12 pl-4 pt-2 pb-4 h-screen">
+                                            {
+                                                state.data.agent.is_active === 'N' ? (
+                                                    <div className="form-group rounded border-0 bg-orange-100 py-4 px-4">
+                                                        <div className="flex flex-row align-middle text-orange-600">
+                                                            <i className="fas fa-exclamation-circle fa-lg mt-1 text-orange-600 flex-none"></i>
+
+                                                            <div className="flex-auto ml-1">
+                                                                <span className="text-sm pl-3 text-orange-600 block">
+                                                                    This account has been suspended. User will not be able to collaborate with your team on {APPLICATION_NAME}.
+                                                                </span>
+
+                                                                <div className="flex flex-row align-middle items-center">
+                                                                    {
+                                                                        state.postingForm.restoringAcc ? (
+                                                                            <button className="text-sm pl-3 text-blue-600 hover:underline cursor-not-allowed" disabled>
+                                                                                Restoring Access
+                                                                            </button>
+                                                                        ) : (
+                                                                            <button className="text-sm pl-3 text-blue-600 hover:underline" onClick={restoreAccountAccessApiCall}>
+                                                                                Restore Access
+                                                                            </button>
+                                                                        )
+                                                                    }
+
+                                                                    <div className="mx-3 text-blue-800">|</div>
+
+                                                                    <button className="text-sm text-blue-600 hover:underline" onClick={restoreAccountAccessApiCall}>
+                                                                        Audit Trail
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ) : null
+                                            }
+
+                                            <div className="w-full mb-5 mt-3">
+                                                <div className="flex flex-row align-middle mb-3">
+                                                    <div className="flex-auto">
+                                                        <p className="text-xl text-emerald-600">
+                                                            Authorization Team
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <p className="text-sm text-slate-600">
+                                                    Team that manages the user's permissions, restrictions and ticket access.
+                                                </p>
+
+                                                <div className="w-full pt-5 pb-3">
+                                                    <div className="flex flex-row border-b pb-2 align-middle">
+                                                        <div className="flex-auto">
+                                                            <span className="py-3 text-left text-xs text-slate-600 uppercase font-normal tracking-wider">
+                                                                Team
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="w-32">
+                                                            <span className="px-3 py-3 text-left text-xs text-emerald-600 uppercase font-normal tracking-wider">
+                                                                -
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-row border-t border-b-2 divide-gray-200 align-middle">
+                                                        <div className="flex-auto">
+                                                            <div className="py-3 whitespace-wrap">
+                                                                <span className="block text-gray-600 mb-1 text-sm">
+                                                                    {state.data.auth_team.name}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="w-32 flex align-middle flex-row">
+                                                            <button
+                                                                type="button"
+                                                                disabled={
+                                                                    state.data.agent.is_active !== 'Y' ? true : false
+                                                                }
+                                                                onClick={showOrHideChangeAuthTeamModal}
+                                                                className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
+                                                                <span>
+                                                                    <span className="left-0 inset-y-0 flex items-center">
+                                                                        <span className="w-5 h-5">
+                                                                            <i className="fas fa-exchange"></i>
+                                                                        </span>
+
+                                                                        <span className="ml-2">
+                                                                            Change
+                                                                        </span>
+                                                                    </span>
+                                                                </span>
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            ) : null
-                                        }
-
-                                        <div className="w-full mb-5 mt-3">
-                                            <div className="flex flex-row align-middle mb-3">
-                                                <div className="flex-auto">
-                                                    <p className="text-xl text-emerald-600">
-                                                        Authorization Team
-                                                    </p>
-                                                </div>
-
-                                                <button
-                                                    type="button"
-                                                    disabled={
-                                                        state.data.agent.is_active !== 'Y' ? true : false
-                                                    }
-                                                    onClick={showOrHideChangeAuthTeamModal}
-                                                    className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
-                                                    <span>
-                                                        <span className="left-0 inset-y-0 flex items-center">
-                                                            <span className="w-5 h-5">
-                                                                <i className="fas fa-exchange"></i>
-                                                            </span>
-
-                                                            <span className="ml-2">
-                                                                Change Team
-                                                            </span>
-                                                        </span>
-                                                    </span>
-                                                </button>
                                             </div>
 
-                                            <p className="text-sm text-slate-600">
-                                                Team that manages the user's permissions, restrictions and ticket access.
-                                            </p>
-
-                                            <div className="w-full pt-5">
-                                                <div className="flex flex-row border-b pb-2 align-middle">
+                                            <div className="w-full mb-5 mt-3">
+                                                <div className="flex flex-row align-middle mb-3">
                                                     <div className="flex-auto">
-                                                        <span className="py-3 text-left text-xs text-slate-600 uppercase font-normal tracking-wider">
-                                                            Team
-                                                        </span>
-                                                    </div>
-
-                                                    <div className="w-32">
-                                                        <span className="px-3 py-3 text-left text-xs text-emerald-600 uppercase font-normal tracking-wider">
-                                                            -
-                                                        </span>
+                                                        <p className="text-xl text-emerald-600">
+                                                            Projects
+                                                        </p>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex flex-row border-t border-b-2 divide-gray-200 align-middle">
-                                                    <div className="flex-auto">
-                                                        <div className="py-2 whitespace-wrap">
-                                                            <span className="block text-blue-600 mb-1 text-sm">
-                                                                {state.data.auth_team.name}
-                                                            </span>
+                                                <p className="text-sm text-slate-600">
+                                                    Agent's participation in the organization's projects
+                                                </p>
 
-                                                            <span className="block text-slate-500 mb-1 text-xs">
-                                                                {state.data.auth_team.description.substring(0, 100)}'...'
-                                                            </span>
-                                                        </div>
-                                                    </div>
+                                                <div className="w-full">
+                                                    <div className="w-6/12 py-5 m-auto">
+                                                        <img src={emptySearchBox} alt="broken_robot" width="100px" className="block text-center m-auto" />
 
-                                                    <div className="w-32 flex align-middle flex-row">
-                                                        <button className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm">
-                                                            Details
-                                                        </button>
+                                                        <p className="text-sm text-center mb-2 text-slate-600">
+                                                            No projects found
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -694,89 +724,44 @@ export const AgentDetails = () => {
 
                                         </div>
 
-                                        <div className="w-full mb-5 mt-3">
-                                            <div className="flex flex-row align-middle mb-3">
-                                                <div className="flex-auto">
-                                                    <p className="text-xl text-emerald-600">
-                                                        Projects
-                                                    </p>
-                                                </div>
+                                        <ChangeInvitationEmail
+                                            uuid={params.uuid}
+                                            email={state.data.agent.email}
+                                            updateAgentEmail={updateAgentEmail}
+                                            show={state.modals.showChangeEmail}
+                                            showOrHide={showOrHideChangeInvitationEmailModal}
+                                        />
 
-                                                <button
-                                                    type="button"
-                                                    disabled={
-                                                        state.data.agent.is_active !== 'Y' ? true : false
-                                                    }
-                                                    className="text-blue-600 m-auto text-right float-right cursor-pointer hover:text-blue-800 text-sm disabled:cursor-not-allowed disabled:opacity-70">
-                                                    <span>
-                                                        <span className="left-0 inset-y-0 flex flex-row align-middle">
-                                                            <span className="w-5 h-5">
-                                                                <i className="fas fa-plus"></i>
-                                                            </span>
+                                        <ChangeAuthTeam
+                                            uuid={params.uuid}
+                                            team_name={state.data.auth_team.name}
+                                            team_uuid={state.data.auth_team.uuid}
+                                            show={state.modals.showChangeAuthTeam}
+                                            showOrHide={showOrHideChangeAuthTeamModal}
+                                            updateAuthorizationTeamState={updateAuthorizationTeamState}
+                                            account_name={
+                                                state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === null ?
+                                                    state.data.agent.email
+                                                    :
+                                                    state.data.agent.account_name
+                                            }
+                                        />
 
-                                                            <span className="ml-2">
-                                                                Add To Project
-                                                            </span>
-                                                        </span>
-                                                    </span>
-                                                </button>
-                                            </div>
-
-                                            <p className="text-sm text-slate-600">
-                                                Agent's participation in the organization's projects
-                                            </p>
-
-                                            <div className="w-full">
-                                                <div className="w-6/12 py-5 m-auto">
-                                                    <img src={emptySearchBox} alt="broken_robot" width="100px" className="block text-center m-auto" />
-
-                                                    <p className="text-sm text-center mb-2 text-slate-600">
-                                                        No projects found
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
+                                        <ActionModal
+                                            iconClass="fad fa-trash-alt fa-lg"
+                                            title="Suspend Account"
+                                            show={state.modals.showSuspendAccount}
+                                            details="User will not be able to access tickets or collaborate with your team. The user's past contributions will however remain"
+                                            showOrHide={showOrHideSuspendAccountModal}
+                                            actionEvent={suspendAgentAccountApiCall}
+                                            isPostingForm={state.postingForm.suspendingAcc}
+                                            actionButton={{
+                                                before: "Suspend",
+                                                after: "Suspending"
+                                            }}
+                                        />
                                     </div>
-
-                                    <ChangeInvitationEmail
-                                        uuid={params.uuid}
-                                        email={state.data.agent.email}
-                                        updateAgentEmail={updateAgentEmail}
-                                        show={state.modals.showChangeEmail}
-                                        showOrHide={showOrHideChangeInvitationEmailModal}
-                                    />
-
-                                    <ChangeAuthTeam
-                                        uuid={params.uuid}
-                                        team_name={state.data.auth_team.name}
-                                        team_uuid={state.data.auth_team.uuid}
-                                        show={state.modals.showChangeAuthTeam}
-                                        showOrHide={showOrHideChangeAuthTeamModal}
-                                        updateAuthorizationTeamState={updateAuthorizationTeamState}
-                                        account_name={
-                                            state.data.agent.email_verified_at === null || state.data.agent.email_verified_at === null ?
-                                                state.data.agent.email
-                                                :
-                                                state.data.agent.account_name
-                                        }
-                                    />
-
-                                    <ActionModal
-                                        iconClass="fad fa-trash-alt fa-lg"
-                                        title="Suspend Account"
-                                        show={state.modals.showSuspendAccount}
-                                        details="User will not be able to access tickets or collaborate with your team. The user's past contributions will however remain"
-                                        showOrHide={showOrHideSuspendAccountModal}
-                                        actionEvent={suspendAgentAccountApiCall}
-                                        isPostingForm={state.postingForm.suspendingAcc}
-                                        actionButton={{
-                                            before: "Suspend",
-                                            after: "Suspending"
-                                        }}
-                                    />
-                                </div>
+                                </>
                             ) : (
                                 <div className="pt-10">
                                     <Loading />
