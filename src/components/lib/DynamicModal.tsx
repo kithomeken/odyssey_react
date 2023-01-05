@@ -1,8 +1,8 @@
+import { toast } from "react-toastify"
 import { Transition, Dialog } from "@headlessui/react"
 import React, { FC, Fragment, useState } from "react"
-import { toast } from "react-toastify"
+
 import { CommsBreakdown } from "../../pages/errors/CommsBreakdown"
-import Error500 from "../../pages/errors/Error500"
 import Loading from "../layouts/Loading"
 
 interface Props {
@@ -122,7 +122,7 @@ export const DynamicModal: FC<Props> = ({ show, size, showOrHideModal, title, de
 
     return (
         <Transition.Root show={show} as={Fragment}>
-            <Dialog as="div" className="fixed z-50 inset-0 overflow-y-auto" onClose={checkIfFormIsPostingData}>
+            <Dialog as="div" className="fixed z-30 inset-0 overflow-y-auto" onClose={checkIfFormIsPostingData}>
                 <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                     <Transition.Child
                         as={Fragment}
