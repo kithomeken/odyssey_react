@@ -8,9 +8,9 @@ function ApiRegistry () {
         apiDomain = 'https://api.odyssey.kennedykitho.me/api'
         mediaDomain = 'https://media.kennedykitho.me'
     } else {
-        FQDN = 'http://localhost:7016/project-0/public'
-        apiDomain = 'http://localhost:7016/project-0/public/api'
-        mediaDomain = 'http://localhost:7016/project-0/public/media'
+        FQDN = 'http://localhost:81/project-0/public'
+        apiDomain = 'http://localhost:81/project-0/public/api'
+        mediaDomain = 'http://localhost:81/project-0/public/media'
     }
 
     return {

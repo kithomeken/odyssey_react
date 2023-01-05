@@ -1,7 +1,8 @@
 import { Transition, Dialog } from "@headlessui/react"
 import React, { FC, Fragment } from "react"
 import { toast } from "react-toastify"
-import state from "sweetalert/typings/modules/state"
+
+import { CommsBreakdown } from "../../pages/errors/CommsBreakdown"
 import Loading from "../layouts/Loading"
 
 interface Props {
@@ -9,18 +10,20 @@ interface Props {
     show: boolean,
     description: any,
     preLoadStatus?: any,
-    formComponents: any,
     showOrHidePanel: any,
+    colorPanel?: boolean,
+    formComponents?: any,
+    panelComponents?: any,
     preLoadsData?: boolean,
-    isPostingForm: boolean,
-    onFormSubmitHandler: any,
-    actionButton: {
+    isPostingForm?: boolean,
+    onFormSubmitHandler?: any,
+    actionButton?: {
         before: any,
         after: any
     }
 }
 
-export const SideBarPanel: FC<Props> = ({ show, showOrHidePanel, title, description, onFormSubmitHandler, isPostingForm, formComponents, actionButton, preLoadsData, preLoadStatus }) => {
+export const SideBarPanel: FC<Props> = ({ show, showOrHidePanel, title, description, onFormSubmitHandler, isPostingForm, formComponents, actionButton, preLoadsData, preLoadStatus, panelComponents, colorPanel }) => {
     const checkIfFormIsPostingData = () => {
         if (!isPostingForm) {
             showOrHidePanel()
@@ -41,56 +44,71 @@ export const SideBarPanel: FC<Props> = ({ show, showOrHidePanel, title, descript
         });
     }
 
+    function classNames(...classes) {
+        return classes.filter(Boolean).join(' ')
+    }
+
     function renderPanelComponents() {
         return (
-            <div className="relative flex-1 mt-20 h-full">
-                <div className="absolute inset-0 pt-3">
+            <div className="relative flex-1 mt-16 h-full">
+                <div className="absolute inset-0">
                     <div className="w-full px-4 sm:px-6">
                         <p className="text-gray-700 text-sm form-group">
                             {description}
                         </p>
                     </div>
 
-
-                    <form className="rounded-md shadow-none space-y-px form-group pb-10" onSubmit={onFormSubmitHandler}>
-                        <div className="w-full px-4 sm:px-6 overflow-scroll">
-                            {
-                                formComponents
-                            }
-                        </div>
-
-                        <div className="bg-gray-100 px-4 w-full py-4 bottom-0 fixed sm:px-6 sm:flex sm:flex-row-reverse">
-                            <div className="w-12/12 space-y-px">
-                                <div className="flex flex-row-reverse items-center align-middle">
-                                    <button type="button" className="w-full inline-flex justify-center text-sm rounded-md border-0 border-transparent shadow-none px-3 py-1 bg-inherit text-gray-600 hover:bg-gray-200 sm:ml-3 sm:w-auto sm:text-sm" onClick={checkIfFormIsPostingData}>
-                                        Cancel
-                                    </button>
-
+                    {
+                        formComponents ? (
+                            <form className="rounded-md shadow-none space-y-px form-group pb-10" onSubmit={onFormSubmitHandler}>
+                                <div className="w-full px-4 sm:px-6 overflow-scroll">
                                     {
-                                        isPostingForm ? (
-                                            <button type="button" className="w-full inline-flex cursor-not-allowed justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white sm:ml-3 sm:w-auto sm:text-sm disabled:bg-emerald-600" disabled={true}>
-                                                <span>
-                                                    <span className="left-0 inset-y-0 flex items-center">
-                                                        <span className="pr-2">
-                                                            {actionButton.after}
-                                                        </span>
-
-                                                        <span className="w-5 h-5">
-                                                            <i className="fad fa-spinner-third fa-lg fa-spin"></i>
-                                                        </span>
-                                                    </span>
-                                                </span>
-                                            </button>
-                                        ) : (
-                                            <button type="submit" className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                                {actionButton.before}
-                                            </button>
-                                        )
+                                        formComponents
                                     }
                                 </div>
-                            </div>
-                        </div>
-                    </form>
+
+                                <div className="bg-gray-100 px-4 w-full py-4 bottom-0 fixed sm:px-6 sm:flex sm:flex-row-reverse">
+                                    <div className="w-12/12 space-y-px">
+                                        <div className="flex flex-row-reverse items-center align-middle">
+                                            <button type="button" className="w-full inline-flex justify-center text-sm rounded-md border-0 border-transparent shadow-none px-3 py-1 bg-inherit text-gray-600 hover:bg-gray-200 sm:ml-3 sm:w-auto sm:text-sm" onClick={checkIfFormIsPostingData}>
+                                                Cancel
+                                            </button>
+
+                                            {
+                                                isPostingForm ? (
+                                                    <button type="button" className="w-full inline-flex cursor-not-allowed justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white sm:ml-3 sm:w-auto sm:text-sm disabled:bg-emerald-600" disabled={true}>
+                                                        <span>
+                                                            <span className="left-0 inset-y-0 flex items-center">
+                                                                <span className="pr-2">
+                                                                    {actionButton.after}
+                                                                </span>
+
+                                                                <span className="w-5 h-5">
+                                                                    <i className="fad fa-spinner-third fa-lg fa-spin"></i>
+                                                                </span>
+                                                            </span>
+                                                        </span>
+                                                    </button>
+                                                ) : (
+                                                    <button type="submit" className="w-full inline-flex justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                        {actionButton.before}
+                                                    </button>
+                                                )
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        ) : (
+                            <>
+                                {
+                                    panelComponents
+                                }
+                            </>
+                        )
+                    }
+
+
                 </div>
             </div>
         )
@@ -145,8 +163,12 @@ export const SideBarPanel: FC<Props> = ({ show, showOrHidePanel, title, descript
                                                 </button>
                                             </div>
                                         </Transition.Child>
-                                        <div className="flex h-full flex-col overflow-y-scroll bg-white pb-6 shadow-xl">
-                                            <div className="px-4 shadow sm:px-6 py-6 bg-emerald-200 fixed top-0 w-full z-40">
+                                        <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                                            <div
+                                                className={classNames(
+                                                    colorPanel ? 'bg-emerald-200 shadow' : 'bg-inherit',
+                                                    'px-4 sm:px-6 py-5 fixed top-0 w-full z-40'
+                                                )}>
                                                 <Dialog.Title className="text-lg text-emerald-700">
                                                     {title}
                                                 </Dialog.Title>
@@ -156,11 +178,13 @@ export const SideBarPanel: FC<Props> = ({ show, showOrHidePanel, title, descript
                                                 preLoadsData ? (
                                                     // For items that pre load data
                                                     preLoadStatus === 'rejected' ? (
-                                                        null
+                                                        <div className="py-2 mt-20">
+                                                            <CommsBreakdown />
+                                                        </div>
                                                     ) : preLoadStatus === 'fulfilled' ? (
                                                         renderPanelComponents()
                                                     ) : (
-                                                        <div className="py-2">
+                                                        <div className="py-2 mt-20">
                                                             <Loading />
                                                         </div>
                                                     )

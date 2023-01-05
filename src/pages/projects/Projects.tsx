@@ -71,12 +71,12 @@ export const Projects = () => {
                 Header: 'Status',
                 accessor: (data: { deleted_at: any }) => (
                     data.deleted_at === null || data.deleted_at === undefined ? (
-                        <span className="text-red-600 bg-red-100 mb-0 text-xs py-1 px-2 rounded">
-                            Suspended
-                        </span>
-                    ) : (
                         <span className="bg-emerald-100 text-emerald-600 mb-0 text-xs py-1 px-2 rounded">
                             Active
+                        </span>
+                    ) : (
+                        <span className="text-red-600 bg-red-100 mb-0 text-xs py-1 px-2 rounded">
+                            Decommissioned
                         </span>
                     )
                 )
