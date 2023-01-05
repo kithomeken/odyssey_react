@@ -27,7 +27,7 @@ export const ProjectDetails = () => {
     })
 
     const buttonIcon = false
-    const buttonTitle = "View Board"
+    const buttonTitle = "Kanban Board"
     const iconType = "fas fa-plus-circle"
 
     const params = useParams();
@@ -105,16 +105,11 @@ export const ProjectDetails = () => {
                     data={state.data}
                     status={state.status}
                     projectId={params.uuid}
+                    dataReload={fetchProjectDetailsApiCall}
                 />
 
             case 'participants':
-                return <ProjectParticipants
-                    updateTabDataState={updateTabDataState}
-                    updateTabStatus={updateTabStatus}
-                    status={state.tabStatus.participants}
-                    data={state.data.participants}
-                    projectId={params.uuid}
-                />
+                return 
 
             case 'documentation':
                 return <ProjectDocumentation
@@ -154,39 +149,82 @@ export const ProjectDetails = () => {
                                 <>
                                     <div className="w-full form-group">
                                         <div className="mb-5">
-                                            <div className={`px-12 py-1 w-full bg-green-50`}>
-                                                <BreadCrumbs breadCrumbDetails={breadCrumb} />
-                                            </div>
-
-                                            <div className={`px-12 pb-2 w-full bg-green-50`}>
-                                                <div className="flex items-center pb-2 pt-2 lg:justify-between w-full">
-                                                    <div className="flex-1 min-w-0">
-                                                        <h2 className="text-2xl leading-7 text-green-600 sm: mb-0">
-                                                            {state.data.project.name}
-                                                        </h2>
+                                            {
+                                                state.data.project.deleted_at === null ? (
+                                                    <div className={`px-12 py-1 w-full bg-green-50`}>
+                                                        <BreadCrumbs breadCrumbDetails={breadCrumb} />
                                                     </div>
+                                                ) : (
+                                                    <div className={`px-12 py-1 w-full bg-red-100`}>
+                                                        <BreadCrumbs breadCrumbDetails={breadCrumb} />
+                                                    </div>
+                                                )
+                                            }
 
-                                                    <div className="mt-5 flex lg:mt-0 lg:ml-4">
-                                                        <span className="hidden sm:block">
-                                                            <button type="button" className={`inline-flex items-center px-4 py-1-5 border border-green-600 rounded shadow-sm text-sm text-green-700 hover:border-green-800 hover:text-green-800 focus:outline-none focus:ring -0 focus:ring-offset-0 focus:ring-green-400`}>
-                                                                {
-                                                                    buttonIcon ? (
-                                                                        <span className={`mr-2 ${iconType}`}></span>
-                                                                    ) : (
-                                                                        ''
-                                                                    )
-                                                                }
+                                            {
+                                                state.data.project.deleted_at === null ? (
+                                                    <div className={`px-12 pb-2 w-full bg-green-50`}>
+                                                        <div className="flex items-center pb-2 pt-2 lg:justify-between w-full">
+                                                            <div className="flex-1 min-w-0">
+                                                                <h2 className="text-2xl leading-7 text-green-600 sm: mb-0">
+                                                                    {state.data.project.name}
+                                                                </h2>
+                                                            </div>
 
-                                                                <span className="text-sm">
-                                                                    {buttonTitle}
+                                                            <div className="mt-5 flex lg:mt-0 lg:ml-4">
+                                                                <span className="hidden sm:block">
+                                                                    <button type="button" className={`inline-flex items-center px-4 py-1-5 border border-green-600 rounded shadow-sm text-sm text-green-700 hover:border-green-800 hover:text-green-800 focus:outline-none focus:ring -0 focus:ring-offset-0 focus:ring-green-400`}>
+                                                                        {
+                                                                            buttonIcon ? (
+                                                                                <span className={`mr-2 ${iconType}`}></span>
+                                                                            ) : (
+                                                                                ''
+                                                                            )
+                                                                        }
+
+                                                                        <span className="text-sm">
+                                                                            {buttonTitle}
+                                                                        </span>
+                                                                    </button>
                                                                 </span>
-                                                            </button>
-                                                        </span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                ) : (
+                                                    <div className={`px-12 pb-2 w-full bg-red-100`}>
+                                                        <div className="flex items-center pb-2 pt-2 lg:justify-between w-full">
+                                                            <div className="flex-1 min-w-0">
+                                                                <h2 className="text-2xl leading-7 text-red-600 sm: mb-0">
+                                                                    {state.data.project.name}
 
-                                                <HeaderParagraph title={state.data.project.description} />
-                                            </div>
+                                                                    <span className="text-red-100 bg-red-600 mb-0 ml-3 text-xs py-1 px-2 rounded">
+                                                                        Decommissioned
+                                                                    </span>
+                                                                </h2>
+                                                            </div>
+
+                                                            <div className="mt-5 flex lg:mt-0 lg:ml-4">
+                                                                <span className="hidden sm:block">
+                                                                    <button type="button" className={`inline-flex items-center px-4 py-1-5 border border-red-600 rounded shadow-sm text-sm text-red-700 hover:border-red-800 hover:text-red-800 focus:outline-none focus:ring -0 focus:ring-offset-0 focus:ring-red-400`}>
+                                                                        {
+                                                                            buttonIcon ? (
+                                                                                <span className={`mr-2 ${iconType}`}></span>
+                                                                            ) : (
+                                                                                ''
+                                                                            )
+                                                                        }
+
+                                                                        <span className="text-sm">
+                                                                            {buttonTitle}
+                                                                        </span>
+                                                                    </button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
+
 
                                             <div className="px-12 py-3">
                                                 <div className="w-12/12 pb-3 flex flex-row">
@@ -196,15 +234,6 @@ export const ProjectDetails = () => {
                                                             "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
                                                         )}>
                                                             <span className="lolrtn robot">Project Overview</span>
-                                                        </button>
-                                                    </div>
-
-                                                    <div className="w-auto cursor-pointer" onClick={() => activateTab('participants')}>
-                                                        <button className={classNames(
-                                                            state.activeTab === 'participants' ? 'text-green-700 border-b-2 border-green-400' : 'hover:text-gray-700 text-gray-500 hover:bg-gray-100 border-b-2',
-                                                            "text-sm items-center block p-2 px-3 rounded-t rounded-b-none"
-                                                        )}>
-                                                            <span className="lolrtn robot">Participants/Members</span>
                                                         </button>
                                                     </div>
 
@@ -222,7 +251,7 @@ export const ProjectDetails = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="w-10/12 pb-6 px-3">
+                                                <div className="w-12/12 pb-6 px-3">
                                                     {loadRespectiveTab(state.activeTab)}
                                                 </div>
                                             </div>

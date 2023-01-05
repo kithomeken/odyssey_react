@@ -1,98 +1,189 @@
 import React, { FC, useState } from "react"
+import { toast } from "react-toastify"
+import { PROJECTS_DECOMMISSION_API_ROUTE, PROJECTS_REINSTATE_API_ROUTE } from "../../api/v1/api.StandardRoutes"
+import { ActionModal } from "../../components/lib/ActionModal"
+import { WarningActionModal } from "../../components/lib/WarningActionModal"
 import DateFormating from "../../lib/hooks/DateFormating"
+import HttpServices from "../../services/HttpServices"
+import { EditProject } from "./EditProject"
+import { ProjectParticipants } from "./ProjectParticipants"
 
 interface Props {
     data: any,
     status: any,
     projectId: any,
+    dataReload: any
 }
 
-export const ProjectOverview: FC<Props> = ({ data, status, projectId }) => {
+export const ProjectOverview: FC<Props> = ({ data, status, projectId, dataReload }) => {
     const [state, setstate] = useState({
-        isPostingForm: false,
-        input: {
-            name: data.project.name,
-            description: data.project.description
+        show: false,
+        modals: {
+            showDecommission: false,
+            showReinstatement: false,
+            showParticipants: true,
         },
-        errors: {
-            name: '',
-            description: ''
-        },
-        change: {
-            name: false,
-            description: false
-        },
+        postingForm: {
+            decommissionProj: false,
+            reinstateProj: false,
+        }
     })
 
-    const onChangeHandler = (e: any) => {
-        const { isPostingForm } = state
-        let isCheckbox: any = (e.target.type === 'checkbox') ? true : false;
-
-        if (!isPostingForm) {
-            let { input }: any = state
-            let { errors }: any = state
-
-            input[e.target.name] = e.target.value
-            errors[e.target.name] = ''
-
-            if (isCheckbox) {
-                if (e.target.checked) {
-                    input[e.target.name] = "Y"
-                } else {
-                    input[e.target.name] = "N"
-                }
-            }
-
+    const showOrHideEditProject = () => {
+        if (data.project.deleted_at === null) {
             setstate({
-                ...state, input, errors
+                ...state, show: !state.show
             })
         }
     }
 
-    const onInputBlur = (e: any) => {
-        const { isPostingForm } = state
+    const showOrHideDecommissionModal = () => {
+        let { modals } = state
+        modals.showDecommission = !state.modals.showDecommission
 
-        if (!isPostingForm) {
-            let { input }: any = state
-            let { errors }: any = state
+        setstate({
+            ...state, modals
+        })
+    }
 
-            let targetValue = e.target.value
-            targetValue = targetValue.trim()
+    const showOrHideReinstatementModal = () => {
+        let { modals } = state
+        modals.showReinstatement = !state.modals.showReinstatement
 
-            if (targetValue.length < 1) {
-                input[e.target.name] = targetValue
-                errors[e.target.name] = 'Project ' + e.target.name + ' cannot be empty'
-            } else if (targetValue.length < 5) {
-                input[e.target.name] = targetValue
-                errors[e.target.name] = 'Project ' + e.target.name + ' cannot be less than 5 characters'
-            } else if (targetValue.length > 5) {
-                switch (e.target.name) {
-                    case 'name':
-                        if (targetValue.length > 50) {
-                            input[e.target.name] = targetValue
-                            errors[e.target.name] = 'Project ' + e.target.name + ' cannot be more than 50 characters'
-                        } else {
-                            input[e.target.name] = targetValue
-                            errors[e.target.name] = ''
-                        }
-                        break;
+        setstate({
+            ...state, modals
+        })
+    }
 
-                    case 'description':
-                        if (targetValue.length > 200) {
-                            input[e.target.name] = targetValue
-                            errors[e.target.name] = 'Project ' + e.target.name + ' cannot be more than 200 characters'
-                        } else {
-                            input[e.target.name] = targetValue
-                            errors[e.target.name] = ''
-                        }
-                        break;
+    const decommissionProjectApiCall = async () => {
+        let { postingForm } = state
+
+        if (data.project.deleted_at === null && !postingForm.decommissionProj) {
+            try {
+                let formData = new FormData
+                formData.append('uuid', projectId)
+
+                postingForm.decommissionProj = true
+                setstate({
+                    ...state, postingForm
+                })
+
+                const response: any = await HttpServices.httpPost(PROJECTS_DECOMMISSION_API_ROUTE, formData)
+                const dataResponse = response.data
+
+                if (response.data.success) {
+                    dataReload()
+                } else {
+                    let toastText = dataResponse.message
+
+                    toast.error(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
                 }
+
+                showOrHideDecommissionModal()
+            } catch (error) {
+                let toastText = 'Something went wrong. Could not complete action'
+
+                toast.error(toastText, {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
             }
 
+            postingForm.decommissionProj = false
             setstate({
-                ...state, input, errors,
+                ...state, postingForm
             })
         }
+    }
+
+    const reinstateProjectApiCall = async () => {
+        let { postingForm } = state
+
+        if (data.project.deleted_at !== null && !postingForm.reinstateProj) {
+            try {
+                let formData = new FormData
+                formData.append('uuid', projectId)
+
+                postingForm.reinstateProj = true
+                setstate({
+                    ...state, postingForm
+                })
+
+                const response: any = await HttpServices.httpPost(PROJECTS_REINSTATE_API_ROUTE, formData)
+                const dataResponse = response.data
+
+                if (response.data.success) {
+                    dataReload()
+                } else {
+                    let toastText = dataResponse.message
+
+                    toast.error(toastText, {
+                        position: "top-right",
+                        autoClose: 7000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                    });
+                }
+
+                showOrHideReinstatementModal()
+            } catch (error) {
+                let toastText = 'Something went wrong. Could not complete action'
+
+                toast.error(toastText, {
+                    position: "top-right",
+                    autoClose: 7000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                });
+            }
+
+            postingForm.reinstateProj = false
+            setstate({
+                ...state, postingForm
+            })
+        }
+    }
+
+    function participantsArray() {
+        let participants = data.project.participants > 4 ? 4 : data.project.participants
+        let participantsArray = [];
+
+        console.log(participants);
+        
+
+        for (var i = 0; i < participants; i++) {
+            participantsArray.push(arguments[i]);
+        }
+
+        return participantsArray
+    }
+
+    const showOrHideProjectParticipants = () => {
+        let { modals } = state
+        modals.showParticipants = !state.modals.showParticipants
+
+        setstate({
+            ...state, modals
+        })
     }
 
     return (
@@ -102,88 +193,91 @@ export const ProjectOverview: FC<Props> = ({ data, status, projectId }) => {
                     null
                 ) : status === 'fulfilled' ? (
                     <>
-                        <div className="w-full mb-3">
-                            <h2 className="text-lg mb-2 leading-7 text-emerald-600 sm:text-lg">
-                                Overview
-                            </h2>
-
-                            <p className="text-sm text-gray-500">
-                                Focal point of information about your project.
-                            </p>
-                        </div>
-
                         <div className="w-full flex flex-row">
-                            <div className="w-8/12 pb-3 pr-3 border-r">
-                                <div className="w-full">
-                                    <div className="w-9/12 flex items-center align-middle">
-                                        <div className="w-full">
-                                            <input type="text" name="name" id="name" autoComplete="off" className="focus:ring-1 w-full focus:ring-green-500 text-gray-700 p-2 capitalize flex-1 block text-lg hover:bg-gray-100 focus:bg-inherit rounded-md border-0" placeholder="Project Name" onChange={onChangeHandler} value={state.input.name} onBlur={onInputBlur} required />
-                                        </div>
-
-                                        <div className="w-12 pl-3">
-                                            {
-                                                state.change.name ? (
-                                                    <span className="fad text-green-500 fa-spinner-third fa-lg block fa-spin"></span>
-                                                ) : (
-                                                    null
-                                                )
-                                            }
-                                        </div>
-                                    </div>
+                            <div className="w-5/12 pb-3 pr-3 border-r">
+                                <div className="w-full mb-2 flex flex-row align-middle items-center">
+                                    <h2 className="text-lg flex-auto leading-7 mb-0 text-emerald-600 sm:text-lg">
+                                        Overview
+                                    </h2>
 
                                     {
-                                        state.errors.name.length > 0 &&
-                                        <span className='invalid-feedback text-xs text-red-600 pl-0 mb-1'>
-                                            {state.errors.name}
-                                        </span>
+                                        data.project.deleted_at === null ? (
+                                            <span className="fal cursor-pointer fa-cog fa-lg text-green-600 block" onClick={showOrHideEditProject}></span>
+                                        ) : (
+                                            <span className="fal cursor-not-allowed fa-cog fa-lg text-green-400 block"></span>
+                                        )
                                     }
                                 </div>
 
                                 <div className="w-full pr-4 pb-3">
-                                    <div className="flex items-center align-middle">
-                                        <div className="w-full">
-                                            <textarea id="description" name="description" rows={1} className="focus:ring-1 focus:ring-green-500 focus:border-green-500 text-gray-700 mt-1 block w-full sm:text-sm border-0 hover:bg-gray-100 focus:bg-inherit rounded-md resize-none p-2" required onChange={onChangeHandler} placeholder="Description" onBlur={onInputBlur} value={state.input.description}></textarea>
-                                        </div>
-
-                                        <div className="w-12 pl-3">
-                                            {
-                                                state.change.name ? (
-                                                    <span className="fad text-green-500 fa-spinner-third fa-lg block fa-spin"></span>
-                                                ) : (
-                                                    null
-                                                )
-                                            }
-                                        </div>
-                                    </div>
-
-                                    {
-                                        state.errors.description.length > 0 &&
-                                        <span className='invalid-feedback text-xs text-red-600 pl-0'>
-                                            {state.errors.description}
-                                        </span>
-                                    }
+                                    <p className="w-full text-gray-700 block sm:text-sm border-0 mb-2">
+                                        {data.project.description}
+                                    </p>
                                 </div>
 
                                 <div className="w-full">
                                     {/* <hr /> */}
-
-                                    <h2 className="text-lg my-3 leading-7 text-emerald-600 sm:text-lg">
-                                        Activity
-                                    </h2>
+                                    <ProjectAbout
+                                        data={data}
+                                        state={state}
+                                        participantsArray={participantsArray}
+                                        showOrHideEditProject={showOrHideEditProject}
+                                        showOrHideDecommissionModal={showOrHideDecommissionModal}
+                                        showOrHideReinstatementModal={showOrHideReinstatementModal}
+                                        showOrHideProjectParticipants={showOrHideProjectParticipants}
+                                    />
                                 </div>
-
-
-
-
                             </div>
 
-                            <div className="w-4/12 pb-3 pl-5">
-                                <ProjectAbout
-                                    data={data}
-                                    state={state}
-                                />
+                            <div className="w-7/12 pb-3 pl-5">
+                                <h2 className="text-lg mb-3 leading-7 text-emerald-600 sm:text-lg">
+                                    Activity
+                                </h2>
                             </div>
                         </div>
+
+                        <EditProject
+                            data={data}
+                            show={state.show}
+                            projectId={projectId}
+                            dataReload={dataReload}
+                            showOrHideModal={showOrHideEditProject}
+                        />
+
+                        <ActionModal
+                            iconClass="fad fa-trash-alt fa-lg"
+                            title="Decommission Project"
+                            show={state.modals.showDecommission}
+                            details="Once you decommission this project you'll not be to raise any changes or support requests"
+                            showOrHide={showOrHideDecommissionModal}
+                            actionEvent={decommissionProjectApiCall}
+                            isPostingForm={state.postingForm.decommissionProj}
+                            actionButton={{
+                                before: "Decommission",
+                                after: "Decommissioning"
+                            }}
+                        />
+
+                        <WarningActionModal
+                            show={state.modals.showReinstatement}
+                            title={"Reinstate Project"}
+                            details={"Reinstate this project to it's former glory"}
+                            iconClass="fad fa-trash-undo-alt fa-lg"
+                            showOrHide={showOrHideReinstatementModal}
+                            actionEvent={reinstateProjectApiCall}
+                            isPostingForm={state.postingForm.reinstateProj}
+                            actionButton={{
+                                before: "Reinstate",
+                                after: "Reinstating..."
+                            }}
+                        />
+
+                        <ProjectParticipants
+                            data={data}
+                            projectId={projectId}
+                            show={state.modals.showParticipants}
+                            showOrHideModal={showOrHideProjectParticipants}
+                        />
                     </>
                 ) : (
                     null
@@ -193,58 +287,124 @@ export const ProjectOverview: FC<Props> = ({ data, status, projectId }) => {
     )
 }
 
-
-const ProjectAbout = ({ data, state }) => {
+const ProjectAbout = ({ data, state, showOrHideEditProject, showOrHideDecommissionModal, showOrHideReinstatementModal, participantsArray, showOrHideProjectParticipants }) => {
     return (
         <React.Fragment>
             <div className="w-full">
-                <h2 className="text mb-2 leading-7 text-emerald-600 sm:text-lg">
-                    About
-                </h2>
-
                 <div className="w-full">
-                    {
-                        data.project.lead !== null && data.project.lead !== undefined ? (
-                            <>
-                                <div className="flex items-center align-middle text-sm mb-2 text-gray-500">
-                                    <span className="ml-2">
-                                        <span className="mr-1">Project Lead: </span>
-                                    </span>
-                                </div>
-
-                                <div className="w-full mb-4">
-                                    <div className="pb-2 mb-2">
-                                        <span className="text-blue-500 text-sm cursor-pointer flex-row align-middle">
-                                            <span className="fas fa-plus mr-2"></span>
-                                            Set Project Lead
-                                        </span>
-                                    </div>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="flex items-center align-middle text-sm mb-2 text-gray-500">
-                                    <span className="">
-                                        <span className="mr-1">Project Lead: </span>
-                                    </span>
-                                </div>
-
-                                <div className="w-full pb-4 text-sm">
-                                    <div className="flex items-center align-middle text-blue-600">
-                                        <span className="fal mr-2 fa-user-crown"></span>
-
-                                        <span className="ml-2">
-                                            <span className="mr-1">
-                                                {data.project.created_by}
+                    <div className="flex flex-row align-middle">
+                        <div className="w-6/12">
+                            {
+                                data.project.project_lead === null || data.project.project_lead === undefined ? (
+                                    <>
+                                        <div className="flex items-center align-middle text-sm mb-2 text-emerald-600">
+                                            <span className="ml-0">
+                                                <span className="mr-1">Project Lead: </span>
                                             </span>
-                                        </span>
-                                    </div>
-                                </div>
+                                        </div>
 
-                                <hr />
-                            </>
-                        )
-                    }
+                                        <div className="w-full mb-4">
+                                            <div className="">
+                                                {
+                                                    data.project.deleted_at === null ? (
+                                                        <span className="text-blue-500 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideEditProject}>
+                                                            <span className="fas fa-plus mr-2"></span>
+                                                            Set Project Lead
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-blue-400 text-sm cursor-not-allowed flex-row align-middle">
+                                                            <span className="fas fa-plus mr-2"></span>
+                                                            Set Project Lead
+                                                        </span>
+                                                    )
+                                                }
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="flex items-center align-middle text-sm mb-2 text-emerald-600">
+                                            <span className="">
+                                                <span className="mr-1">Project Lead: </span>
+                                            </span>
+                                        </div>
+
+                                        <div className="w-full pb-4 text-sm">
+                                            <div className="flex items-center align-middle text-blue-600">
+                                                <span className="fal mr-2 fa-user-crown"></span>
+
+                                                <span className="ml-2">
+                                                    <span className="mr-1">
+                                                        {data.project.project_lead_name}
+                                                    </span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </>
+                                )
+                            }
+                        </div>
+
+                        <div className="w-6/12">
+                            <div className="text-sm mb-2 text-emerald-600">
+                                <span className="ml-0">
+                                    <span className="mr-1">Participants: </span>
+                                </span>
+                            </div>
+
+                            <div className="flex items-center align-middle text-sm">
+                                <span className="ml-0">
+                                    <div key={1233} className="w-full flex flex-row">
+                                        <div className="flex -space-x-2 overflow-hidden flex-auto">
+                                            {
+                                                participantsArray().map((index: React.Key) => {
+                                                    return (
+                                                        <img key={index} className="inline-block h-7 w-7 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+                                                    )
+                                                })
+                                            }
+                                        </div>
+
+                                        {
+                                            data.project.deleted_at === null ? (
+                                                <div className="ml-3">
+                                                    {
+                                                        data.project.participants > 1 ? (
+                                                            <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideProjectParticipants}>
+                                                                View Participants
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideProjectParticipants}>
+                                                                <span className="fas fa-plus mr-2"></span>
+                                                                Add Participants
+                                                            </span>
+                                                        )
+                                                    }
+                                                </div>
+                                            ) : (
+                                                <div className="ml-3">
+                                                    {
+                                                        data.project.participants > 1 ? (
+                                                            <span className="text-blue-400 text-sm cursor-not-allowed flex-row align-middle" onClick={showOrHideProjectParticipants}>
+                                                                View Participants
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-blue-400 text-sm cursor-not-allowed flex-row align-middle" onClick={showOrHideProjectParticipants}>
+                                                                <span className="fas fa-plus mr-2"></span>
+                                                                Add Participants
+                                                            </span>
+                                                        )
+                                                    }
+                                                </div>
+                                            )
+                                        }
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
 
                     <div className="w-full text-xs pt-3 mb-2 text-slate-500">
                         <div className="flex items-center align-middle text- mb-2 text-gray-500">
@@ -288,18 +448,28 @@ const ProjectAbout = ({ data, state }) => {
                         </div>
 
                         <div className="w-8/12">
-                            71
+                            {data.project.participants}
                         </div>
                     </div>
 
                     <div className="w-full">
                         <hr />
 
-                        <div className="py-3">
-                            <button type="button" className="text-sm rounded-md text-left border border-transparent px-3 py-1 bg-inherit text-red-600 hover:bg-red-600 hover:text-white hover:shadow-sm w-auto focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-red-600">
-                                Decommission Project
-                            </button>
-                        </div>
+                        {
+                            data.project.deleted_at === null ? (
+                                <div className="py-3">
+                                    <button type="button" onClick={showOrHideDecommissionModal} className="text-sm rounded-md text-left border border-transparent px-3 py-1 bg-inherit text-red-600 hover:bg-red-600 hover:text-white hover:shadow-sm w-auto focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-red-600">
+                                        Decommission Project
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="py-3">
+                                    <button type="button" onClick={showOrHideReinstatementModal} className="text-sm rounded-md text-left border border-transparent px-3 py-1 bg-inherit text-orange-600 hover:bg-amber-600 hover:text-white hover:shadow-sm w-auto focus:outline-none focus:ring-0 focus:ring-offset-0 focus:ring-amber-600">
+                                        Reinstate Project
+                                    </button>
+                                </div>
+                            )
+                        }
                     </div>
                 </div>
             </div>
