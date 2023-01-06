@@ -7,6 +7,9 @@ import { BespokePanel } from "../../components/lib/BespokePanel";
 import { ScrollWithShadow } from "../../lib/hooks/ScrollWithShadow";
 import HttpServices from "../../services/HttpServices";
 import { CommsBreakdownVert } from "../errors/CommsBreakdownVert";
+import parachute from '../../assets/images/parachute.png'
+import trashCan from '../../assets/images/trash_can.gif'
+import { AddParticipant } from "./AddParticipant";
 
 interface Props {
     data: any,
@@ -17,8 +20,15 @@ interface Props {
 
 export const ProjectParticipants: FC<Props> = ({ data, projectId, show, showOrHideModal }) => {
     const [state, setstate] = useState({
+        status: "pending",
         participants: null,
-        status: "pending"
+        trashCan: {
+            show: false,
+            index: ''
+        },
+        show: {
+            addParticipants: false,
+        }
     })
 
     const { boxShadow, onScrollHandler } = ScrollWithShadow();
@@ -53,8 +63,24 @@ export const ProjectParticipants: FC<Props> = ({ data, projectId, show, showOrHi
         }
     }
 
-    console.log(state.status);
-    console.log(state.participants);
+    const showOrHideTrashCan = (index: any) => {
+        let { trashCan } = state
+        trashCan.index = index
+        trashCan.show = !state.trashCan.show
+
+        setstate({
+            ...state, trashCan
+        })
+    }
+
+    const showOrHideAddParticipants = () => {
+        let { show } = state
+        show.addParticipants = !state.show.addParticipants
+
+        setstate({
+            ...state, show
+        })
+    }
 
     return (
         <React.Fragment>
@@ -78,15 +104,24 @@ export const ProjectParticipants: FC<Props> = ({ data, projectId, show, showOrHi
                                                         {state.participants.length} participants present
                                                     </span>
                                                 ) : (
-                                                    <span className="text-slate-600 text-sm">
+                                                    <span className="text-slate-600 flex-auto text-sm">
                                                         Add a participant
                                                     </span>
                                                 )
                                             }
 
-                                            <button type="submit" className="justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                                Add
-                                            </button>
+                                            {
+                                                data.project.deleted_at === null ? (
+                                                    <button type="button" onClick={showOrHideAddParticipants} className="justify-center text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                                        Add
+                                                    </button>
+                                                ) : (
+                                                    <button type="button" disabled className="justify-center cursor-not-allowed text-sm rounded-md border border-transparent shadow-sm px-3 py-1 bg-emerald-600 text-white focus:outline-none focus:ring-0 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-60">
+                                                        Add
+                                                    </button>
+                                                )
+                                            }
+
                                         </div>
                                     </>
                                 ) : null
@@ -100,75 +135,66 @@ export const ProjectParticipants: FC<Props> = ({ data, projectId, show, showOrHi
                                 </div>
                             ) : state.status === 'fulfilled' ? (
                                 <>
-                                    <div className="text-sm mt-20">
+                                    <div className="text-sm mt-24">
                                         <div className="w-full /* h-[calc(100%_-_0rem)] */ overflow-y-auto">
-                                            <ul role="list" className="p-6 divide-y divide-slate-200" onScroll={onScrollHandler} style={{ boxShadow }}>
-                                                {
-                                                    state.participants.map((participant: any, index: any) => {
-                                                        return (
-                                                            <>
-                                                                <li key={index} className="flex items-center flex-row align-middle py-3 first:pt-1 last:pb-0">
-                                                                    <img className="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=8" alt="" />
+                                            {
+                                                state.participants.length > 0 ? (
+                                                    <ul role="list" className="p-6 divide-y divide-slate-200" onScroll={onScrollHandler} style={{ boxShadow }}>
+                                                        {
+                                                            state.participants.map((participant: any, index: any) => {
+                                                                return (
+                                                                    <>
+                                                                        <li key={index} className="flex items-center flex-row align-middle py-3 first:pt-1 last:pb-0"
+                                                                            onMouseEnter={() => showOrHideTrashCan(index)}
+                                                                            onMouseLeave={() => showOrHideTrashCan(index)}
+                                                                        >
+                                                                            <img className="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=8" alt="" />
 
-                                                                    <div className="ml-3 overflow-hidden flex-auto">
-                                                                        <div className="flex flex-row align-middle flex-auto">
-                                                                            <p className="text-sm font-medium text-slate-900">
-                                                                                {participant.account_name}
-                                                                            </p>
+                                                                            <div className="ml-3 overflow-hidden flex-auto">
+                                                                                <div className="flex flex-row align-middle flex-auto">
+                                                                                    <p className="text-sm font-medium text-slate-900">
+                                                                                        {participant.account_name}
+                                                                                    </p>
 
-                                                                            {
-                                                                                participant.lead === 'Y' ? (
-                                                                                    <span className="text-emerald-600 mb-0 text-xs px-2 ml-1 rounded">
-                                                                                        Project Lead
-                                                                                    </span>
-                                                                                ) : null
-                                                                            }
-                                                                        </div>
+                                                                                    {
+                                                                                        participant.lead === 'Y' ? (
+                                                                                            <span className="text-emerald-600 mb-0 text-xs px-2 ml-1 rounded">
+                                                                                                Project Lead
+                                                                                            </span>
+                                                                                        ) : null
+                                                                                    }
+                                                                                </div>
 
 
-                                                                        <p className="text-sm text-slate-500 truncate">
-                                                                            {participant.email}
-                                                                        </p>
-                                                                    </div>
+                                                                                <p className="text-sm text-slate-500 truncate">
+                                                                                    {participant.email}
+                                                                                </p>
+                                                                            </div>
 
-                                                                    <span className="h-7 w-7 flex items-center">
-                                                                        <span className="fal cursor-pointer fa-times-circle text-red-600 block m-auto"></span>
-                                                                    </span>
-                                                                </li>
-
-                                                                {/* <div className="flex flex-row align-middle items-center px-4 py-2 hover:bg-gray-200">
-                                                            <img key={index} className="inline-block ml-1 h-7 w-7 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-
-                                                            <div className="flex-auto ml-2">
-                                                                <div className="flex flex-row align-middle">
-                                                                    <span className="text-gray-800 block sm:text-sm border-0 ml-2 mb-0">
-                                                                        {participant.account_name}
-                                                                    </span>
-
-                                                                    {
-                                                                        participant.lead === 'Y' ? (
-                                                                            <span className="text-emerald-600 mb-0 text-xs px-2 ml-1 rounded">
-                                                                                Project Lead
+                                                                            <span className="h-7 w-7 flex items-center">
+                                                                                {
+                                                                                    state.trashCan.show && state.trashCan.index === index ? (
+                                                                                        // <span className="fal cursor-pointer fa-trash-alt text-red-600 block m-auto  fa-beat"></span>
+                                                                                        <img key={index} className="cursor-pointer inline-block h-7 w-7 rounded-full ring-2 ring-white" src={trashCan} alt="" />
+                                                                                    ) : null
+                                                                                }
                                                                             </span>
-                                                                        ) : null
-                                                                    }
-                                                                </div>
-
-
-                                                                <span className="text-sm text-slate-500 block ml-2">
-                                                                    {participant.email}
-                                                                </span>
+                                                                        </li>
+                                                                    </>
+                                                                )
+                                                            })
+                                                        }
+                                                    </ul>
+                                                ) : (
+                                                    <div className="bg-white px-4 pt-6 pb-4 sm:p-6 sm:pb-4">
+                                                        <div className="flex flex-col items-center">
+                                                            <div className="mx-auto flex-shrink-0 flex items-center justify-center my-3 sm:mx-0 sm:h-auto sm:w-40">
+                                                                <img src={parachute} alt="broken_robot" width="auto" className="block text-center m-auto" />
                                                             </div>
-
-
-
-                                                            <span className="fal cursor-pointer fa-times-circle text-red-600 block"></span>
-                                                        </div> */}
-                                                            </>
-                                                        )
-                                                    })
-                                                }
-                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            }
                                         </div>
                                     </div>
                                 </>
@@ -180,6 +206,13 @@ export const ProjectParticipants: FC<Props> = ({ data, projectId, show, showOrHi
                         }
                     </>
                 }
+            />
+
+            <AddParticipant
+                data={data}
+                projectId={projectId}
+                show={state.show.addParticipants}
+                showOrHideModal={showOrHideAddParticipants}
             />
         </React.Fragment>
     )
