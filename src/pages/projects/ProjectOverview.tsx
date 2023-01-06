@@ -21,7 +21,7 @@ export const ProjectOverview: FC<Props> = ({ data, status, projectId, dataReload
         modals: {
             showDecommission: false,
             showReinstatement: false,
-            showParticipants: true,
+            showParticipants: false,
         },
         postingForm: {
             decommissionProj: false,
@@ -168,7 +168,7 @@ export const ProjectOverview: FC<Props> = ({ data, status, projectId, dataReload
         let participantsArray = [];
 
         console.log(participants);
-        
+
 
         for (var i = 0; i < participants; i++) {
             participantsArray.push(arguments[i]);
@@ -307,7 +307,7 @@ const ProjectAbout = ({ data, state, showOrHideEditProject, showOrHideDecommissi
                                             <div className="">
                                                 {
                                                     data.project.deleted_at === null ? (
-                                                        <span className="text-blue-500 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideEditProject}>
+                                                        <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideEditProject}>
                                                             <span className="fas fa-plus mr-2"></span>
                                                             Set Project Lead
                                                         </span>
@@ -355,7 +355,7 @@ const ProjectAbout = ({ data, state, showOrHideEditProject, showOrHideDecommissi
                             <div className="flex items-center align-middle text-sm">
                                 <span className="ml-0">
                                     <div key={1233} className="w-full flex flex-row">
-                                        <div className="flex -space-x-2 overflow-hidden flex-auto">
+                                        <div className="flex -space-x-2 overflow-hidden flex-auto mr-3">
                                             {
                                                 participantsArray().map((index: React.Key) => {
                                                     return (
@@ -367,7 +367,7 @@ const ProjectAbout = ({ data, state, showOrHideEditProject, showOrHideDecommissi
 
                                         {
                                             data.project.deleted_at === null ? (
-                                                <div className="ml-3">
+                                                <div>
                                                     {
                                                         data.project.participants > 1 ? (
                                                             <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideProjectParticipants}>
@@ -382,16 +382,15 @@ const ProjectAbout = ({ data, state, showOrHideEditProject, showOrHideDecommissi
                                                     }
                                                 </div>
                                             ) : (
-                                                <div className="ml-3">
+                                                <div>
                                                     {
                                                         data.project.participants > 1 ? (
-                                                            <span className="text-blue-400 text-sm cursor-not-allowed flex-row align-middle" onClick={showOrHideProjectParticipants}>
+                                                            <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideProjectParticipants}>
                                                                 View Participants
                                                             </span>
                                                         ) : (
-                                                            <span className="text-blue-400 text-sm cursor-not-allowed flex-row align-middle" onClick={showOrHideProjectParticipants}>
-                                                                <span className="fas fa-plus mr-2"></span>
-                                                                Add Participants
+                                                            <span className="text-slate-600 text-sm flex-row align-middle" onClick={showOrHideProjectParticipants}>
+                                                                Project has no participants
                                                             </span>
                                                         )
                                                     }
