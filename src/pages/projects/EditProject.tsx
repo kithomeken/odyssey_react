@@ -1,3 +1,4 @@
+import Select from 'react-select'
 import { toast } from "react-toastify"
 import { Listbox } from "@headlessui/react"
 import React, { FC, useState } from "react"
@@ -18,7 +19,6 @@ interface Props {
 export const EditProject: FC<Props> = ({ data, projectId, show, showOrHideModal, dataReload }) => {
     const [state, setstate] = useState({
         status: 'pending',
-        participants: null,
         isPostingForm: false,
         project: {
             checkProject: false,
@@ -32,7 +32,11 @@ export const EditProject: FC<Props> = ({ data, projectId, show, showOrHideModal,
         errors: {
             name: '',
             description: ''
-        }
+        },
+        participants: [{
+            value: '',
+            label: '',
+        }],
     })
 
     React.useEffect(() => {
@@ -46,11 +50,25 @@ export const EditProject: FC<Props> = ({ data, projectId, show, showOrHideModal,
             const response: any = await HttpServices.httpGet(PROJECTS_PTNTL_LEADS_API_ROUTE)
 
             if (response.data.success) {
-                let { participants } = state
-                participants = response.data.payload.potential_leads
+                let { participants }: any = state
+                let placeHolderArray = []
+                let participantsArray = response.data.payload.potential_leads
+
+                Object.keys(participantsArray).forEach(function (key) {
+                    let placeHolderObject = {
+                        label: '',
+                        value: ''
+                    }
+
+                    placeHolderObject.value = participantsArray[key].uuid
+                    placeHolderObject.label = participantsArray[key].account_name
+
+                    console.log(placeHolderObject);
+                    placeHolderArray.push(placeHolderObject)
+                });
 
                 setstate({
-                    ...state, participants, status: 'fulfilled',
+                    ...state, participants: placeHolderArray, status: 'fulfilled',
                 })
             } else {
                 setstate({
@@ -350,74 +368,7 @@ export const EditProject: FC<Props> = ({ data, projectId, show, showOrHideModal,
                                 <div className="w-full">
                                     {
                                         state.participants && (
-                                            <ListBoxZero
-                                                state={state.input.project_lead}
-                                                label="Project Lead"
-                                                onChangeListBoxHandler={onChangeListBoxHandler}
-                                                listButton={
-                                                    <>
-                                                        {
-                                                            state.input.project_lead === null || state.input.project_lead === undefined ? (
-                                                                <span className="flex items-center">
-                                                                    <span className="ml-2 text-sm text-gray-700 truncate">
-                                                                        Select Project Lead
-                                                                    </span>
-                                                                </span>
-                                                            ) : (
-                                                                <>
-                                                                    {
-                                                                        state.participants.map((participant: any, index: React.Key) => (
-                                                                            <span key={index}>
-                                                                                {
-                                                                                    state.input.project_lead === participant.uuid ? (
-                                                                                        <span className="flex items-center">
-                                                                                            <span className="ml-2 text-sm text-gray-700 truncate">{participant.account_name}</span>
-                                                                                        </span>
-                                                                                    ) : null
-                                                                                }
-                                                                            </span>
-                                                                        ))
-                                                                    }
-                                                                </>
-                                                            )
-                                                        }
-
-                                                        <span className="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                                            <i className="far fa-chevron-down text-emerald-500"></i>
-                                                        </span>
-                                                    </>
-                                                }
-                                                listOptions={
-                                                    <>
-                                                        {state.participants.map((participant: any, index: React.Key) => (
-                                                            <Listbox.Option
-                                                                key={index}
-                                                                className={({ active }) =>
-                                                                    classNames(
-                                                                        active ? 'text-white bg-gray-100' : 'text-gray-900',
-                                                                        'cursor-default select-none relative py-2 pl-3 pr-9'
-                                                                    )
-                                                                }
-                                                                value={participant.uuid}
-                                                            >
-                                                                {({ selected }) => (
-                                                                    <div className="flex flex-row align-middle">
-                                                                        <span className="flex items-center flex-auto">
-                                                                            <span className="ml-2 text-sm text-gray-700 truncate">{participant.account_name}</span>
-                                                                        </span>
-
-                                                                        {selected ? (
-                                                                            <span className="text-green-600 absolute inset-y-0 w-10 right-0 flex flex-row items-center justify-center align-middle">
-                                                                                <i className="fas fa-check"></i>
-                                                                            </span>
-                                                                        ) : null}
-                                                                    </div>
-                                                                )}
-                                                            </Listbox.Option>
-                                                        ))}
-                                                    </>
-                                                }
-                                            />
+                                            <Select options={state.participants} />
                                         )
                                     }
                                 </div>

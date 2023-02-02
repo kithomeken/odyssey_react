@@ -1,12 +1,13 @@
 import React, { FC, useState } from "react"
 import { toast } from "react-toastify"
-import { PROJECTS_DECOMMISSION_API_ROUTE, PROJECTS_REINSTATE_API_ROUTE } from "../../api/v1/api.StandardRoutes"
+
+import { EditProject } from "./EditProject"
+import HttpServices from "../../services/HttpServices"
+import DateFormating from "../../lib/hooks/DateFormating"
+import { ProjectParticipants } from "./ProjectParticipants"
 import { ActionModal } from "../../components/lib/ActionModal"
 import { WarningActionModal } from "../../components/lib/WarningActionModal"
-import DateFormating from "../../lib/hooks/DateFormating"
-import HttpServices from "../../services/HttpServices"
-import { EditProject } from "./EditProject"
-import { ProjectParticipants } from "./ProjectParticipants"
+import { PROJECTS_DECOMMISSION_API_ROUTE, PROJECTS_REINSTATE_API_ROUTE } from "../../api/v1/api.StandardRoutes"
 
 interface Props {
     data: any,
@@ -293,7 +294,7 @@ const ProjectAbout = ({ data, state, showOrHideEditProject, showOrHideDecommissi
             <div className="w-full">
                 <div className="w-full">
                     <div className="flex flex-row align-middle">
-                        <div className="w-6/12">
+                        <div className="w-full">
                             {
                                 data.project.project_lead === null || data.project.project_lead === undefined ? (
                                     <>
@@ -330,76 +331,29 @@ const ProjectAbout = ({ data, state, showOrHideEditProject, showOrHideDecommissi
                                         </div>
 
                                         <div className="w-full pb-4 text-sm">
-                                            <div className="flex items-center align-middle text-blue-600">
-                                                <span className="fal mr-2 fa-user-crown"></span>
+                                            <div className="flex items-center align-middle text-slate-600">
+                                                <div className="mr-0">
+                                                    <span className="fal mr-2 fa-user-crown"></span>
 
-                                                <span className="ml-2">
-                                                    <span className="mr-1">
-                                                        {data.project.project_lead_name}
+                                                    <span className="ml-2">
+                                                        <span className="mr-1">
+                                                            {data.project.project_lead_name}
+                                                        </span>
                                                     </span>
-                                                </span>
+                                                </div>
+
+                                                <div className="mx-2 border-l border-l-gray-400 py-2"></div>
+
+                                                <div className="flex-none">
+                                                    <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideProjectParticipants}>
+                                                        View Participants
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
                                     </>
                                 )
                             }
-                        </div>
-
-                        <div className="w-6/12">
-                            <div className="text-sm mb-2 text-emerald-600">
-                                <span className="ml-0">
-                                    <span className="mr-1">Participants: </span>
-                                </span>
-                            </div>
-
-                            <div className="flex items-center align-middle text-sm">
-                                <span className="ml-0">
-                                    <div key={1233} className="w-full flex flex-row">
-                                        <div className="flex -space-x-2 overflow-hidden flex-auto mr-3">
-                                            {
-                                                participantsArray().map((index: React.Key) => {
-                                                    return (
-                                                        <img key={index} className="inline-block h-7 w-7 rounded-full ring-2 ring-white" src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
-                                                    )
-                                                })
-                                            }
-                                        </div>
-
-                                        {
-                                            data.project.deleted_at === null ? (
-                                                <div>
-                                                    {
-                                                        data.project.participants > 1 ? (
-                                                            <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideProjectParticipants}>
-                                                                View Participants
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideProjectParticipants}>
-                                                                <span className="fas fa-plus mr-2"></span>
-                                                                Add Participants
-                                                            </span>
-                                                        )
-                                                    }
-                                                </div>
-                                            ) : (
-                                                <div>
-                                                    {
-                                                        data.project.participants > 1 ? (
-                                                            <span className="text-blue-600 text-sm cursor-pointer flex-row align-middle" onClick={showOrHideProjectParticipants}>
-                                                                View Participants
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-slate-600 text-sm flex-row align-middle" onClick={showOrHideProjectParticipants}>
-                                                                Project has no participants
-                                                            </span>
-                                                        )
-                                                    }
-                                                </div>
-                                            )
-                                        }
-                                    </div>
-                                </span>
-                            </div>
                         </div>
                     </div>
 
