@@ -41,6 +41,7 @@
     "react-router-dom": "^6.2.1",
     "react-sanctum": "^2.1.2",
     "react-scripts": "5.0.0",
+    "react-select": "^5.7.0",
     "react-table": "^7.8.0",
     "react-tailwindcss-select": "^1.6.0",
     "react-toastify": "^8.1.0",
